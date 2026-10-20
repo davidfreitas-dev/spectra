@@ -90,16 +90,39 @@ function handleSelect(exercise: ExerciseCatalogItem) {
   emit('select', exercise)
   emit('close')
 }
+
+let isBackdropMouseDown = false
+
+function handleBackdropMouseDown(e: MouseEvent) {
+  isBackdropMouseDown = e.target === e.currentTarget
+}
+
+function handleBackdropMouseUp(e: MouseEvent) {
+  if (!isBackdropMouseDown || e.target !== e.currentTarget) {
+    isBackdropMouseDown = false
+  }
+}
+
+function handleBackdropClick(e: MouseEvent) {
+  if (isBackdropMouseDown && e.target === e.currentTarget) {
+    emit('close')
+  }
+  isBackdropMouseDown = false
+}
 </script>
 
 <template>
   <div
     v-if="isOpen"
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-xs animate-in fade-in duration-150"
-    @click.self="emit('close')"
+    @mousedown="handleBackdropMouseDown"
+    @mouseup="handleBackdropMouseUp"
+    @click="handleBackdropClick"
   >
     <div
       class="bg-surface border-2 border-border-primary rounded-2xl w-full max-w-xl max-h-[85vh] flex flex-col shadow-[0_8px_0_0_#111111] overflow-hidden"
+      @mousedown.stop
+      @click.stop
     >
       <!-- Modal Header -->
       <div class="p-4 sm:p-5 border-b border-border-grid flex items-center justify-between bg-bg-alternate">

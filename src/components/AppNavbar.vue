@@ -38,6 +38,7 @@ const emit = defineEmits<{
   (e: 'nav-click', item: NavItem): void
   (e: 'sign-up'): void
   (e: 'user-click'): void
+  (e: 'start-today'): void
 }>()
 
 const route = useRoute()
@@ -65,9 +66,10 @@ function goToSettings() {
   router.push('/settings')
 }
 
-function handleCreateWorkout() {
+function handleStartTodayWorkout() {
   mobileMenuOpen.value = false
-  router.push({ path: '/workouts', query: { create: 'true' } })
+  emit('start-today')
+  router.push({ path: '/', query: { start: 'true', _t: Date.now().toString() } })
 }
 
 // Bloqueia o scroll do body quando o menu mobile estiver aberto
@@ -265,18 +267,18 @@ watch(
             </nav>
           </div>
 
-          <!-- Bottom: Criar Novo Treino Action Button -->
+          <!-- Bottom: Iniciar Treino do Dia Action Button -->
           <div class="w-full max-w-xs mx-auto pb-4">
             <AppButton
               variant="fill"
               size="lg"
               class="w-full"
-              @click="handleCreateWorkout"
+              @click="handleStartTodayWorkout"
             >
               <template #icon>
-                <span class="material-symbols-outlined text-lg!">add</span>
+                <span class="material-symbols-outlined text-lg!">play_circle</span>
               </template>
-              Criar Novo Treino
+              Iniciar Treino do Dia
             </AppButton>
           </div>
         </div>

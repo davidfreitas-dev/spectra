@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { usePreferencesStore } from '@/stores/preferencesStore'
 import { useWorkoutsStore } from '@/stores/workoutsStore'
 import { useSessionsStore, type ProgressionSuggestion } from '@/stores/sessionsStore'
@@ -17,6 +17,7 @@ import {
 } from '@/components'
 import type { Workout, UserLevel, Equipment } from '@/types/domain'
 
+const route = useRoute()
 const router = useRouter()
 const preferencesStore = usePreferencesStore()
 const workoutsStore = useWorkoutsStore()
@@ -32,6 +33,7 @@ onMounted(() => {
   preferencesStore.load()
   workoutsStore.load()
   sessionsStore.load()
+  checkStartQuery()
 })
 
 // Chave do dia de hoje (monday, tuesday, etc.)
@@ -87,6 +89,22 @@ function handleStartTodayWorkout() {
     showPreSummaryModal.value = true
   }
 }
+
+function checkStartQuery() {
+  if (route.query.start === 'true') {
+    handleStartTodayWorkout()
+    router.replace({ path: '/', query: {} })
+  }
+}
+
+watch(
+  () => [route.query.start, route.query._t],
+  ([start]) => {
+    if (start === 'true') {
+      checkStartQuery()
+    }
+  }
+)
 
 function handleConfirmStartWorkout() {
   if (!workoutForSummary.value) return

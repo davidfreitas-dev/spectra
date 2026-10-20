@@ -227,7 +227,7 @@ function handleSelectVariation(variation: ExerciseCatalogItem) {
               </div>
 
               <!-- Level / PR indicator -->
-              <div class="flex items-center justify-between pt-2 border-t border-border-grid">
+              <div class="flex items-center justify-between pt-4 border-t border-border-grid">
                 <div class="flex items-center gap-2">
                   <AppStatusBadge
                     v-if="exercise.level === 'beginner'"

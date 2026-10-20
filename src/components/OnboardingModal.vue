@@ -144,7 +144,12 @@ function handleFinish() {
           :class="selectedEquipment.includes(eq.value)
             ? 'border-border-primary bg-primary-container/10 shadow-[0_2px_0_0_#111111] font-bold'
             : 'border-border-grid bg-surface hover:bg-bg-alternate'"
+          role="checkbox"
+          :aria-checked="selectedEquipment.includes(eq.value)"
+          tabindex="0"
           @click="toggleEquipment(eq.value)"
+          @keydown.space.prevent="toggleEquipment(eq.value)"
+          @keydown.enter.prevent="toggleEquipment(eq.value)"
         >
           <div class="flex items-center gap-3">
             <span class="material-symbols-outlined text-ink-muted !text-xl">
@@ -156,7 +161,9 @@ function handleFinish() {
           <AppCheckbox
             :model-value="selectedEquipment.includes(eq.value)"
             size="md"
-            @click.stop="toggleEquipment(eq.value)"
+            class="pointer-events-none"
+            tabindex="-1"
+            aria-hidden="true"
           />
         </div>
 

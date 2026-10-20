@@ -144,7 +144,9 @@ function handleSave() {
           <AppCheckbox
             :model-value="selectedDayKeys.includes(day.key)"
             size="md"
-            @click.stop="toggleDay(day.key)"
+            class="pointer-events-none"
+            tabindex="-1"
+            aria-hidden="true"
           />
         </div>
       </div>
