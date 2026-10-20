@@ -1,0 +1,148 @@
+import type { Workout } from '@/types/domain'
+
+export const PRESET_WORKOUTS: Workout[] = [
+  {
+    id: 'preset-fullbody-beginner',
+    name: 'Iniciante — Corpo Todo (Full Body)',
+    items: [
+      {
+        id: 'item-1',
+        exerciseId: 'australian-pullup',
+        sets: 3,
+        target: 8,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-2',
+        exerciseId: 'pushup-standard',
+        sets: 3,
+        target: 10,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-3',
+        exerciseId: 'squat-air',
+        sets: 3,
+        target: 15,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-4',
+        exerciseId: 'plank-standard',
+        sets: 3,
+        target: 30,
+        restSeconds: 60,
+      },
+    ],
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'preset-push-intermediate',
+    name: 'Empurrada (Peito, Tríceps & Ombros)',
+    items: [
+      {
+        id: 'item-1',
+        exerciseId: 'dips-parallel',
+        sets: 4,
+        target: 8,
+        restSeconds: 90,
+      },
+      {
+        id: 'item-2',
+        exerciseId: 'pushup-diamond',
+        sets: 3,
+        target: 10,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-3',
+        exerciseId: 'pike-pushup',
+        sets: 3,
+        target: 8,
+        restSeconds: 75,
+      },
+      {
+        id: 'item-4',
+        exerciseId: 'pushup-standard',
+        sets: 3,
+        target: 12,
+        restSeconds: 60,
+      },
+    ],
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'preset-pull-intermediate',
+    name: 'Puxada (Costas & Bíceps)',
+    items: [
+      {
+        id: 'item-1',
+        exerciseId: 'pullup-standard',
+        sets: 4,
+        target: 6,
+        restSeconds: 90,
+      },
+      {
+        id: 'item-2',
+        exerciseId: 'chinup-standard',
+        sets: 3,
+        target: 8,
+        restSeconds: 75,
+      },
+      {
+        id: 'item-3',
+        exerciseId: 'australian-pullup',
+        sets: 3,
+        target: 10,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-4',
+        exerciseId: 'dead-hang',
+        sets: 3,
+        target: 30,
+        restSeconds: 60,
+      },
+    ],
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'preset-legs-core',
+    name: 'Pernas & Abdômen (Core)',
+    items: [
+      {
+        id: 'item-1',
+        exerciseId: 'squat-air',
+        sets: 4,
+        target: 20,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-2',
+        exerciseId: 'lunges',
+        sets: 3,
+        target: 12,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-3',
+        exerciseId: 'hanging-leg-raise',
+        sets: 3,
+        target: 8,
+        restSeconds: 75,
+      },
+      {
+        id: 'item-4',
+        exerciseId: 'hollow-body-hold',
+        sets: 3,
+        target: 30,
+        restSeconds: 60,
+      },
+    ],
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
+]

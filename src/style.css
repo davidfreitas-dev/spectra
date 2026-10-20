@@ -1,0 +1,138 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #a33e00;
+  --color-primary-container: #f26a21;
+  --color-primary-hover: #d9591a;
+  --color-primary-soft: #fde9dc;
+  --color-on-primary: #ffffff;
+
+  --color-ink: #111111;
+  --color-ink-muted: #555555;
+  --color-ink-subtle: #8a8a8a;
+
+  --color-surface: #ffffff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f5f3f3;
+  --color-surface-container: #efeded;
+  --color-surface-container-high: #eae8e7;
+  --color-surface-container-highest: #e4e2e2;
+  --color-surface-variant: #e4e2e2;
+
+  --color-border-primary: #111111;
+  --color-border-grid: #e4dfd6;
+
+  --color-bg-alternate: #f5f2ec;
+  --color-bg-canvas: #ffffff;
+  --color-background: #fbf9f8;
+  --color-on-background: #1b1c1c;
+  --color-on-surface: #1b1c1c;
+
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+
+  --color-success: #15803d;
+  --color-success-container: #dcfce7;
+  --color-on-success: #ffffff;
+
+  --color-warning: #b45309;
+  --color-warning-container: #fef3c7;
+  --color-on-warning: #111111;
+
+  --color-info: #0369a1;
+  --color-info-container: #e0f2fe;
+  --color-on-info: #ffffff;
+
+  --color-rest: #7e22ce;
+  --color-rest-container: #f3e8ff;
+  --color-on-rest: #ffffff;
+
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-headline: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-eyebrow: "Space Grotesk", system-ui, sans-serif;
+  --font-metric-number: "Space Grotesk", monospace, sans-serif;
+  --font-button-text: "Space Grotesk", system-ui, sans-serif;
+}
+
+@layer base {
+  html,
+  body {
+    min-height: 100%;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-bg-canvas, #ffffff);
+    color: var(--color-ink, #111111);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Safe area padding helper for standalone PWA / iOS home bar */
+  :root {
+    --sat: env(safe-area-inset-top);
+    --sar: env(safe-area-inset-right);
+    --sab: env(safe-area-inset-bottom);
+    --sal: env(safe-area-inset-left);
+  }
+
+  .material-symbols-outlined {
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+  }
+}
+
+/* Directional lateral tab slide (App Native feel) */
+.page-slide-left-enter-active,
+.page-slide-left-leave-active,
+.page-slide-right-enter-active,
+.page-slide-right-leave-active {
+  transition: opacity 180ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+/* Navigating to the right (e.g. Hoje -> Treinos) */
+.page-slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(16px);
+}
+.page-slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+
+/* Navigating to the left (e.g. Treinos -> Hoje) */
+.page-slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+.page-slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(16px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-slide-left-enter-active,
+  .page-slide-left-leave-active,
+  .page-slide-right-enter-active,
+  .page-slide-right-leave-active {
+    transition: opacity 100ms ease;
+    will-change: auto;
+  }
+
+  .page-slide-left-enter-from,
+  .page-slide-left-leave-to,
+  .page-slide-right-enter-from,
+  .page-slide-right-leave-to {
+    opacity: 0;
+    transform: none;
+  }
+}
+
+
