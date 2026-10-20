@@ -2,6 +2,8 @@
 
 > Aplicativo web de calistenia progressivo (PWA), responsivo (mobile-first), 100% local-first e sem dependência de contas ou servidores externos.
 
+🚀 **Acesse online:** [https://davidfreitas-dev.github.io/spectra/](https://davidfreitas-dev.github.io/spectra/)
+
 ---
 
 ## 🎯 Sobre o Spectra
@@ -124,6 +126,11 @@ npm run build
 # Pré-visualize a versão final compilada
 npm run preview
 ```
+
+### Deploy no GitHub Pages
+
+O projeto conta com automação contínua via GitHub Actions em [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml). A cada push na branch principal (`main`), a build é gerada e disponibilizada automaticamente em:
+👉 **[https://davidfreitas-dev.github.io/spectra/](https://davidfreitas-dev.github.io/spectra/)**
 
 ---
 
