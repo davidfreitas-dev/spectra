@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import AppButton from './AppButton.vue'
 import AppIcon from './AppIcon.vue'
 
@@ -67,11 +68,7 @@ function handleStartTodayWorkout() {
 }
 
 // Bloqueia o scroll do body quando o menu mobile estiver aberto
-watch(mobileMenuOpen, (isOpen) => {
-  if (typeof document !== 'undefined') {
-    document.body.style.overflow = isOpen ? 'hidden' : ''
-  }
-})
+useBodyScrollLock(mobileMenuOpen)
 
 // Fecha o menu móvel ao mudar de rota
 watch(
@@ -204,18 +201,9 @@ watch(
           v-if="mobileMenuOpen"
           class="fixed inset-0 z-50 bg-surface flex flex-col justify-between p-6 sm:p-8 select-none overflow-y-auto"
         >
-          <!-- Top Row: Close (Orange), Title/Logo (Centered), Icon (Orange) -->
+          <!-- Top Row: Brand Logo (Left), Close Button (Right) -->
           <div class="flex items-center justify-between">
-            <button
-              type="button"
-              class="w-10 h-10 flex items-center justify-start text-primary-container hover:opacity-75 transition-opacity cursor-pointer outline-none"
-              aria-label="Fechar menu"
-              @click="mobileMenuOpen = false"
-            >
-              <AppIcon name="close" :size="24" stroke-width="2.5" />
-            </button>
-
-            <!-- Brand Logo (Same as Standard Navbar) -->
+            <!-- Brand Logo (Left-aligned) -->
             <RouterLink to="/" class="flex items-center gap-2 group outline-none" @click="mobileMenuOpen = false">
               <div class="grid grid-cols-2 gap-0.5 w-5 h-5">
                 <span class="w-2 h-2 rounded-xs bg-primary-container transition-transform group-hover:scale-110" />
@@ -228,13 +216,14 @@ watch(
               </span>
             </RouterLink>
 
+            <!-- Close Button (Right-aligned) -->
             <button
               type="button"
               class="w-10 h-10 flex items-center justify-end text-primary-container hover:opacity-75 transition-opacity cursor-pointer outline-none"
-              aria-label="Configurações"
-              @click="goToSettings"
+              aria-label="Fechar menu"
+              @click="mobileMenuOpen = false"
             >
-              <AppIcon name="settings" :size="24" />
+              <AppIcon name="close" :size="24" stroke-width="2.5" />
             </button>
           </div>
 

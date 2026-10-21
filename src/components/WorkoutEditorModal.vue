@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, toRef } from 'vue'
 import { DOMAIN_LIMITS } from '@/constants/domain'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import {
@@ -8,6 +8,7 @@ import {
   AppStepper,
   AppIcon,
 } from '@/components'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import ExerciseSelectorModal from './ExerciseSelectorModal.vue'
 import type { Workout, WorkoutItem, ExerciseCatalogItem, Equipment } from '@/types/domain'
 
@@ -21,6 +22,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'save', data: { id?: string; name: string; items: WorkoutItem[] }): void
 }>()
+
+useBodyScrollLock(toRef(props, 'isOpen'))
 
 const workoutName = ref('')
 const items = ref<WorkoutItem[]>([])
@@ -156,18 +159,20 @@ function handleBackdropClick(e: MouseEvent) {
 </script>
 
 <template>
-  <div
-    v-if="isOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink/50 backdrop-blur-xs animate-in fade-in duration-150"
-    @mousedown="handleBackdropMouseDown"
-    @mouseup="handleBackdropMouseUp"
-    @click="handleBackdropClick"
-  >
+  <Transition name="modal-sheet">
     <div
-      class="bg-surface border-2 border-border-primary rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-[0_8px_0_0_#111111] overflow-hidden"
-      @mousedown.stop
-      @click.stop
+      v-if="isOpen"
+      class="modal-backdrop fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-ink/50 backdrop-blur-xs select-none"
+      @mousedown="handleBackdropMouseDown"
+      @mouseup="handleBackdropMouseUp"
+      @click="handleBackdropClick"
+      @touchmove.self.prevent
     >
+      <div
+        class="modal-card bg-surface border-t-2 sm:border-2 border-border-primary rounded-t-3xl sm:rounded-2xl w-full max-w-2xl max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-[0_8px_0_0_#111111] overflow-hidden"
+        @mousedown.stop
+        @click.stop
+      >
       <!-- Header -->
       <div class="p-4 sm:p-5 border-b border-border-grid flex items-center justify-between bg-bg-alternate">
         <div>
@@ -360,4 +365,5 @@ function handleBackdropClick(e: MouseEvent) {
       @select="handleAddExercise"
     />
   </div>
+</Transition>
 </template>

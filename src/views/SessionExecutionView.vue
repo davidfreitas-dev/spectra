@@ -6,6 +6,7 @@ import { usePreferencesStore } from '@/stores/preferencesStore'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { useWakeLock } from '@/composables/useWakeLock'
 import { useSound } from '@/composables/useSound'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import {
   AppButton,
   AppStepper,
@@ -27,6 +28,9 @@ const showSummaryModal = ref(false)
 const showDetailModal = ref(false)
 const selectedExerciseDetail = ref<ExerciseCatalogItem | null>(null)
 const sessionNote = ref('')
+
+useBodyScrollLock(showQuitModal)
+useBodyScrollLock(showSummaryModal)
 
 // Stepper input para a série atual (pré-preenchido com a meta)
 const currentActualInput = ref<number>(10)
@@ -484,90 +488,95 @@ function openExerciseDetail() {
     </div>
 
     <!-- QUIT / TERMINATE MODAL -->
-    <div
-      v-if="showQuitModal"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-xs animate-in fade-in duration-150"
-      @click.self="showQuitModal = false"
-    >
+    <Transition name="modal-pop">
       <div
-        class="bg-surface border-2 border-border-primary rounded-2xl w-full max-w-md shadow-[0_8px_0_0_#111111] overflow-hidden"
+        v-if="showQuitModal"
+        class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-xs select-none"
+        @click.self="showQuitModal = false"
+        @touchmove.self.prevent
       >
-        <div class="p-5 border-b border-border-grid bg-bg-alternate">
-          <h2 class="font-display text-lg font-bold text-ink">
-            Encerrar Treino
-          </h2>
-          <p class="text-xs text-ink-muted mt-1">
-            Escolha como deseja finalizar esta sessão.
-          </p>
-        </div>
+        <div
+          class="modal-card bg-surface border-2 border-border-primary rounded-2xl w-full max-w-md shadow-[0_8px_0_0_#111111] overflow-hidden"
+        >
+          <div class="p-5 border-b border-border-grid bg-bg-alternate">
+            <h2 class="font-display text-lg font-bold text-ink">
+              Encerrar Treino
+            </h2>
+            <p class="text-xs text-ink-muted mt-1">
+              Escolha como deseja finalizar esta sessão.
+            </p>
+          </div>
 
-        <div class="p-5 space-y-3">
-          <!-- Save Partial -->
-          <button
-            type="button"
-            :disabled="!hasAtLeastOneSetRecorded"
-            class="w-full text-left p-3.5 rounded-xl border border-border-grid transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer hover:border-border-primary"
-            @click="handleQuitPartial"
-          >
-            <div class="flex items-center gap-2.5">
-              <AppIcon name="save" :size="20" class="text-primary-container" />
-              <div>
-                <span class="font-bold text-sm text-ink block">Salvar como Parcial</span>
-                <span class="text-xs text-ink-muted">
-                  {{ hasAtLeastOneSetRecorded ? 'Registra as séries já realizadas no seu histórico.' : 'Requer ao menos 1 série registrada.' }}
-                </span>
-              </div>
-            </div>
-          </button>
-
-          <!-- Discard Button using variant="danger" -->
-          <div class="pt-1">
-            <AppButton
-              variant="danger"
-              size="md"
-              class="w-full"
-              @click="handleQuitDiscard"
+          <div class="p-5 space-y-3">
+            <!-- Save Partial -->
+            <button
+              type="button"
+              :disabled="!hasAtLeastOneSetRecorded"
+              class="w-full text-left p-3.5 rounded-xl border border-border-grid transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer hover:border-border-primary"
+              @click="handleQuitPartial"
             >
-              <AppIcon name="trash" :size="16" />
-              Descartar Treino
+              <div class="flex items-center gap-2.5">
+                <AppIcon name="save" :size="20" class="text-primary-container" />
+                <div>
+                  <span class="font-bold text-sm text-ink block">Salvar como Parcial</span>
+                  <span class="text-xs text-ink-muted">
+                    {{ hasAtLeastOneSetRecorded ? 'Registra as séries já realizadas no seu histórico.' : 'Requer ao menos 1 série registrada.' }}
+                  </span>
+                </div>
+              </div>
+            </button>
+
+            <!-- Discard Button using variant="danger" -->
+            <div class="pt-1">
+              <AppButton
+                variant="danger"
+                size="md"
+                class="w-full"
+                @click="handleQuitDiscard"
+              >
+                <AppIcon name="trash" :size="16" />
+                Descartar Treino
+              </AppButton>
+            </div>
+          </div>
+
+          <div class="p-4 border-t border-border-grid bg-bg-alternate flex justify-end">
+            <AppButton variant="outline" size="sm" @click="showQuitModal = false">
+              Continuar Treinando
             </AppButton>
           </div>
         </div>
-
-        <div class="p-4 border-t border-border-grid bg-bg-alternate flex justify-end">
-          <AppButton variant="outline" size="sm" @click="showQuitModal = false">
-            Continuar Treinando
-          </AppButton>
-        </div>
       </div>
-    </div>
+    </Transition>
 
     <!-- FINAL SUMMARY MODAL / SCREEN -->
-    <div
-      v-if="showSummaryModal"
-      class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink/60 backdrop-blur-sm animate-in fade-in duration-200"
-    >
+    <Transition name="modal-sheet">
       <div
-        class="bg-surface border-2 border-border-primary rounded-2xl w-full max-w-lg max-h-[90vh] flex flex-col shadow-[0_8px_0_0_#111111] overflow-hidden"
+        v-if="showSummaryModal"
+        class="modal-backdrop fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-ink/60 backdrop-blur-sm select-none"
+        @touchmove.self.prevent
       >
-        <!-- Summary Header -->
-        <div class="p-5 border-b border-border-grid bg-bg-alternate text-center">
-          <div class="w-12 h-12 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center mx-auto mb-2 shadow-[0_2px_0_0_#111111]">
-            <AppIcon name="trophy" :size="24" />
+        <div
+          class="modal-card bg-surface border-t-2 sm:border-2 border-border-primary rounded-t-3xl sm:rounded-2xl w-full max-w-lg max-h-[92vh] sm:max-h-[90vh] flex flex-col shadow-[0_8px_0_0_#111111] overflow-hidden"
+        >
+          <!-- Summary Header -->
+          <div class="p-5 border-b border-border-grid bg-bg-alternate text-center">
+            <div class="w-12 h-12 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center mx-auto mb-2 shadow-[0_2px_0_0_#111111]">
+              <AppIcon name="trophy" :size="24" />
+            </div>
+            <span class="font-eyebrow text-[10px] uppercase font-bold text-primary-container tracking-wider block">
+              Treino Concluído
+            </span>
+            <h2 class="font-display text-2xl font-black text-ink">
+              Excelente trabalho!
+            </h2>
+            <span class="text-xs text-ink-muted font-medium">
+              {{ session.workoutName }}
+            </span>
           </div>
-          <span class="font-eyebrow text-[10px] uppercase font-bold text-primary-container tracking-wider block">
-            Treino Concluído
-          </span>
-          <h2 class="font-display text-2xl font-black text-ink">
-            Excelente trabalho!
-          </h2>
-          <span class="text-xs text-ink-muted font-medium">
-            {{ session.workoutName }}
-          </span>
-        </div>
 
-        <!-- Summary Body -->
-        <div class="flex-1 overflow-y-auto p-5 space-y-4">
+          <!-- Summary Body -->
+          <div class="flex-1 overflow-y-auto p-5 space-y-4">
           <!-- Metrics Cards -->
           <div class="grid grid-cols-2 gap-3">
             <div class="p-3 rounded-xl border border-border-grid bg-surface text-center">
@@ -670,6 +679,7 @@ function openExerciseDetail() {
         </div>
       </div>
     </div>
+  </Transition>
 
     <!-- Exercise Detail Modal -->
     <ExerciseDetailModal

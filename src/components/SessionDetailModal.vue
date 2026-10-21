@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, toRef } from 'vue'
 import { AppButton, AppStatusBadge } from '@/components'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import AppIcon from './AppIcon.vue'
 import type { Session } from '@/types/domain'
 
@@ -13,6 +14,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'delete', sessionId: string): void
 }>()
+
+useBodyScrollLock(toRef(props, 'isOpen'))
 
 const formattedDuration = computed(() => {
   if (!props.session || !props.session.endedAt) return '—'
@@ -39,14 +42,16 @@ const formattedDate = computed(() => {
 </script>
 
 <template>
-  <div
-    v-if="isOpen && session"
-    class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-ink/50 backdrop-blur-xs animate-in fade-in duration-150"
-    @click.self="emit('close')"
-  >
+  <Transition name="modal-sheet">
     <div
-      class="bg-surface border-2 border-border-primary rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col shadow-[0_8px_0_0_#111111] overflow-hidden"
+      v-if="isOpen && session"
+      class="modal-backdrop fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-ink/50 backdrop-blur-xs select-none"
+      @click.self="emit('close')"
+      @touchmove.self.prevent
     >
+      <div
+        class="modal-card bg-surface border-t-2 sm:border-2 border-border-primary rounded-t-3xl sm:rounded-2xl w-full max-w-lg max-h-[88vh] sm:max-h-[85vh] flex flex-col shadow-[0_8px_0_0_#111111] overflow-hidden"
+      >
       <!-- Header -->
       <div class="p-4 sm:p-5 border-b border-border-grid flex items-center justify-between bg-bg-alternate">
         <div>
@@ -148,4 +153,5 @@ const formattedDate = computed(() => {
       </div>
     </div>
   </div>
+</Transition>
 </template>

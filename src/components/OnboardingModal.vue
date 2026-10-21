@@ -1,17 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, toRef } from 'vue'
 import { AppButton, AppCheckbox } from '@/components'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import AppIcon from './AppIcon.vue'
 import type { AppIconName } from './icons'
 import type { UserLevel, Equipment } from '@/types/domain'
 
-defineProps<{
+const props = defineProps<{
   isOpen: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'complete', data: { level: UserLevel; equipment: Equipment[] }): void
 }>()
+
+useBodyScrollLock(toRef(props, 'isOpen'))
 
 const step = ref<1 | 2>(1)
 const selectedLevel = ref<UserLevel>('beginner')
@@ -71,13 +74,15 @@ function handleFinish() {
 </script>
 
 <template>
-  <div
-    v-if="isOpen"
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm animate-in fade-in duration-200"
-  >
+  <Transition name="modal-pop">
     <div
-      class="bg-surface border-2 border-border-primary rounded-2xl w-full max-w-lg shadow-[0_8px_0_0_#111111] overflow-hidden"
+      v-if="isOpen"
+      class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm select-none"
+      @touchmove.self.prevent
     >
+      <div
+        class="modal-card bg-surface border-2 border-border-primary rounded-2xl w-full max-w-lg shadow-[0_8px_0_0_#111111] overflow-hidden"
+      >
       <!-- Header -->
       <div class="p-5 border-b border-border-grid bg-bg-alternate">
         <div class="flex items-center justify-between">
@@ -176,4 +181,5 @@ function handleFinish() {
       </div>
     </div>
   </div>
+</Transition>
 </template>

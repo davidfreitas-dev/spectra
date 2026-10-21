@@ -6,6 +6,7 @@ import { usePreferencesStore } from '@/stores/preferencesStore'
 import { useSessionsStore, type ProgressionSuggestion } from '@/stores/sessionsStore'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { DAYS_OF_WEEK } from '@/constants/domain'
+import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import {
   AppButton,
   AppCard,
@@ -44,6 +45,8 @@ const workoutToSchedule = ref<Workout | null>(null)
 // Exclusão com confirmação
 const workoutToDelete = ref<Workout | null>(null)
 const showDeleteConfirm = ref(false)
+
+useBodyScrollLock(showDeleteConfirm)
 
 onMounted(() => {
   workoutsStore.load()
@@ -245,6 +248,19 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
           dot-color="primary"
         >
           <div class="space-y-4">
+            <!-- Informações de quantidade de exercícios e tempo estimado (apenas mobile) -->
+            <div class="sm:hidden flex items-center justify-between px-3 py-2 rounded-xl bg-bg-alternate border border-border-grid text-xs text-ink-muted">
+              <div class="flex items-center gap-1.5 font-medium">
+                <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
+                <span><strong class="text-ink font-bold">{{ workout.items.length }}</strong> exercícios</span>
+              </div>
+              <div class="h-3.5 w-px bg-border-grid" />
+              <div class="flex items-center gap-1.5 font-medium">
+                <AppIcon name="clock" :size="14" class="text-primary-container" />
+                <span>Estimado: <strong class="text-ink font-bold">~{{ calculateEstimatedMinutes(workout) }} min</strong></span>
+              </div>
+            </div>
+
             <!-- Exercícios do treino em grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div
@@ -265,14 +281,25 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                 </span>
               </div>
             </div>
+          </div>
 
-            <!-- Card Actions -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-border-grid">
-              <span class="font-eyebrow text-xs text-ink-muted">
-                {{ workout.items.length }} exercícios • ~{{ calculateEstimatedMinutes(workout) }} min
-              </span>
+          <template #footer>
+            <div class="flex items-center justify-between gap-3 w-full">
+              <!-- Info de exercícios e tempo com ícones (tablet e desktop) -->
+              <div class="hidden sm:inline-flex sm:items-center gap-2 font-eyebrow text-xs text-ink-muted">
+                <span class="inline-flex items-center gap-1.5">
+                  <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
+                  <span>{{ workout.items.length }} exercícios</span>
+                </span>
+                <span class="text-border-primary">•</span>
+                <span class="inline-flex items-center gap-1.5">
+                  <AppIcon name="clock" :size="14" class="text-primary-container" />
+                  <span>~{{ calculateEstimatedMinutes(workout) }} min</span>
+                </span>
+              </div>
 
-              <div class="flex items-center gap-1.5 flex-wrap">
+              <!-- Botões de ação sempre alinhados à direita -->
+              <div class="flex items-center justify-end gap-1.5 flex-wrap ml-auto">
                 <AppButton
                   variant="outline"
                   size="sm"
@@ -317,6 +344,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                   variant="fill"
                   size="sm"
                   class="ml-1"
+                  title="Iniciar Treino"
                   @click="handleStartWorkout(workout)"
                 >
                   <AppIcon name="play" :size="16" />
@@ -324,7 +352,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                 </AppButton>
               </div>
             </div>
-          </div>
+          </template>
         </AppCard>
       </div>
     </div>
@@ -337,10 +365,24 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
       >
         <AppCard
           :title="preset.name"
-          eyebrow="Modelo Pronto (Estático)"
+          eyebrow="Modelo Pronto"
           dot-color="ink"
         >
           <div class="space-y-4">
+            <!-- Informações de quantidade de exercícios e tempo estimado (apenas mobile) -->
+            <div class="sm:hidden flex items-center justify-between px-3 py-2 rounded-xl bg-bg-alternate border border-border-grid text-xs text-ink-muted">
+              <div class="flex items-center gap-1.5 font-medium">
+                <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
+                <span><strong class="text-ink font-bold">{{ preset.items.length }}</strong> exercícios</span>
+              </div>
+              <div class="h-3.5 w-px bg-border-grid" />
+              <div class="flex items-center gap-1.5 font-medium">
+                <AppIcon name="clock" :size="14" class="text-primary-container" />
+                <span>Estimado: <strong class="text-ink font-bold">~{{ calculateEstimatedMinutes(preset) }} min</strong></span>
+              </div>
+            </div>
+
+            <!-- Exercícios do treino em grid -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <div
                 v-for="item in preset.items"
@@ -360,33 +402,50 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                 </span>
               </div>
             </div>
+          </div>
 
-            <div class="flex items-center justify-between pt-3 border-t border-border-grid">
-              <span class="font-eyebrow text-xs text-ink-muted">
-                {{ preset.items.length }} exercícios • ~{{ calculateEstimatedMinutes(preset) }} min
-              </span>
+          <template #footer>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
+              <!-- Info de exercícios e tempo com ícones (tablet e desktop) -->
+              <div class="hidden sm:inline-flex sm:items-center gap-2 font-eyebrow text-xs text-ink-muted">
+                <span class="inline-flex items-center gap-1.5">
+                  <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
+                  <span>{{ preset.items.length }} exercícios</span>
+                </span>
+                <span class="text-border-primary">•</span>
+                <span class="inline-flex items-center gap-1.5">
+                  <AppIcon name="clock" :size="14" class="text-primary-container" />
+                  <span>~{{ calculateEstimatedMinutes(preset) }} min</span>
+                </span>
+              </div>
 
-              <div class="flex items-center gap-2">
+              <!-- Botões de ação: 100% largura lado a lado no mobile, alinhados à direita no tablet/desktop -->
+              <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
                 <AppButton
                   variant="outline"
                   size="sm"
+                  class="w-full sm:w-auto"
+                  title="Copiar para Meus Treinos"
                   @click="handleCopyPreset(preset.id)"
                 >
                   <AppIcon name="copy" :size="16" />
-                  Copiar para Meus Treinos
+                  <span class="sm:hidden truncate">Copiar Treino</span>
+                  <span class="hidden sm:inline">Copiar para Meus Treinos</span>
                 </AppButton>
 
                 <AppButton
                   variant="fill"
                   size="sm"
+                  class="w-full sm:w-auto"
+                  title="Iniciar Treino"
                   @click="handleStartWorkout(preset)"
                 >
                   <AppIcon name="play" :size="16" />
-                  Iniciar
+                  <span>Iniciar</span>
                 </AppButton>
               </div>
             </div>
-          </div>
+          </template>
         </AppCard>
       </div>
     </div>
@@ -422,32 +481,35 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
     />
 
     <!-- Delete Confirmation Modal -->
-    <div
-      v-if="showDeleteConfirm && workoutToDelete"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-xs animate-in fade-in duration-150"
-      @click.self="showDeleteConfirm = false"
-    >
+    <Transition name="modal-pop">
       <div
-        class="bg-surface border-2 border-border-primary rounded-2xl w-full max-w-sm p-5 shadow-[0_8px_0_0_#111111] space-y-4"
+        v-if="showDeleteConfirm && workoutToDelete"
+        class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-xs select-none"
+        @click.self="showDeleteConfirm = false"
+        @touchmove.self.prevent
       >
-        <div class="space-y-1">
-          <h3 class="font-display text-lg font-bold text-ink">
-            Excluir Treino?
-          </h3>
-          <p class="text-xs text-ink-muted leading-relaxed">
-            Tem certeza de que deseja excluir "{{ workoutToDelete.name }}"? As sessões passadas permanecerão intactas no histórico.
-          </p>
-        </div>
+        <div
+          class="modal-card bg-surface border-2 border-border-primary rounded-2xl w-full max-w-sm p-5 shadow-[0_8px_0_0_#111111] space-y-4"
+        >
+          <div class="space-y-1">
+            <h3 class="font-display text-lg font-bold text-ink">
+              Excluir Treino?
+            </h3>
+            <p class="text-xs text-ink-muted leading-relaxed">
+              Tem certeza de que deseja excluir "{{ workoutToDelete.name }}"? As sessões passadas permanecerão intactas no histórico.
+            </p>
+          </div>
 
-        <div class="flex items-center justify-end gap-2 pt-2">
-          <AppButton variant="outline" size="sm" @click="showDeleteConfirm = false">
-            Cancelar
-          </AppButton>
-          <AppButton variant="danger" size="sm" @click="executeDeleteWorkout">
-            Sim, Excluir
-          </AppButton>
+          <div class="flex items-center justify-end gap-2 pt-2">
+            <AppButton variant="outline" size="sm" @click="showDeleteConfirm = false">
+              Cancelar
+            </AppButton>
+            <AppButton variant="danger" size="sm" @click="executeDeleteWorkout">
+              Sim, Excluir
+            </AppButton>
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
   </div>
 </template>

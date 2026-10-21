@@ -128,4 +128,144 @@
   }
 }
 
+/* ==========================================================================
+   Modal Transitions (Tactile Neobrutalist Pop & Adaptive Bottom Sheet)
+   ========================================================================== */
+
+/* Prevent touch/overscroll chaining to page background */
+.modal-backdrop {
+  touch-action: none;
+  overscroll-behavior: contain;
+}
+
+.modal-card {
+  touch-action: auto;
+  overscroll-behavior: contain;
+}
+
+.modal-card .overflow-y-auto {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* --------------------------------------------------------------------------
+   1. modal-pop: Tactile Neobrutalist Pop
+   Centered scale with subtle overshoot/spring on open, snappy fade on exit.
+   Used for: Confirmation dialogs, quit alerts, delete prompts, onboarding.
+   -------------------------------------------------------------------------- */
+.modal-pop-enter-active {
+  transition: opacity 180ms ease-out;
+}
+.modal-pop-enter-active .modal-card,
+.modal-pop-enter-active .modal-box {
+  transition: transform 220ms cubic-bezier(0.34, 1.4, 0.64, 1),
+              opacity 180ms ease-out;
+}
+.modal-pop-leave-active {
+  transition: opacity 150ms ease-in;
+}
+.modal-pop-leave-active .modal-card,
+.modal-pop-leave-active .modal-box {
+  transition: transform 150ms cubic-bezier(0.4, 0, 1, 1),
+              opacity 150ms ease-in;
+}
+
+.modal-pop-enter-from,
+.modal-pop-leave-to {
+  opacity: 0;
+}
+.modal-pop-enter-from .modal-card,
+.modal-pop-enter-from .modal-box {
+  opacity: 0;
+  transform: scale(0.92) translateY(8px);
+}
+.modal-pop-leave-to .modal-card,
+.modal-pop-leave-to .modal-box {
+  opacity: 0;
+  transform: scale(0.95);
+}
+
+/* --------------------------------------------------------------------------
+   2. modal-sheet: Adaptive Bottom Sheet & Spring Pop
+   Mobile (< sm): Native bottom sheet sliding up from bottom edge.
+   Desktop (>= sm): Centered tactile pop with spring curve.
+   Used for: Pre-workout summary, editor, exercise details, selector, schedule.
+   -------------------------------------------------------------------------- */
+.modal-sheet-enter-active {
+  transition: opacity 240ms ease-out;
+}
+.modal-sheet-leave-active {
+  transition: opacity 180ms ease-in;
+}
+
+/* Mobile (< 640px) */
+@media (max-width: 639.98px) {
+  .modal-sheet-enter-active .modal-card,
+  .modal-sheet-enter-active .modal-box {
+    transition: transform 260ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .modal-sheet-leave-active .modal-card,
+  .modal-sheet-leave-active .modal-box {
+    transition: transform 180ms cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  .modal-sheet-enter-from,
+  .modal-sheet-leave-to {
+    opacity: 0;
+  }
+  .modal-sheet-enter-from .modal-card,
+  .modal-sheet-enter-from .modal-box,
+  .modal-sheet-leave-to .modal-card,
+  .modal-sheet-leave-to .modal-box {
+    transform: translateY(100%);
+  }
+}
+
+/* Tablet & Desktop (>= 640px) */
+@media (min-width: 640px) {
+  .modal-sheet-enter-active .modal-card,
+  .modal-sheet-enter-active .modal-box {
+    transition: transform 220ms cubic-bezier(0.34, 1.3, 0.64, 1),
+                opacity 180ms ease-out;
+  }
+  .modal-sheet-leave-active .modal-card,
+  .modal-sheet-leave-active .modal-box {
+    transition: transform 160ms cubic-bezier(0.4, 0, 1, 1),
+                opacity 160ms ease-in;
+  }
+  .modal-sheet-enter-from,
+  .modal-sheet-leave-to {
+    opacity: 0;
+  }
+  .modal-sheet-enter-from .modal-card,
+  .modal-sheet-enter-from .modal-box {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+  .modal-sheet-leave-to .modal-card,
+  .modal-sheet-leave-to .modal-box {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+}
+
+/* Accessibility: Reduced Motion for Modals */
+@media (prefers-reduced-motion: reduce) {
+  .modal-pop-enter-active,
+  .modal-pop-leave-active,
+  .modal-sheet-enter-active,
+  .modal-sheet-leave-active,
+  .modal-pop-enter-active .modal-card,
+  .modal-pop-leave-active .modal-card,
+  .modal-pop-enter-active .modal-box,
+  .modal-pop-leave-active .modal-box,
+  .modal-sheet-enter-active .modal-card,
+  .modal-sheet-leave-active .modal-card,
+  .modal-sheet-enter-active .modal-box,
+  .modal-sheet-leave-active .modal-box {
+    transition: opacity 120ms ease !important;
+    transform: none !important;
+  }
+}
+
 
