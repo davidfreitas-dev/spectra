@@ -40,7 +40,7 @@ function select(option: SegmentedOption) {
         :key="opt.value"
         type="button"
         :disabled="disabled || opt.disabled"
-        class="flex-1 py-2 px-3 rounded-lg font-button-text text-xs text-center transition-all outline-none"
+        class="flex-1 py-2 px-3 rounded-lg font-button-text text-xs text-center whitespace-nowrap transition-all outline-none cursor-pointer disabled:cursor-not-allowed"
         :class="opt.value === modelValue
           ? 'bg-surface border border-border-primary shadow-[0_2px_0_0_#111111] text-ink font-bold active:translate-y-px active:shadow-none'
           : 'text-ink-muted hover:text-ink font-medium border border-transparent'"

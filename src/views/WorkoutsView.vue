@@ -10,11 +10,13 @@ import {
   AppButton,
   AppCard,
   AppIcon,
+  AppSegmentedControl,
   WorkoutEditorModal,
   WorkoutPreSummaryModal,
   WorkoutScheduleModal,
 } from '@/components'
 import type { Workout, WorkoutItem } from '@/types/domain'
+import type { SegmentedOption } from '@/types'
 
 const router = useRouter()
 const route = useRoute()
@@ -23,6 +25,11 @@ const preferencesStore = usePreferencesStore()
 const sessionsStore = useSessionsStore()
 
 const activeTab = ref<'user' | 'presets'>('user')
+
+const tabOptions = computed<SegmentedOption[]>(() => [
+  { value: 'user', label: `Meus Treinos (${workoutsStore.workouts.length})` },
+  { value: 'presets', label: `Modelos Prontos (${workoutsStore.presets.length})` },
+])
 
 // Modais
 const showEditorModal = ref(false)
@@ -188,8 +195,8 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
 <template>
   <div class="max-w-225 mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 select-none">
     <!-- View Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border-grid">
-      <div>
+    <div class="flex flex-wrap items-center justify-between gap-y-3 gap-x-4 pb-4 border-b border-border-grid">
+      <div class="order-1 sm:mr-auto min-w-0">
         <div class="inline-flex items-center gap-1.5 font-eyebrow text-[10px] text-primary-container font-bold uppercase tracking-wider mb-1">
           <span class="w-2 h-2 rounded-xs bg-primary-container inline-block" />
           <span>Biblioteca de Rotinas</span>
@@ -199,41 +206,24 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
         </h1>
       </div>
 
-      <div class="flex items-center gap-3">
-        <!-- Segmented Tab Toggle -->
-        <div class="flex items-center gap-1 p-1 rounded-xl bg-bg-alternate border border-border-primary">
-          <button
-            type="button"
-            class="px-4 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer"
-            :class="activeTab === 'user'
-              ? 'bg-surface border border-border-primary shadow-[0_2px_0_0_#111111] text-ink'
-              : 'text-ink-muted hover:text-ink'"
-            @click="activeTab = 'user'"
-          >
-            Meus Treinos ({{ workoutsStore.workouts.length }})
-          </button>
-          <button
-            type="button"
-            class="px-4 py-1.5 rounded-lg font-bold text-xs transition-all cursor-pointer"
-            :class="activeTab === 'presets'
-              ? 'bg-surface border border-border-primary shadow-[0_2px_0_0_#111111] text-ink'
-              : 'text-ink-muted hover:text-ink'"
-            @click="activeTab = 'presets'"
-          >
-            Modelos Prontos ({{ workoutsStore.presets.length }})
-          </button>
-        </div>
+      <AppButton
+        v-if="activeTab === 'user'"
+        variant="fill"
+        size="sm"
+        class="order-2 sm:order-3 shrink-0"
+        @click="handleNewWorkout"
+      >
+        <AppIcon name="plus" :size="16" />
+        Novo Treino
+      </AppButton>
 
-        <AppButton
-          v-if="activeTab === 'user'"
-          variant="fill"
-          size="sm"
-          @click="handleNewWorkout"
-        >
-          <AppIcon name="plus" :size="16" />
-          Novo Treino
-        </AppButton>
-      </div>
+      <!-- Segmented Tab Toggle -->
+      <AppSegmentedControl
+        :model-value="activeTab"
+        :options="tabOptions"
+        class="order-3 sm:order-2 w-full sm:w-auto"
+        @update:model-value="(val) => (activeTab = val as 'user' | 'presets')"
+      />
     </div>
 
     <!-- User Workouts Tab -->
