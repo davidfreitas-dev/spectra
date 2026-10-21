@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { AppButton, AppCheckbox } from '@/components'
+import AppIcon from './AppIcon.vue'
 import { DAYS_OF_WEEK } from '@/constants/domain'
 import type { Workout } from '@/types/domain'
 
@@ -87,7 +88,7 @@ function handleSave() {
           class="w-9 h-9 flex items-center justify-center rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate text-ink font-bold cursor-pointer transition-colors"
           @click="emit('close')"
         >
-          <span class="material-symbols-outlined !text-lg">close</span>
+          <AppIcon name="close" :size="18" />
         </button>
       </div>
 

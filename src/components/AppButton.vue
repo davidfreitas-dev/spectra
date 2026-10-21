@@ -122,12 +122,10 @@ const variantClasses = computed(() => {
     :class="[sizeClasses, shapeClasses, variantClasses, loading ? 'cursor-wait opacity-85' : '']"
     @click="handleClick"
   >
-    <AppSpinner v-if="loading && !iconOnly" :size="spinnerSize" :variant="spinnerVariant" />
-    <template v-else>
-      <slot name="left-icon" />
-      <slot name="icon" />
+    <template v-if="loading">
+      <AppSpinner :size="spinnerSize" :variant="spinnerVariant" />
+      <span v-if="!iconOnly">Aguarde...</span>
     </template>
-    <slot />
-    <slot v-if="!loading || iconOnly" name="right-icon" />
+    <slot v-else />
   </button>
 </template>

@@ -8,6 +8,7 @@ import {
   AppStatusBadge,
   AppChip,
   AppConfirmDialog,
+  AppIcon,
 } from '@/components'
 import { StorageService } from '@/services/storageService'
 import { usePreferencesStore } from '@/stores/preferencesStore'
@@ -210,9 +211,10 @@ function handleConfirmReset() {
         ? 'bg-success/15 border border-border-success text-success'
         : 'bg-error-container/20 border border-border-error text-error'"
     >
-      <span class="material-symbols-outlined text-base!">
-        {{ feedbackType === 'success' ? 'check_circle' : 'error' }}
-      </span>
+      <AppIcon
+        :name="feedbackType === 'success' ? 'check' : 'error'"
+        :size="16"
+      />
       <span>{{ feedbackMessage }}</span>
     </div>
 
@@ -282,16 +284,12 @@ function handleConfirmReset() {
 
         <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-border-grid">
           <AppButton variant="fill" size="sm" :loading="isExporting" @click="exportBackup">
-            <template #left-icon>
-              <span class="material-symbols-outlined text-base!">file_download</span>
-            </template>
+            <AppIcon name="download" :size="16" />
             Exportar Backup JSON
           </AppButton>
 
           <AppButton variant="outline" size="sm" :loading="isImporting" @click="triggerImport">
-            <template #left-icon>
-              <span class="material-symbols-outlined text-base!">file_upload</span>
-            </template>
+            <AppIcon name="upload" :size="16" />
             Restaurar Backup JSON
           </AppButton>
 
@@ -316,9 +314,7 @@ function handleConfirmReset() {
 
         <div class="pt-2 border-t border-border-grid">
           <AppButton variant="danger" size="sm" :loading="isResetting" @click="openResetConfirm">
-            <template #left-icon>
-              <span class="material-symbols-outlined text-base!">delete_forever</span>
-            </template>
+            <AppIcon name="trash" :size="16" />
             Apagar Todos os Dados
           </AppButton>
         </div>

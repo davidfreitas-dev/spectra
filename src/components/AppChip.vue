@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { ChipVariant } from '@/types'
+import AppIcon from './AppIcon.vue'
 
 interface Props {
   label?: string
@@ -68,12 +69,11 @@ const stateClasses = computed(() => {
     @click="handleClick"
   >
     <slot name="icon">
-      <span
+      <AppIcon
         v-if="selected"
-        class="material-symbols-outlined !text-[13px] !leading-none w-3.5 h-3.5 flex items-center justify-center shrink-0"
-      >
-        {{ shape === 'tag' ? 'done' : 'check' }}
-      </span>
+        name="check"
+        :size="13"
+      />
     </slot>
     <span><slot>{{ label }}</slot></span>
   </button>

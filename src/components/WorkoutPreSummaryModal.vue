@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { AppButton } from '@/components'
+import AppIcon from './AppIcon.vue'
 import type { Workout, WorkoutItem } from '@/types/domain'
 import type { ProgressionSuggestion } from '@/stores/sessionsStore'
 
@@ -65,7 +66,7 @@ const estimatedDurationMinutes = computed(() => {
           class="w-9 h-9 flex items-center justify-center rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate text-ink font-bold cursor-pointer transition-colors"
           @click="emit('close')"
         >
-          <span class="material-symbols-outlined !text-lg">close</span>
+          <AppIcon name="close" :size="18" />
         </button>
       </div>
 
@@ -93,7 +94,7 @@ const estimatedDurationMinutes = computed(() => {
           class="p-4 rounded-xl border-2 border-primary-container bg-primary-container/10 space-y-3"
         >
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary-container !text-lg">trending_up</span>
+            <AppIcon name="trending_up" :size="18" class="text-primary-container" />
             <span class="font-bold text-xs uppercase text-primary-container tracking-wider">
               Sugestão de Progressão Disponível
             </span>
@@ -108,7 +109,7 @@ const estimatedDurationMinutes = computed(() => {
               <span class="font-bold text-sm text-ink">{{ sug.exerciseName }}</span>
               <div class="flex items-center gap-1.5 font-metric-number text-xs font-bold text-ink">
                 <span class="text-ink-muted line-through">{{ sug.currentTarget }}</span>
-                <span class="material-symbols-outlined !text-xs text-primary-container">arrow_forward</span>
+                <AppIcon name="arrow_right" :size="12" class="text-primary-container" />
                 <span class="text-primary-container bg-primary-container/15 px-1.5 py-0.5 rounded">
                   {{ sug.suggestedTarget }} {{ sug.measurementType === 'reps' ? 'reps' : 's' }}
                 </span>
@@ -186,9 +187,7 @@ const estimatedDurationMinutes = computed(() => {
           class="flex-1"
           @click="emit('start')"
         >
-          <template #icon>
-            <span class="material-symbols-outlined !text-xl">play_arrow</span>
-          </template>
+          <AppIcon name="play" :size="20" />
           Começar Treino
         </AppButton>
       </div>

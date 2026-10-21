@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { AppButton } from '@/components'
+import AppIcon from './AppIcon.vue'
 import type { ExerciseCatalogItem } from '@/types/domain'
 
 const props = defineProps<{
@@ -50,7 +51,7 @@ const harderExercise = computed(() => {
           class="w-9 h-9 flex items-center justify-center rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate text-ink font-bold cursor-pointer transition-colors"
           @click="emit('close')"
         >
-          <span class="material-symbols-outlined !text-lg">close</span>
+          <AppIcon name="close" :size="18" />
         </button>
       </div>
 
@@ -98,9 +99,7 @@ const harderExercise = computed(() => {
           v-if="exercise.safetyNote"
           class="p-3.5 rounded-xl border border-warning-container bg-warning-container/10 flex items-start gap-2.5 text-xs text-ink"
         >
-          <span class="material-symbols-outlined text-warning-container !text-lg shrink-0">
-            shield_alert
-          </span>
+          <AppIcon name="shield_alert" :size="18" class="text-warning-container shrink-0" />
           <div>
             <span class="font-bold block text-ink">Dica de Segurança</span>
             <span>{{ exercise.safetyNote }}</span>

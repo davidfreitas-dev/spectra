@@ -13,6 +13,7 @@ import {
   AppCard,
   AppSpinner,
   AppCheckbox,
+  AppIcon,
 } from '@/components'
 import type { SegmentedOption, SelectOption } from '@/types'
 
@@ -355,17 +356,13 @@ const swatches = [
                 <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Padrão Tátil (Rounded-XL)</div>
                 <div class="flex flex-wrap items-center gap-3">
                   <AppButton variant="fill" shape="rounded">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-base">play_circle</span>
-                    </template>
+                    <AppIcon name="play" :size="16" />
                     <span>Padrão</span>
                   </AppButton>
 
                   <AppButton variant="fill" shape="rounded">
                     <span>Com Ícone</span>
-                    <template #right-icon>
-                      <span class="material-symbols-outlined text-base">arrow_forward</span>
-                    </template>
+                    <AppIcon name="arrow_right" :size="16" />
                   </AppButton>
 
                   <AppButton variant="fill" shape="rounded" :pressed="true">
@@ -377,9 +374,7 @@ const swatches = [
                   </AppButton>
 
                   <AppButton variant="fill" shape="rounded" :disabled="true">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-sm">lock</span>
-                    </template>
+                    <AppIcon name="lock" :size="14" />
                     <span>Desabilitado</span>
                   </AppButton>
                 </div>
@@ -390,17 +385,13 @@ const swatches = [
                 <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Ações em Pill (Rounded-Full)</div>
                 <div class="flex flex-wrap items-center gap-3">
                   <AppButton variant="fill" shape="pill">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-base">replay</span>
-                    </template>
+                    <AppIcon name="replay" :size="16" />
                     <span>Padrão</span>
                   </AppButton>
 
                   <AppButton variant="fill" shape="pill">
                     <span>Com Ícone</span>
-                    <template #right-icon>
-                      <span class="material-symbols-outlined text-base">arrow_forward</span>
-                    </template>
+                    <AppIcon name="arrow_right" :size="16" />
                   </AppButton>
 
                   <AppButton variant="fill" shape="pill" :pressed="true">
@@ -412,9 +403,7 @@ const swatches = [
                   </AppButton>
 
                   <AppButton variant="fill" shape="pill" :disabled="true">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-sm">lock</span>
-                    </template>
+                    <AppIcon name="lock" :size="14" />
                     <span>Desabilitado</span>
                   </AppButton>
                 </div>
@@ -426,25 +415,25 @@ const swatches = [
                 <div class="flex flex-wrap items-center gap-4">
                   <div class="flex items-center gap-2">
                     <AppButton variant="fill" shape="rounded" :icon-only="true" title="Padrão">
-                      <span class="material-symbols-outlined text-lg">add</span>
+                      <AppIcon name="plus" :size="18" />
                     </AppButton>
                     <AppButton variant="fill" shape="rounded" :icon-only="true" :pressed="true" title="Pressionado">
-                      <span class="material-symbols-outlined text-lg">add</span>
+                      <AppIcon name="plus" :size="18" />
                     </AppButton>
                     <AppButton variant="fill" shape="rounded" :icon-only="true" :disabled="true" title="Desabilitado">
-                      <span class="material-symbols-outlined text-base">lock</span>
+                      <AppIcon name="lock" :size="16" />
                     </AppButton>
                   </div>
                   <div class="h-6 w-px bg-border-grid" />
                   <div class="flex items-center gap-2">
                     <AppButton variant="fill" shape="circle" :icon-only="true" title="Padrão">
-                      <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                      <AppIcon name="arrow_right" :size="18" />
                     </AppButton>
                     <AppButton variant="fill" shape="circle" :icon-only="true" :pressed="true" title="Pressionado">
-                      <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                      <AppIcon name="arrow_right" :size="18" />
                     </AppButton>
                     <AppButton variant="fill" shape="circle" :icon-only="true" :disabled="true" title="Desabilitado">
-                      <span class="material-symbols-outlined text-base">lock</span>
+                      <AppIcon name="lock" :size="16" />
                     </AppButton>
                   </div>
                 </div>
@@ -460,17 +449,13 @@ const swatches = [
                 <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Padrão Tátil (Rounded-XL)</div>
                 <div class="flex flex-wrap items-center gap-3">
                   <AppButton variant="outline" shape="rounded">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-base">tune</span>
-                    </template>
+                    <AppIcon name="sliders" :size="16" />
                     <span>Padrão</span>
                   </AppButton>
 
                   <AppButton variant="outline" shape="rounded">
                     <span>Com Ícone</span>
-                    <template #right-icon>
-                      <span class="material-symbols-outlined text-base">arrow_forward</span>
-                    </template>
+                    <AppIcon name="arrow_right" :size="16" />
                   </AppButton>
 
                   <AppButton variant="outline" shape="rounded" :pressed="true">
@@ -482,9 +467,7 @@ const swatches = [
                   </AppButton>
 
                   <AppButton variant="outline" shape="rounded" :disabled="true">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-sm">lock</span>
-                    </template>
+                    <AppIcon name="lock" :size="14" />
                     <span>Desabilitado</span>
                   </AppButton>
                 </div>
@@ -495,17 +478,13 @@ const swatches = [
                 <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Ações em Pill (Rounded-Full)</div>
                 <div class="flex flex-wrap items-center gap-3">
                   <AppButton variant="outline" shape="pill">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-base">help_outline</span>
-                    </template>
+                    <AppIcon name="help" :size="16" />
                     <span>Padrão</span>
                   </AppButton>
 
                   <AppButton variant="outline" shape="pill">
                     <span>Com Ícone</span>
-                    <template #right-icon>
-                      <span class="material-symbols-outlined text-base">arrow_forward</span>
-                    </template>
+                    <AppIcon name="arrow_right" :size="16" />
                   </AppButton>
 
                   <AppButton variant="outline" shape="pill" :pressed="true">
@@ -517,9 +496,7 @@ const swatches = [
                   </AppButton>
 
                   <AppButton variant="outline" shape="pill" :disabled="true">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-sm">lock</span>
-                    </template>
+                    <AppIcon name="lock" :size="14" />
                     <span>Desabilitado</span>
                   </AppButton>
                 </div>
@@ -531,25 +508,25 @@ const swatches = [
                 <div class="flex flex-wrap items-center gap-4">
                   <div class="flex items-center gap-2">
                     <AppButton variant="outline" shape="rounded" :icon-only="true" title="Padrão">
-                      <span class="material-symbols-outlined text-lg">add</span>
+                      <AppIcon name="plus" :size="18" />
                     </AppButton>
                     <AppButton variant="outline" shape="rounded" :icon-only="true" :pressed="true" title="Pressionado">
-                      <span class="material-symbols-outlined text-lg">add</span>
+                      <AppIcon name="plus" :size="18" />
                     </AppButton>
                     <AppButton variant="outline" shape="rounded" :icon-only="true" :disabled="true" title="Desabilitado">
-                      <span class="material-symbols-outlined text-base">lock</span>
+                      <AppIcon name="lock" :size="16" />
                     </AppButton>
                   </div>
                   <div class="h-6 w-px bg-border-grid" />
                   <div class="flex items-center gap-2">
                     <AppButton variant="outline" shape="circle" :icon-only="true" title="Padrão">
-                      <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                      <AppIcon name="arrow_right" :size="18" />
                     </AppButton>
                     <AppButton variant="outline" shape="circle" :icon-only="true" :pressed="true" title="Pressionado">
-                      <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                      <AppIcon name="arrow_right" :size="18" />
                     </AppButton>
                     <AppButton variant="outline" shape="circle" :icon-only="true" :disabled="true" title="Desabilitado">
-                      <span class="material-symbols-outlined text-base">lock</span>
+                      <AppIcon name="lock" :size="16" />
                     </AppButton>
                   </div>
                 </div>
@@ -565,17 +542,13 @@ const swatches = [
                 <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Padrão Tátil (Rounded-XL)</div>
                 <div class="flex flex-wrap items-center gap-3">
                   <AppButton variant="danger" shape="rounded">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-base">delete</span>
-                    </template>
+                    <AppIcon name="trash" :size="16" />
                     <span>Padrão</span>
                   </AppButton>
 
                   <AppButton variant="danger" shape="rounded">
                     <span>Com Ícone</span>
-                    <template #right-icon>
-                      <span class="material-symbols-outlined text-base">delete_forever</span>
-                    </template>
+                    <AppIcon name="trash" :size="16" />
                   </AppButton>
 
                   <AppButton variant="danger" shape="rounded" :pressed="true">
@@ -587,9 +560,7 @@ const swatches = [
                   </AppButton>
 
                   <AppButton variant="danger" shape="rounded" :disabled="true">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-sm">lock</span>
-                    </template>
+                    <AppIcon name="lock" :size="14" />
                     <span>Desabilitado</span>
                   </AppButton>
                 </div>
@@ -600,17 +571,13 @@ const swatches = [
                 <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Ações em Pill (Rounded-Full)</div>
                 <div class="flex flex-wrap items-center gap-3">
                   <AppButton variant="danger" shape="pill">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-base">close</span>
-                    </template>
+                    <AppIcon name="close" :size="16" />
                     <span>Padrão</span>
                   </AppButton>
 
                   <AppButton variant="danger" shape="pill">
                     <span>Com Ícone</span>
-                    <template #right-icon>
-                      <span class="material-symbols-outlined text-base">arrow_forward</span>
-                    </template>
+                    <AppIcon name="arrow_right" :size="16" />
                   </AppButton>
 
                   <AppButton variant="danger" shape="pill" :pressed="true">
@@ -622,9 +589,7 @@ const swatches = [
                   </AppButton>
 
                   <AppButton variant="danger" shape="pill" :disabled="true">
-                    <template #left-icon>
-                      <span class="material-symbols-outlined text-sm">lock</span>
-                    </template>
+                    <AppIcon name="lock" :size="14" />
                     <span>Desabilitado</span>
                   </AppButton>
                 </div>
@@ -636,13 +601,13 @@ const swatches = [
                 <div class="flex flex-wrap items-center gap-4">
                   <div class="flex items-center gap-2">
                     <AppButton variant="danger" shape="rounded" :icon-only="true" title="Padrão">
-                      <span class="material-symbols-outlined text-lg">delete</span>
+                      <AppIcon name="trash" :size="18" />
                     </AppButton>
                     <AppButton variant="danger" shape="rounded" :icon-only="true" :pressed="true" title="Pressionado">
-                      <span class="material-symbols-outlined text-lg">delete</span>
+                      <AppIcon name="trash" :size="18" />
                     </AppButton>
                     <AppButton variant="danger" shape="rounded" :icon-only="true" :disabled="true" title="Desabilitado">
-                      <span class="material-symbols-outlined text-lg">delete</span>
+                      <AppIcon name="trash" :size="18" />
                     </AppButton>
                   </div>
                 </div>
@@ -682,7 +647,7 @@ const swatches = [
               label="Identificador do Treino"
             >
               <template #right>
-                <span class="material-symbols-outlined text-ink-muted text-base">edit</span>
+                <AppIcon name="edit" :size="16" class="text-ink-muted" />
               </template>
             </AppInput>
 

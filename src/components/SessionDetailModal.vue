@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { AppButton, AppStatusBadge } from '@/components'
+import AppIcon from './AppIcon.vue'
 import type { Session } from '@/types/domain'
 
 const props = defineProps<{
@@ -64,7 +65,7 @@ const formattedDate = computed(() => {
           class="w-9 h-9 flex items-center justify-center rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate text-ink font-bold cursor-pointer transition-colors"
           @click="emit('close')"
         >
-          <span class="material-symbols-outlined !text-lg">close</span>
+          <AppIcon name="close" :size="18" />
         </button>
       </div>
 
@@ -137,9 +138,7 @@ const formattedDate = computed(() => {
       <!-- Footer with Delete Session -->
       <div class="p-4 border-t border-border-grid bg-bg-alternate flex items-center justify-between">
         <AppButton variant="danger" size="sm" @click="emit('delete', session.id)">
-          <template #left-icon>
-            <span class="material-symbols-outlined text-base!">delete</span>
-          </template>
+          <AppIcon name="trash" :size="16" />
           Excluir Sessão
         </AppButton>
 

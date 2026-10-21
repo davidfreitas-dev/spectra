@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { AppButton } from '@/components'
+import AppIcon from './AppIcon.vue'
 import { DAYS_OF_WEEK } from '@/constants/domain'
 import type { Workout } from '@/types/domain'
 
@@ -56,7 +57,7 @@ function handleExplore() {
           class="w-9 h-9 flex items-center justify-center rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate text-ink font-bold cursor-pointer transition-colors"
           @click="emit('close')"
         >
-          <span class="material-symbols-outlined text-lg!">close</span>
+          <AppIcon name="close" :size="18" />
         </button>
       </div>
 
@@ -73,19 +74,19 @@ function handleExplore() {
         >
           <div class="flex items-center gap-2.5">
             <span class="w-8 h-8 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-center text-ink-muted">
-              <span class="material-symbols-outlined text-lg!">bedtime</span>
+              <AppIcon name="moon" :size="18" />
             </span>
             <div>
               <span class="font-bold text-sm text-ink block">Descanso</span>
               <span class="text-xs text-ink-muted">Sem treino agendado neste dia</span>
             </div>
           </div>
-          <span
+          <AppIcon
             v-if="!currentWorkoutId"
-            class="material-symbols-outlined text-primary-container text-xl!"
-          >
-            check_circle
-          </span>
+            name="check"
+            :size="20"
+            class="text-primary-container"
+          />
         </button>
 
         <div class="pt-2 pb-1">
@@ -100,7 +101,7 @@ function handleExplore() {
           class="p-4 text-center space-y-3 bg-bg-alternate rounded-xl border border-dashed border-border-grid"
         >
           <div class="w-9 h-9 mx-auto rounded-full bg-surface border border-border-grid flex items-center justify-center text-ink-muted">
-            <span class="material-symbols-outlined text-lg!">fitness_center</span>
+            <AppIcon name="dumbbell" :size="18" />
           </div>
           <div>
             <div class="font-bold text-xs text-ink">Nenhum treino criado</div>
@@ -110,9 +111,7 @@ function handleExplore() {
           </div>
           <div class="pt-1">
             <AppButton variant="fill" size="sm" @click="handleExplore">
-              <template #left-icon>
-                <span class="material-symbols-outlined text-base!">content_copy</span>
-              </template>
+              <AppIcon name="copy" :size="16" />
               Explorar Treinos Prontos
             </AppButton>
           </div>
@@ -132,19 +131,19 @@ function handleExplore() {
           >
             <div class="flex items-center gap-2.5">
               <span class="w-8 h-8 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-center text-primary-container">
-                <span class="material-symbols-outlined text-lg!">fitness_center</span>
+                <AppIcon name="dumbbell" :size="18" />
               </span>
               <div>
                 <span class="font-bold text-sm text-ink block">{{ workout.name }}</span>
                 <span class="text-xs text-ink-muted">{{ workout.items.length }} exercícios</span>
               </div>
             </div>
-            <span
+            <AppIcon
               v-if="currentWorkoutId === workout.id"
-              class="material-symbols-outlined text-primary-container text-xl!"
-            >
-              check_circle
-            </span>
+              name="check"
+              :size="20"
+              class="text-primary-container"
+            />
           </button>
         </template>
       </div>

@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import AppButton from './AppButton.vue'
+import AppIcon from './AppIcon.vue'
 
 interface NavItem {
   label: string
@@ -101,9 +102,7 @@ watch(
           aria-label="Abrir menu de navegação"
           @click="mobileMenuOpen = !mobileMenuOpen"
         >
-          <span class="material-symbols-outlined text-lg!">
-            {{ mobileMenuOpen ? 'close' : 'menu' }}
-          </span>
+          <AppIcon :name="mobileMenuOpen ? 'close' : 'menu'" :size="18" />
         </button>
 
         <!-- Brand Logo (Centered on Mobile, Flowing on Desktop) -->
@@ -162,9 +161,7 @@ watch(
             size="sm"
             @click="handleSignUp"
           >
-            <template #icon>
-              <span class="material-symbols-outlined text-sm!">play_circle</span>
-            </template>
+            <AppIcon name="play" :size="16" />
             <span>{{ signUpText }}</span>
           </AppButton>
         </div>
@@ -179,7 +176,7 @@ watch(
             aria-label="Iniciar Treino"
             @click="handleSignUp"
           >
-            <span class="material-symbols-outlined text-base!">play_circle</span>
+            <AppIcon name="play" :size="18" />
           </AppButton>
         </div>
 
@@ -194,7 +191,7 @@ watch(
           @click="goToSettings"
         >
           <slot name="user-icon">
-            <span class="material-symbols-outlined text-base!">settings</span>
+            <AppIcon name="settings" :size="18" />
           </slot>
         </AppButton>
       </div>
@@ -222,7 +219,7 @@ watch(
               aria-label="Fechar menu"
               @click="mobileMenuOpen = false"
             >
-              <span class="material-symbols-outlined text-2xl font-bold">close</span>
+              <AppIcon name="close" :size="24" stroke-width="2.5" />
             </button>
 
             <!-- Brand Logo (Same as Standard Navbar) -->
@@ -244,7 +241,7 @@ watch(
               aria-label="Configurações"
               @click="goToSettings"
             >
-              <span class="material-symbols-outlined text-2xl">settings</span>
+              <AppIcon name="settings" :size="24" />
             </button>
           </div>
 
@@ -275,9 +272,7 @@ watch(
               class="w-full"
               @click="handleStartTodayWorkout"
             >
-              <template #icon>
-                <span class="material-symbols-outlined text-lg!">play_circle</span>
-              </template>
+              <AppIcon name="play" :size="20" />
               Iniciar Treino do Dia
             </AppButton>
           </div>

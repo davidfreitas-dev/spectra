@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import AppIcon from './AppIcon.vue'
 import type { SelectOption } from '@/types'
 
 interface Props {
@@ -85,9 +86,9 @@ const selectClasses = computed(() => {
 
       <div class="absolute right-2.5 flex items-center pointer-events-none" :class="disabled ? 'text-ink-subtle' : error ? 'text-error' : 'text-ink'">
         <slot name="icon">
-          <span v-if="disabled" class="material-symbols-outlined text-lg">lock</span>
-          <span v-else-if="error" class="material-symbols-outlined text-lg">error</span>
-          <span v-else class="material-symbols-outlined text-lg">expand_more</span>
+          <AppIcon v-if="disabled" name="lock" :size="18" />
+          <AppIcon v-else-if="error" name="error" :size="18" />
+          <AppIcon v-else name="chevron_down" :size="18" />
         </slot>
       </div>
     </div>

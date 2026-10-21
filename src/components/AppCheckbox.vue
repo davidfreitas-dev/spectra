@@ -43,7 +43,7 @@ function handleChange(event: Event) {
 const boxSizeClasses = computed(() => {
   switch (props.size) {
     case 'sm':
-      return 'w-4 h-4 rounded-md border-2'
+      return 'w-4 h-4 rounded-sm border-2'
     case 'lg':
       return 'w-6 h-6 rounded-lg border-2'
     case 'md':

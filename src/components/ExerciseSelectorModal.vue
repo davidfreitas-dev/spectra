@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { AppButton, AppInput, AppChip, AppCheckbox } from '@/components'
+import AppIcon from './AppIcon.vue'
 import type { ExerciseCatalogItem, Equipment } from '@/types/domain'
 
 const props = defineProps<{
@@ -139,7 +140,7 @@ function handleBackdropClick(e: MouseEvent) {
           class="w-9 h-9 flex items-center justify-center rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate text-ink font-bold cursor-pointer transition-colors"
           @click="emit('close')"
         >
-          <span class="material-symbols-outlined text-lg!">close</span>
+          <AppIcon name="close" :size="18" />
         </button>
       </div>
 
@@ -240,9 +241,11 @@ function handleBackdropClick(e: MouseEvent) {
             </div>
           </div>
 
-          <span class="material-symbols-outlined text-ink-muted group-hover:text-primary-container transition-transform group-hover:translate-x-0.5">
-            add_circle
-          </span>
+          <AppIcon
+            name="plus"
+            :size="20"
+            class="text-ink-muted group-hover:text-primary-container transition-transform group-hover:translate-x-0.5"
+          />
         </button>
       </div>
 

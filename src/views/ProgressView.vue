@@ -6,6 +6,7 @@ import {
   AppProgressBar,
   AppStatusBadge,
   AppButton,
+  AppIcon,
   SessionDetailModal,
 } from '@/components'
 import { useSessionsStore } from '@/stores/sessionsStore'
@@ -154,7 +155,7 @@ function calculateSessionDuration(session: Session): string {
       class="p-8 sm:p-12 rounded-2xl border-2 border-border-primary bg-surface text-center space-y-4 shadow-[0_4px_0_0_#111111]"
     >
       <div class="w-14 h-14 rounded-2xl bg-bg-alternate border border-border-grid flex items-center justify-center mx-auto text-primary-container">
-        <span class="material-symbols-outlined text-3xl!">insights</span>
+        <AppIcon name="trending_up" :size="30" />
       </div>
       <div class="space-y-1">
         <h2 class="font-display text-xl font-bold text-ink">
@@ -167,9 +168,7 @@ function calculateSessionDuration(session: Session): string {
 
       <div class="pt-2">
         <AppButton variant="fill" size="md" @click="router.push('/')">
-          <template #icon>
-            <span class="material-symbols-outlined text-xl">play_arrow</span>
-          </template>
+          <AppIcon name="play" :size="20" />
           Iniciar Meu Primeiro Treino
         </AppButton>
       </div>

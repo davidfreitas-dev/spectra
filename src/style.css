@@ -78,13 +78,6 @@
     --sal: env(safe-area-inset-left);
   }
 
-  .material-symbols-outlined {
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-  }
 }
 
 /* Directional lateral tab slide (App Native feel) */

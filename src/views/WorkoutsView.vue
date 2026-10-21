@@ -9,6 +9,7 @@ import { DAYS_OF_WEEK } from '@/constants/domain'
 import {
   AppButton,
   AppCard,
+  AppIcon,
   WorkoutEditorModal,
   WorkoutPreSummaryModal,
   WorkoutScheduleModal,
@@ -229,9 +230,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
           size="sm"
           @click="handleNewWorkout"
         >
-          <template #icon>
-            <span class="material-symbols-outlined !text-base">add</span>
-          </template>
+          <AppIcon name="plus" :size="16" />
           Novo Treino
         </AppButton>
       </div>
@@ -291,7 +290,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                   title="Agendar na semana"
                   @click="openSchedulePicker(workout)"
                 >
-                  <span class="material-symbols-outlined text-base!">calendar_today</span>
+                  <AppIcon name="calendar" :size="16" />
                 </AppButton>
 
                 <AppButton
@@ -301,7 +300,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                   title="Duplicar treino"
                   @click="handleDuplicateWorkout(workout.id)"
                 >
-                  <span class="material-symbols-outlined text-base!">content_copy</span>
+                  <AppIcon name="copy" :size="16" />
                 </AppButton>
 
                 <AppButton
@@ -311,7 +310,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                   title="Editar treino"
                   @click="handleEditWorkout(workout)"
                 >
-                  <span class="material-symbols-outlined text-base!">edit</span>
+                  <AppIcon name="edit" :size="16" />
                 </AppButton>
 
                 <AppButton
@@ -321,7 +320,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                   title="Excluir treino"
                   @click="confirmDeleteWorkout(workout)"
                 >
-                  <span class="material-symbols-outlined text-base!">delete</span>
+                  <AppIcon name="trash" :size="16" />
                 </AppButton>
 
                 <AppButton
@@ -330,9 +329,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                   class="ml-1"
                   @click="handleStartWorkout(workout)"
                 >
-                  <template #icon>
-                    <span class="material-symbols-outlined !text-base">play_arrow</span>
-                  </template>
+                  <AppIcon name="play" :size="16" />
                   Iniciar
                 </AppButton>
               </div>
@@ -385,9 +382,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                   size="sm"
                   @click="handleCopyPreset(preset.id)"
                 >
-                  <template #icon>
-                    <span class="material-symbols-outlined !text-base">add_to_photos</span>
-                  </template>
+                  <AppIcon name="copy" :size="16" />
                   Copiar para Meus Treinos
                 </AppButton>
 
@@ -396,9 +391,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
                   size="sm"
                   @click="handleStartWorkout(preset)"
                 >
-                  <template #icon>
-                    <span class="material-symbols-outlined !text-base">play_arrow</span>
-                  </template>
+                  <AppIcon name="play" :size="16" />
                   Iniciar
                 </AppButton>
               </div>

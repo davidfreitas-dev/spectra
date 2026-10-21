@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { StatusBadgeType } from '@/types'
+import AppIcon from './AppIcon.vue'
+import type { AppIconName } from './icons'
 
 interface Props {
   type: StatusBadgeType
@@ -11,7 +13,7 @@ const props = defineProps<Props>()
 
 interface BadgeConfig {
   defaultLabel: string
-  icon: string
+  icon: AppIconName
   pulse?: boolean
   classes: string
   iconColorClass?: string
@@ -24,7 +26,7 @@ const config = computed<BadgeConfig>(() => {
     case 'completed':
       return {
         defaultLabel: 'Concluída',
-        icon: 'check_circle',
+        icon: 'check',
         classes: 'bg-success border-border-primary text-on-success shadow-[0_2px_0_0_#111111]',
         iconColorClass: 'text-on-success',
         textColorClass: 'text-on-success',
@@ -32,7 +34,7 @@ const config = computed<BadgeConfig>(() => {
     case 'in_progress':
       return {
         defaultLabel: 'Em andamento',
-        icon: 'play_circle',
+        icon: 'play',
         pulse: true,
         classes: 'bg-primary-container border-border-primary text-on-primary shadow-[0_2px_0_0_#111111]',
         iconColorClass: 'text-on-primary',
@@ -41,7 +43,7 @@ const config = computed<BadgeConfig>(() => {
     case 'partial':
       return {
         defaultLabel: 'Parcial',
-        icon: 'timelapse',
+        icon: 'clock',
         classes: 'bg-warning-container border-border-primary text-on-warning shadow-[0_2px_0_0_#111111]',
         iconColorClass: 'text-on-warning font-bold',
         textColorClass: 'text-on-warning',
@@ -49,7 +51,7 @@ const config = computed<BadgeConfig>(() => {
     case 'planned':
       return {
         defaultLabel: 'Planejado',
-        icon: 'calendar_today',
+        icon: 'calendar',
         classes: 'bg-info border-border-primary text-on-info shadow-[0_2px_0_0_#111111]',
         iconColorClass: 'text-on-info',
         textColorClass: 'text-on-info',
@@ -57,7 +59,7 @@ const config = computed<BadgeConfig>(() => {
     case 'rest':
       return {
         defaultLabel: 'Descanso',
-        icon: 'bedtime',
+        icon: 'moon',
         classes: 'bg-rest border-border-primary text-on-rest shadow-[0_2px_0_0_#111111]',
         iconColorClass: 'text-on-rest',
         textColorClass: 'text-on-rest',
@@ -65,7 +67,7 @@ const config = computed<BadgeConfig>(() => {
     case 'abandoned':
       return {
         defaultLabel: 'Abandonada',
-        icon: 'cancel',
+        icon: 'close',
         classes: 'bg-error border-border-primary text-on-error shadow-[0_2px_0_0_#111111]',
         iconColorClass: 'text-on-error',
         textColorClass: 'text-on-error',
@@ -91,7 +93,7 @@ const config = computed<BadgeConfig>(() => {
     case 'weighted':
       return {
         defaultLabel: 'Carga Adicional',
-        icon: 'bolt',
+        icon: 'zap',
         classes: 'bg-primary-soft border-border-primary text-primary shadow-[0_2px_0_0_#111111]',
         iconColorClass: 'text-primary',
         textColorClass: 'text-primary',
@@ -114,12 +116,11 @@ const displayLabel = computed(() => props.label || config.value.defaultLabel)
     ]"
   >
     <slot name="icon">
-      <span
-        class="material-symbols-outlined !text-[13px] !leading-none w-3.5 h-3.5 flex items-center justify-center shrink-0"
+      <AppIcon
+        :name="config.icon"
+        :size="13"
         :class="[config.iconColorClass, { 'animate-pulse': config.pulse }]"
-      >
-        {{ config.icon }}
-      </span>
+      />
     </slot>
     <span :class="config.textColorClass">{{ displayLabel }}</span>
   </div>

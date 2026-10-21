@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { AppButton, AppCheckbox } from '@/components'
+import AppIcon from './AppIcon.vue'
+import type { AppIconName } from './icons'
 import type { UserLevel, Equipment } from '@/types/domain'
 
 defineProps<{
@@ -33,11 +35,11 @@ const levels: { value: UserLevel; label: string; desc: string }[] = [
   },
 ]
 
-const equipmentOptions: { value: Equipment; label: string; icon: string }[] = [
-  { value: 'none', label: 'Apenas Peso Corporal', icon: 'accessibility_new' },
-  { value: 'bar', label: 'Barra Fixa', icon: 'horizontal_rule' },
-  { value: 'band', label: 'Elástico de Resistência', icon: 'linear_scale' },
-  { value: 'rope', label: 'Corda de Pular', icon: 'sports' },
+const equipmentOptions: { value: Equipment; label: string; icon: AppIconName }[] = [
+  { value: 'none', label: 'Apenas Peso Corporal', icon: 'user' },
+  { value: 'bar', label: 'Barra Fixa', icon: 'minus' },
+  { value: 'band', label: 'Elástico de Resistência', icon: 'activity' },
+  { value: 'rope', label: 'Corda de Pular', icon: 'flame' },
 ]
 
 function toggleEquipment(eq: Equipment) {
@@ -109,12 +111,12 @@ function handleFinish() {
         >
           <div class="flex items-center justify-between">
             <span class="font-bold text-sm text-ink">{{ lvl.label }}</span>
-            <span
+            <AppIcon
               v-if="selectedLevel === lvl.value"
-              class="material-symbols-outlined text-primary-container !text-xl"
-            >
-              check_circle
-            </span>
+              name="check"
+              :size="20"
+              class="text-primary-container"
+            />
           </div>
           <p class="text-xs text-ink-muted mt-1 font-normal">
             {{ lvl.desc }}
@@ -124,9 +126,7 @@ function handleFinish() {
         <div class="pt-4 flex justify-end">
           <AppButton variant="fill" @click="step = 2">
             Avançar
-            <template #right-icon>
-              <span class="material-symbols-outlined !text-base">arrow_forward</span>
-            </template>
+            <AppIcon name="arrow_right" :size="16" />
           </AppButton>
         </div>
       </div>
@@ -152,9 +152,7 @@ function handleFinish() {
           @keydown.enter.prevent="toggleEquipment(eq.value)"
         >
           <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-ink-muted !text-xl">
-              {{ eq.icon }}
-            </span>
+            <AppIcon :name="eq.icon" :size="20" class="text-ink-muted" />
             <span class="font-bold text-sm text-ink">{{ eq.label }}</span>
           </div>
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import AppIcon from './AppIcon.vue'
 
 interface Props {
   modelValue: number
@@ -64,7 +65,7 @@ function increment() {
         @click="decrement"
       >
         <slot name="minus-icon">
-          <span class="material-symbols-outlined text-lg">remove</span>
+          <AppIcon name="minus" :size="16" />
         </slot>
       </button>
 
@@ -91,7 +92,7 @@ function increment() {
         @click="increment"
       >
         <slot name="plus-icon">
-          <span class="material-symbols-outlined text-lg">add</span>
+          <AppIcon name="plus" :size="16" />
         </slot>
       </button>
     </div>

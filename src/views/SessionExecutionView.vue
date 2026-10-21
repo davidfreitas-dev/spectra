@@ -10,6 +10,7 @@ import {
   AppButton,
   AppStepper,
   AppProgressBar,
+  AppIcon,
   ExerciseDetailModal,
 } from '@/components'
 import type { SessionExercise, ExerciseCatalogItem } from '@/types/domain'
@@ -341,9 +342,7 @@ function openExerciseDetail() {
           class="w-full sm:w-auto"
           @click="handleAddRestTime"
         >
-          <template #icon>
-            <span class="material-symbols-outlined !text-xl">more_time</span>
-          </template>
+          <AppIcon name="timer" :size="20" />
           +30 Segundos
         </AppButton>
 
@@ -353,9 +352,7 @@ function openExerciseDetail() {
           class="w-full sm:w-auto"
           @click="handleSkipRest"
         >
-          <template #icon>
-            <span class="material-symbols-outlined !text-xl">skip_next</span>
-          </template>
+          <AppIcon name="skip" :size="20" />
           Pular Descanso
         </AppButton>
       </div>
@@ -386,7 +383,7 @@ function openExerciseDetail() {
           title="Ver instruções do exercício"
           @click="openExerciseDetail"
         >
-          <span class="material-symbols-outlined !text-xl">info</span>
+          <AppIcon name="info" :size="20" />
         </button>
       </div>
 
@@ -426,9 +423,7 @@ function openExerciseDetail() {
             size="lg"
             @click="handleStartExerciseTimer"
           >
-            <template #icon>
-              <span class="material-symbols-outlined !text-xl">play_arrow</span>
-            </template>
+            <AppIcon name="play" :size="20" />
             Iniciar Cronômetro
           </AppButton>
           <AppButton
@@ -437,9 +432,7 @@ function openExerciseDetail() {
             size="lg"
             @click="handleStopExerciseTimer"
           >
-            <template #icon>
-              <span class="material-symbols-outlined !text-xl">pause</span>
-            </template>
+            <AppIcon name="pause" :size="20" />
             Pausar
           </AppButton>
         </div>
@@ -484,9 +477,7 @@ function openExerciseDetail() {
           class="w-full sm:flex-1"
           @click="handleCompleteSet"
         >
-          <template #icon>
-            <span class="material-symbols-outlined !text-xl">check</span>
-          </template>
+          <AppIcon name="check" :size="20" />
           Concluir Série
         </AppButton>
       </div>
@@ -519,7 +510,7 @@ function openExerciseDetail() {
             @click="handleQuitPartial"
           >
             <div class="flex items-center gap-2.5">
-              <span class="material-symbols-outlined text-primary-container !text-xl">save</span>
+              <AppIcon name="save" :size="20" class="text-primary-container" />
               <div>
                 <span class="font-bold text-sm text-ink block">Salvar como Parcial</span>
                 <span class="text-xs text-ink-muted">
@@ -537,9 +528,7 @@ function openExerciseDetail() {
               class="w-full"
               @click="handleQuitDiscard"
             >
-              <template #icon>
-                <span class="material-symbols-outlined !text-base">delete</span>
-              </template>
+              <AppIcon name="trash" :size="16" />
               Descartar Treino
             </AppButton>
           </div>
@@ -564,7 +553,7 @@ function openExerciseDetail() {
         <!-- Summary Header -->
         <div class="p-5 border-b border-border-grid bg-bg-alternate text-center">
           <div class="w-12 h-12 rounded-2xl bg-primary-container text-on-primary flex items-center justify-center mx-auto mb-2 shadow-[0_2px_0_0_#111111]">
-            <span class="material-symbols-outlined !text-2xl">emoji_events</span>
+            <AppIcon name="trophy" :size="24" />
           </div>
           <span class="font-eyebrow text-[10px] uppercase font-bold text-primary-container tracking-wider block">
             Treino Concluído
@@ -601,7 +590,7 @@ function openExerciseDetail() {
             class="p-4 rounded-xl border-2 border-primary-container bg-primary-container/10 space-y-2"
           >
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-primary-container !text-base">military_tech</span>
+              <AppIcon name="medal" :size="16" class="text-primary-container" />
               <span class="font-bold text-xs uppercase text-primary-container tracking-wider">
                 Novo Recorde Pessoal Batido!
               </span>

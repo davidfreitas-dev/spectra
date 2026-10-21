@@ -6,6 +6,7 @@ import {
   AppButton,
   AppInput,
   AppStepper,
+  AppIcon,
 } from '@/components'
 import ExerciseSelectorModal from './ExerciseSelectorModal.vue'
 import type { Workout, WorkoutItem, ExerciseCatalogItem, Equipment } from '@/types/domain'
@@ -182,7 +183,7 @@ function handleBackdropClick(e: MouseEvent) {
           class="w-9 h-9 flex items-center justify-center rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate text-ink font-bold cursor-pointer transition-colors"
           @click="emit('close')"
         >
-          <span class="material-symbols-outlined !text-lg">close</span>
+          <AppIcon name="close" :size="18" />
         </button>
       </div>
 
@@ -193,7 +194,7 @@ function handleBackdropClick(e: MouseEvent) {
           v-if="errorMessage"
           class="p-3 rounded-xl bg-error-container/20 border border-border-error text-error text-xs font-bold flex items-center gap-2"
         >
-          <span class="material-symbols-outlined !text-base">error</span>
+          <AppIcon name="error" :size="16" />
           <span>{{ errorMessage }}</span>
         </div>
 
@@ -226,9 +227,7 @@ function handleBackdropClick(e: MouseEvent) {
             :disabled="items.length >= DOMAIN_LIMITS.EXERCISES_PER_WORKOUT.MAX"
             @click="showSelector = true"
           >
-            <template #icon>
-              <span class="material-symbols-outlined !text-base">add</span>
-            </template>
+            <AppIcon name="plus" :size="16" />
             Adicionar
           </AppButton>
         </div>
@@ -260,7 +259,7 @@ function handleBackdropClick(e: MouseEvent) {
                   title="Mover para cima"
                   @click="moveUp(index)"
                 >
-                  <span class="material-symbols-outlined !text-sm text-ink">arrow_upward</span>
+                  <AppIcon name="arrow_up" :size="14" class="text-ink" />
                 </button>
                 <button
                   type="button"
@@ -269,7 +268,7 @@ function handleBackdropClick(e: MouseEvent) {
                   title="Mover para baixo"
                   @click="moveDown(index)"
                 >
-                  <span class="material-symbols-outlined !text-sm text-ink">arrow_downward</span>
+                  <AppIcon name="arrow_down" :size="14" class="text-ink" />
                 </button>
                 <button
                   type="button"
@@ -277,7 +276,7 @@ function handleBackdropClick(e: MouseEvent) {
                   title="Remover exercício"
                   @click="removeItem(index)"
                 >
-                  <span class="material-symbols-outlined !text-sm">delete</span>
+                  <AppIcon name="trash" :size="14" />
                 </button>
               </div>
             </div>

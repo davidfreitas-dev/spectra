@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import AppIcon from './AppIcon.vue'
 
 interface Props {
   modelValue?: string | number
@@ -89,12 +90,12 @@ const inputClasses = computed(() => {
 
       <div v-if="error" class="absolute right-2.5 flex items-center pointer-events-none text-error">
         <slot name="error-icon">
-          <span class="material-symbols-outlined text-lg">error</span>
+          <AppIcon name="error" :size="18" />
         </slot>
       </div>
       <div v-else-if="disabled" class="absolute right-2.5 flex items-center pointer-events-none text-ink-subtle">
         <slot name="disabled-icon">
-          <span class="material-symbols-outlined text-base">lock</span>
+          <AppIcon name="lock" :size="16" />
         </slot>
       </div>
       <div v-else-if="$slots.right" class="absolute right-2.5 flex items-center text-ink-muted">

@@ -11,6 +11,7 @@ import {
   AppCard,
   AppProgressBar,
   AppStatusBadge,
+  AppIcon,
   ScheduleDayModal,
   WorkoutPreSummaryModal,
   OnboardingModal,
@@ -200,9 +201,7 @@ function formatSessionDate(isoString: string): string {
         class="w-full sm:w-auto shrink-0"
         @click="router.push('/session')"
       >
-        <template #icon>
-          <span class="material-symbols-outlined !text-xl">play_arrow</span>
-        </template>
+        <AppIcon name="play" :size="20" />
         Retomar Treino
       </AppButton>
     </div>
@@ -304,11 +303,10 @@ function formatSessionDate(isoString: string): string {
             class="w-full"
             @click="handleStartTodayWorkout"
           >
-            <template #icon>
-              <span class="material-symbols-outlined !text-xl">
-                {{ sessionsStore.activeSession ? 'replay' : 'play_arrow' }}
-              </span>
-            </template>
+            <AppIcon
+              :name="sessionsStore.activeSession ? 'replay' : 'play'"
+              :size="20"
+            />
             <span>{{ sessionsStore.activeSession ? 'Retomar Treino em Andamento' : 'Iniciar Treino de Hoje' }}</span>
           </AppButton>
         </div>
