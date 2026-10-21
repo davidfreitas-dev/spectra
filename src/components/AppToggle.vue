@@ -91,7 +91,6 @@ const knobClasses = computed(() => {
     </button>
   </div>
 
-  <!-- Standalone Switch (without wrapper) -->
   <button
     v-else
     type="button"
@@ -102,6 +101,7 @@ const knobClasses = computed(() => {
     :class="trackClasses"
     @click="toggle"
   >
+    <!-- Standalone Switch (without wrapper) -->
     <span
       class="w-5 h-5 rounded-full transition-transform duration-200 inline-block pointer-events-none"
       :class="knobClasses"

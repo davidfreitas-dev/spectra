@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterView, useRouter } from 'vue-router'
-import { AppNavbar, AppSpinner } from '@/components'
+import { AppNavbar } from '@/components'
 
 const router = useRouter()
 const transitionName = ref('page-slide-left')
@@ -33,14 +33,7 @@ router.beforeEach((to, from) => {
       <RouterView v-slot="{ Component, route }">
         <Transition :name="transitionName" mode="out-in">
           <div :key="route.path">
-            <Suspense>
-              <component :is="Component" />
-              <template #fallback>
-                <div class="flex flex-col items-center justify-center min-h-[50vh] p-8">
-                  <AppSpinner size="lg" label="Carregando..." />
-                </div>
-              </template>
-            </Suspense>
+            <component :is="Component" />
           </div>
         </Transition>
       </RouterView>

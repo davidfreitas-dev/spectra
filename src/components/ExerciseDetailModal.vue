@@ -112,7 +112,7 @@ const harderExercise = computed(() => {
         </div>
 
         <!-- Variations (Easier / Harder) -->
-        <div v-if="easierExercise || harderExercise" class="space-y-2 pt-2 border-t border-border-grid">
+        <div v-if="easierExercise || harderExercise" class="space-y-2 pt-4 border-t border-border-grid">
           <h3 class="font-bold text-xs uppercase text-ink-muted tracking-wider">
             Variações do Movimento
           </h3>

@@ -301,12 +301,13 @@ function handleNextClick() {
             size="sm"
             @click="handleNextClick"
           >
-            <template v-if="currentConfig.stepNumber < currentConfig.totalSteps">
+            <template v-if="!currentConfig.isLastStepOfPage">
               Próximo
               <AppIcon name="arrow_right" :size="14" />
             </template>
             <template v-else>
-              Entendi, Treinar!
+              <AppIcon name="check" :size="14" />
+              Concluir
             </template>
           </AppButton>
         </div>

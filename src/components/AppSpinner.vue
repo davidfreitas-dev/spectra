@@ -93,13 +93,13 @@ const labelSizeClass = computed(() => {
 </script>
 
 <template>
-  <!-- Fullscreen Modal Mode -->
   <div
     v-if="fullscreen"
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/40 backdrop-blur-xs animate-in fade-in duration-150"
     role="status"
     aria-live="polite"
   >
+    <!-- Fullscreen Modal Mode -->
     <div
       class="bg-surface border-2 border-border-primary rounded-2xl px-6 py-5 flex flex-col items-center gap-3.5 shadow-[0_6px_0_0_#111111]"
     >
@@ -142,13 +142,13 @@ const labelSizeClass = computed(() => {
     </div>
   </div>
 
-  <!-- In-Card/In-Container Overlay Mode -->
   <div
     v-else-if="overlay"
     class="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 bg-surface/85 backdrop-blur-xs rounded-inherit animate-in fade-in duration-150"
     role="status"
     aria-live="polite"
   >
+    <!-- In-Card/In-Container Overlay Mode -->
     <div :class="['relative inline-flex items-center justify-center', sizeDimensions.class]">
       <svg
         class="animate-spin w-full h-full"
@@ -190,7 +190,6 @@ const labelSizeClass = computed(() => {
     <span class="sr-only">{{ label || 'Carregando...' }}</span>
   </div>
 
-  <!-- Standard Inline Spinner -->
   <div
     v-else
     class="inline-flex items-center"
@@ -200,6 +199,7 @@ const labelSizeClass = computed(() => {
     role="status"
     aria-live="polite"
   >
+    <!-- Standard Inline Spinner -->
     <div :class="['relative inline-flex items-center justify-center shrink-0', sizeDimensions.class]">
       <svg
         class="animate-spin w-full h-full"

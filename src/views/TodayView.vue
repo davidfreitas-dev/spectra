@@ -14,7 +14,6 @@ import {
   AppStatusBadge,
   AppIcon,
   ScheduleDayModal,
-  WorkoutPreSummaryModal,
   OnboardingModal,
   AppSpotlightOverlay,
 } from '@/components'
@@ -31,8 +30,6 @@ const tourStore = useTourStore()
 // Modais
 const showScheduleModal = ref(false)
 const selectedDayKey = ref<string | null>(null)
-const showPreSummaryModal = ref(false)
-const workoutForSummary = ref<Workout | null>(null)
 const showWelcomeBanner = ref(false)
 
 onMounted(() => {
@@ -84,26 +81,19 @@ function openScheduleForDay(dayKey: string) {
 function handleAssignDayWorkout(workoutId: string | null) {
   if (selectedDayKey.value) {
     preferencesStore.setDayWorkout(selectedDayKey.value, workoutId)
-    if (selectedDayKey.value === todayKey.value && workoutId) {
-      const assigned = workoutsStore.getWorkoutById(workoutId)
-      if (assigned) {
-        workoutForSummary.value = assigned
-        showPreSummaryModal.value = true
-      }
-    }
   }
 }
 
 function handleStartTodayWorkout() {
   if (tourStore.isTourActive && ['today-schedule', 'today-weekly-goal', 'today-start'].includes(tourStore.currentStepKey)) {
-    tourStore.setStep('pre-summary-start')
+    tourStore.finishTour()
   }
 
   if (sessionsStore.activeSession) {
     router.push('/session')
   } else if (todayWorkout.value) {
-    workoutForSummary.value = todayWorkout.value
-    showPreSummaryModal.value = true
+    sessionsStore.startSession(todayWorkout.value)
+    router.push('/session')
   } else {
     if (workoutsStore.workouts.length > 0) {
       openScheduleForDay(todayKey.value)
@@ -129,20 +119,10 @@ watch(
   }
 )
 
-function handleConfirmStartWorkout() {
-  if (!workoutForSummary.value) return
-  if (tourStore.isTourActive && tourStore.currentStepKey === 'pre-summary-start') {
-    tourStore.setStep('session-exercise')
-  }
-  sessionsStore.startSession(workoutForSummary.value)
-  showPreSummaryModal.value = false
-  router.push('/session')
-}
-
 function handleAcceptSuggestion(suggestion: ProgressionSuggestion) {
-  if (workoutForSummary.value) {
+  if (todayWorkout.value) {
     workoutsStore.updateExerciseTarget(
-      workoutForSummary.value.id,
+      todayWorkout.value.id,
       suggestion.exerciseId,
       suggestion.suggestedTarget
     )
@@ -150,8 +130,8 @@ function handleAcceptSuggestion(suggestion: ProgressionSuggestion) {
 }
 
 function handleDismissSuggestion(suggestion: ProgressionSuggestion) {
-  if (workoutForSummary.value) {
-    workoutsStore.dismissSuggestion(workoutForSummary.value.id, suggestion.exerciseId)
+  if (todayWorkout.value) {
+    workoutsStore.dismissSuggestion(todayWorkout.value.id, suggestion.exerciseId)
   }
 }
 
@@ -356,6 +336,57 @@ function formatSessionDate(isoString: string): string {
       eyebrow="Rotina Prescrita para Hoje"
     >
       <div class="space-y-4">
+        <!-- Progression Suggestions Card (if any) -->
+        <div
+          v-if="todaySuggestions.length > 0"
+          class="p-4 rounded-xl border-2 border-primary-container bg-primary-container/10 space-y-3"
+        >
+          <div class="flex items-center gap-2">
+            <AppIcon name="trending_up" :size="18" class="text-primary-container" />
+            <span class="font-bold text-xs uppercase text-primary-container tracking-wider">
+              Sugestão de Progressão Disponível
+            </span>
+          </div>
+
+          <div
+            v-for="sug in todaySuggestions"
+            :key="sug.exerciseId"
+            class="p-3 rounded-lg bg-surface border border-border-grid space-y-2"
+          >
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-sm text-ink">{{ sug.exerciseName }}</span>
+              <div class="flex items-center gap-1.5 font-metric-number text-xs font-bold text-ink">
+                <span class="text-ink-muted line-through">{{ sug.currentTarget }}</span>
+                <AppIcon name="arrow_right" :size="12" class="text-primary-container" />
+                <span class="text-primary-container bg-primary-container/15 px-1.5 py-0.5 rounded">
+                  {{ sug.suggestedTarget }} {{ sug.measurementType === 'reps' ? 'reps' : 's' }}
+                </span>
+              </div>
+            </div>
+
+            <p class="text-xs text-ink-muted">
+              {{ sug.reason }}
+            </p>
+
+            <div class="flex items-center gap-2 pt-1">
+              <AppButton
+                variant="fill"
+                size="sm"
+                @click="handleAcceptSuggestion(sug)"
+              >
+                Aceitar
+              </AppButton>
+              <AppButton
+                variant="ghost"
+                size="sm"
+                @click="handleDismissSuggestion(sug)"
+              >
+                Ignorar
+              </AppButton>
+            </div>
+          </div>
+        </div>
+
         <div class="divide-y divide-border-grid">
           <div
             v-for="(item, idx) in todayWorkout.items"
@@ -448,27 +479,15 @@ function formatSessionDate(isoString: string): string {
       @explore-workouts="router.push('/workouts')"
     />
 
-    <!-- Pre-Workout Summary Modal -->
-    <WorkoutPreSummaryModal
-      :is-open="showPreSummaryModal"
-      :workout="workoutForSummary"
-      :suggestions="todaySuggestions"
-      @close="showPreSummaryModal = false"
-      @start="handleConfirmStartWorkout"
-      @accept-suggestion="handleAcceptSuggestion"
-      @dismiss-suggestion="handleDismissSuggestion"
-    />
-
     <!-- Onboarding Modal (Step 1 & 2 on first launch) -->
     <OnboardingModal
       :is-open="preferencesStore.isLoaded && !preferencesStore.preferences.onboardingDone"
       @complete="handleOnboardingComplete"
     />
 
-    <!-- Interactive Spotlight Overlay (Initial Screen & Modal) -->
+    <!-- Interactive Spotlight Overlay (Initial Screen) -->
     <AppSpotlightOverlay step-key="today-schedule" />
     <AppSpotlightOverlay step-key="today-weekly-goal" />
-    <AppSpotlightOverlay step-key="today-start" @next="handleStartTodayWorkout" />
-    <AppSpotlightOverlay step-key="pre-summary-start" />
+    <AppSpotlightOverlay step-key="today-start" />
   </div>
 </template>

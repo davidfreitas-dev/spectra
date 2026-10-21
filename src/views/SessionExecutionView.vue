@@ -428,8 +428,9 @@ function openExerciseDetail() {
 
         <button
           type="button"
-          class="p-2 rounded-xl border border-border-grid bg-bg-alternate hover:border-border-primary text-ink transition-colors cursor-pointer"
+          class="w-10 h-10 rounded-xl border border-border-grid bg-bg-alternate hover:border-border-primary text-ink flex items-center justify-center shrink-0 transition-colors cursor-pointer"
           title="Ver instruções do exercício"
+          aria-label="Ver instruções do exercício"
           @click="openExerciseDetail"
         >
           <AppIcon name="info" :size="20" />
@@ -489,7 +490,7 @@ function openExerciseDetail() {
 
       <!-- REPS EXERCISE / RESULT STEPPER -->
       <div class="space-y-3 pt-2" data-tour="session-stepper">
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
           <span class="font-eyebrow text-xs uppercase font-bold text-ink-muted">
             Meta Planejada:
             <span class="text-ink font-bold">{{ currentExercise.target }} {{ currentExercise.measurementType === 'reps' ? 'repetições' : 'segundos' }}</span>
@@ -747,5 +748,10 @@ function openExerciseDetail() {
     <AppSpotlightOverlay step-key="session-stepper" />
     <AppSpotlightOverlay step-key="session-complete-set" />
     <AppSpotlightOverlay step-key="session-rest" />
+  </div>
+
+  <div v-else class="max-w-175 mx-auto px-4 sm:px-6 py-20 text-center space-y-3">
+    <div class="inline-block animate-spin w-6 h-6 border-2 border-primary-container border-t-transparent rounded-full" />
+    <p class="text-xs text-ink-muted">Redirecionando...</p>
   </div>
 </template>
