@@ -1059,19 +1059,32 @@ const swatches = [
 
           <!-- Status Badges -->
           <AppCard title="Badges de Status da Sessão" dot-color="ink" badge="Sinalização Semântica">
-            <p class="font-body text-xs text-ink-muted mb-4 leading-relaxed">
-              Estado nunca indicado apenas por cor — sempre acompanhado de ícone vetorial e texto descritivo.
-            </p>
-
             <div class="space-y-4">
               <!-- Session Statuses -->
-              <div class="flex flex-wrap items-center gap-2">
-                <AppStatusBadge type="completed" />
-                <AppStatusBadge type="in_progress" />
-                <AppStatusBadge type="partial" />
-                <AppStatusBadge type="planned" />
-                <AppStatusBadge type="rest" />
-                <AppStatusBadge type="abandoned" />
+               <div>
+                <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">
+                  Status de Sessões:
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <AppStatusBadge type="completed" />
+                    <AppStatusBadge type="in_progress" />
+                    <AppStatusBadge type="partial" />
+                    <AppStatusBadge type="planned" />
+                    <AppStatusBadge type="rest" />
+                    <AppStatusBadge type="abandoned" />
+                </div>
+              </div>
+
+              <!-- User / Exercise Levels -->
+              <div class="pt-4 border-t border-border-grid">
+                <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">
+                  Níveis de Treino &amp; Usuário:
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <AppStatusBadge type="beginner" />
+                  <AppStatusBadge type="intermediate" />
+                  <AppStatusBadge type="advanced" />
+                </div>
               </div>
 
               <!-- Informative Badges -->

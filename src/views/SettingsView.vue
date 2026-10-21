@@ -282,7 +282,7 @@ function handleConfirmReset() {
           O Spectra opera 100% no seu dispositivo. Exporte seu arquivo JSON regularmente para não perder seu histórico ou para transferir para outro aparelho.
         </p>
 
-        <div class="flex flex-wrap items-center gap-3 pt-2 border-t border-border-grid">
+        <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-border-grid">
           <AppButton variant="fill" size="sm" :loading="isExporting" @click="exportBackup">
             <AppIcon name="download" :size="16" />
             Exportar Backup JSON
@@ -312,7 +312,7 @@ function handleConfirmReset() {
           Apaga permanentemente todos os treinos, sessões e configurações do navegador neste dispositivo.
         </p>
 
-        <div class="pt-2 border-t border-border-grid">
+        <div class="pt-4 border-t border-border-grid">
           <AppButton variant="danger" size="sm" :loading="isResetting" @click="openResetConfirm">
             <AppIcon name="trash" :size="16" />
             Apagar Todos os Dados

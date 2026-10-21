@@ -1,3 +1,5 @@
+import type { UserLevel } from './domain'
+
 export type ButtonVariant = 'fill' | 'outline' | 'ghost' | 'danger'
 export type ButtonShape = 'rounded' | 'pill' | 'circle'
 export type ButtonSize = 'sm' | 'md' | 'lg'
@@ -32,3 +34,4 @@ export type StatusBadgeType =
   | 'pr'
   | 'bodyweight'
   | 'weighted'
+  | UserLevel

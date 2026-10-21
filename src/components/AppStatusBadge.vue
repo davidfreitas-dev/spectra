@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { StatusBadgeType } from '@/types'
-import AppIcon from './AppIcon.vue'
 import type { AppIconName } from './icons'
+import AppIcon from './AppIcon.vue'
 
 interface Props {
   type: StatusBadgeType
   label?: string
+  isEyebrow?: boolean
 }
 
 const props = defineProps<Props>()
@@ -84,7 +85,7 @@ const config = computed<BadgeConfig>(() => {
     case 'bodyweight':
       return {
         defaultLabel: 'Peso Corporal',
-        icon: 'scale',
+        icon: 'body',
         classes: 'bg-bg-alternate border-border-primary text-ink shadow-[0_2px_0_0_#111111]',
         iconColorClass: 'text-ink',
         textColorClass: 'text-ink',
@@ -99,10 +100,35 @@ const config = computed<BadgeConfig>(() => {
         textColorClass: 'text-primary',
         isEyebrow: true,
       }
+    case 'beginner':
+      return {
+        defaultLabel: 'Iniciante',
+        icon: 'leaf',
+        classes: 'bg-success border-border-primary text-on-success shadow-[0_2px_0_0_#111111]',
+        iconColorClass: 'text-on-success',
+        textColorClass: 'text-on-success',
+      }
+    case 'intermediate':
+      return {
+        defaultLabel: 'Intermediário',
+        icon: 'trending_up',
+        classes: 'bg-info border-border-primary text-on-info shadow-[0_2px_0_0_#111111]',
+        iconColorClass: 'text-on-info',
+        textColorClass: 'text-on-info',
+      }
+    case 'advanced':
+      return {
+        defaultLabel: 'Avançado',
+        icon: 'flame',
+        classes: 'bg-primary border-border-primary text-on-primary shadow-[0_2px_0_0_#111111]',
+        iconColorClass: 'text-on-primary',
+        textColorClass: 'text-on-primary',
+      }
   }
 })
 
 const displayLabel = computed(() => props.label || config.value.defaultLabel)
+const isEyebrowMode = computed(() => props.isEyebrow ?? config.value.isEyebrow ?? false)
 </script>
 
 <template>
@@ -110,7 +136,7 @@ const displayLabel = computed(() => props.label || config.value.defaultLabel)
     class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border transition-transform select-none leading-none"
     :class="[
       config.classes,
-      config.isEyebrow
+      isEyebrowMode
         ? 'font-eyebrow text-[10px] uppercase font-bold tracking-wider'
         : 'font-button-text text-[11px] font-bold'
     ]"

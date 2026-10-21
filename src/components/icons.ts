@@ -41,6 +41,9 @@ import {
   Activity,
   Flame,
   SlidersHorizontal,
+  PersonStanding,
+  Spline,
+  Leaf,
 } from '@lucide/vue'
 
 export const iconMap = {
@@ -89,12 +92,15 @@ export const iconMap = {
   star: Star,
   scale: Scale,
   zap: Zap,
+  rope: Spline,
+  leaf: Leaf,
 
   // Backup
   download: Download,
   upload: Upload,
 
   // Equipment
+  body: PersonStanding,
   user: User,
   activity: Activity,
   flame: Flame,

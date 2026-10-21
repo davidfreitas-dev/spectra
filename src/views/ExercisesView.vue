@@ -229,21 +229,7 @@ function handleSelectVariation(variation: ExerciseCatalogItem) {
               <!-- Level / PR indicator -->
               <div class="flex items-center justify-between pt-4 border-t border-border-grid">
                 <div class="flex items-center gap-2">
-                  <AppStatusBadge
-                    v-if="exercise.level === 'beginner'"
-                    type="completed"
-                    label="Iniciante"
-                  />
-                  <AppStatusBadge
-                    v-else-if="exercise.level === 'intermediate'"
-                    type="planned"
-                    label="Intermediário"
-                  />
-                  <AppStatusBadge
-                    v-else
-                    type="weighted"
-                    label="Avançado"
-                  />
+                  <AppStatusBadge :type="exercise.level" />
                 </div>
 
                 <!-- Personal Record Badge if exists -->

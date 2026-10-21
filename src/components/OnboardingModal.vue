@@ -36,9 +36,9 @@ const levels: { value: UserLevel; label: string; desc: string }[] = [
 ]
 
 const equipmentOptions: { value: Equipment; label: string; icon: AppIconName }[] = [
-  { value: 'none', label: 'Apenas Peso Corporal', icon: 'user' },
+  { value: 'none', label: 'Apenas Peso Corporal', icon: 'body' },
   { value: 'bar', label: 'Barra Fixa', icon: 'minus' },
-  { value: 'band', label: 'Elástico de Resistência', icon: 'activity' },
+  { value: 'band', label: 'Elástico de Resistência', icon: 'rope' },
   { value: 'rope', label: 'Corda de Pular', icon: 'flame' },
 ]
 
