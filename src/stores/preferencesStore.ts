@@ -15,6 +15,7 @@ const DEFAULT_PREFERENCES: Preferences = {
   soundEnabled: true,
   vibrationEnabled: true,
   onboardingDone: false,
+  firstSessionTourDone: false,
 }
 
 export const usePreferencesStore = defineStore('preferences', () => {
@@ -66,6 +67,22 @@ export const usePreferencesStore = defineStore('preferences', () => {
     persist()
   }
 
+  function completeFirstSessionTour() {
+    preferences.value.firstSessionTourDone = true
+    persist()
+  }
+
+  function resetOnboarding() {
+    preferences.value.onboardingDone = false
+    preferences.value.firstSessionTourDone = false
+    persist()
+  }
+
+  function resetSessionTour() {
+    preferences.value.firstSessionTourDone = false
+    persist()
+  }
+
   // Meta semanal é estritamente a quantidade de dias com treino atribuído na agenda
   const weeklyGoal = computed(() => {
     if (!preferences.value.schedule) return 0
@@ -82,5 +99,8 @@ export const usePreferencesStore = defineStore('preferences', () => {
     setDayWorkout,
     setToggles,
     completeOnboarding,
+    completeFirstSessionTour,
+    resetOnboarding,
+    resetSessionTour,
   }
 })

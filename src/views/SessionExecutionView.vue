@@ -13,6 +13,7 @@ import {
   AppProgressBar,
   AppIcon,
   ExerciseDetailModal,
+  FirstSessionGuideModal,
 } from '@/components'
 import type { SessionExercise, ExerciseCatalogItem } from '@/types/domain'
 
@@ -26,11 +27,13 @@ const { playTimerComplete, playSetComplete } = useSound()
 const showQuitModal = ref(false)
 const showSummaryModal = ref(false)
 const showDetailModal = ref(false)
+const showGuideModal = ref(false)
 const selectedExerciseDetail = ref<ExerciseCatalogItem | null>(null)
 const sessionNote = ref('')
 
 useBodyScrollLock(showQuitModal)
 useBodyScrollLock(showSummaryModal)
+useBodyScrollLock(showGuideModal)
 
 // Stepper input para a série atual (pré-preenchido com a meta)
 const currentActualInput = ref<number>(10)
@@ -40,10 +43,16 @@ const now = ref(Date.now())
 let clockInterval: ReturnType<typeof setInterval> | null = null
 
 onMounted(async () => {
+  preferencesStore.load()
   sessionsStore.load()
   if (!sessionsStore.activeSession) {
     router.replace('/')
     return
+  }
+
+  // Se for o primeiro treino do usuário, abre automaticamente o guia interativo
+  if (!preferencesStore.preferences.firstSessionTourDone) {
+    showGuideModal.value = true
   }
 
   // Ativa Wake Lock para manter a tela do celular ligada durante o treino
@@ -234,6 +243,11 @@ function handleFinishComplete() {
   router.push('/progress')
 }
 
+function handleCompleteGuide() {
+  showGuideModal.value = false
+  preferencesStore.completeFirstSessionTour()
+}
+
 // Duração total da sessão (fim - início)
 const sessionDurationFormatted = computed(() => {
   if (!session.value) return '0 min'
@@ -296,13 +310,25 @@ function openExerciseDetail() {
         </div>
       </div>
 
-      <AppButton
-        variant="outline"
-        size="sm"
-        @click="showQuitModal = true"
-      >
-        Encerrar
-      </AppButton>
+      <div class="flex items-center gap-2">
+        <AppButton
+          variant="outline"
+          size="sm"
+          class="px-2"
+          title="Como funciona a tela de treino"
+          aria-label="Como funciona a tela de treino"
+          @click="showGuideModal = true"
+        >
+          <AppIcon name="help" :size="16" />
+        </AppButton>
+        <AppButton
+          variant="outline"
+          size="sm"
+          @click="showQuitModal = true"
+        >
+          Encerrar
+        </AppButton>
+      </div>
     </div>
 
     <!-- Progress Indicator -->
@@ -687,6 +713,13 @@ function openExerciseDetail() {
       :exercise="selectedExerciseDetail"
       :personal-record="selectedExerciseDetail ? sessionsStore.getPersonalRecord(selectedExerciseDetail.id) : null"
       @close="showDetailModal = false"
+    />
+
+    <!-- First Session Guide Modal (First-time coachmarks / Help) -->
+    <FirstSessionGuideModal
+      :is-open="showGuideModal"
+      @close="handleCompleteGuide"
+      @complete="handleCompleteGuide"
     />
   </div>
 </template>

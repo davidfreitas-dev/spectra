@@ -13,6 +13,7 @@ import {
   AppCard,
   AppSpinner,
   AppCheckbox,
+  AppAlert,
   AppIcon,
 } from '@/components'
 import type { SegmentedOption, SelectOption } from '@/types'
@@ -1097,6 +1098,59 @@ const swatches = [
                   <AppStatusBadge type="bodyweight" />
                   <AppStatusBadge type="weighted" />
                 </div>
+              </div>
+            </div>
+          </AppCard>
+
+          <AppCard title="Alertas &amp; Mensagens de Sistema (AppAlert)" dot-color="primary" badge="4 Estados Mapeados" class="mt-8">
+            <div class="space-y-4">
+              <div>
+                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                  1. Alerta Primário (Spectra Primary)
+                </span>
+                <AppAlert
+                  variant="primary"
+                  title="Dica de Rotina"
+                >
+                  Já preparamos uma rotina baseada no seu nível na aba <strong>Hoje</strong>. Você pode começar agora mesmo ou explorar a biblioteca!
+                </AppAlert>
+              </div>
+
+              <div>
+                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                  2. Alerta de Sucesso (Success)
+                </span>
+                <AppAlert
+                  variant="success"
+                  title="Série Concluída"
+                >
+                  Novo Recorde Pessoal (PR) registrado! Você superou sua marca anterior em 2 repetições.
+                </AppAlert>
+              </div>
+
+              <div>
+                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                  3. Alerta Informativo (Info)
+                </span>
+                <AppAlert
+                  variant="info"
+                  title="Aviso de Intervalo"
+                >
+                  O cronômetro de descanso continua rodando em segundo plano caso você alterne de aba.
+                </AppAlert>
+              </div>
+
+              <div>
+                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                  4. Alerta de Atenção / Erro (Danger)
+                </span>
+                <AppAlert
+                  variant="danger"
+                  title="Atenção à Postura"
+                  dismissible
+                >
+                  Mantenha as escápulas engajadas e evite hiperestender os cotovelos no final do movimento.
+                </AppAlert>
               </div>
             </div>
           </AppCard>

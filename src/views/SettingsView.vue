@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import {
   AppCard,
   AppButton,
@@ -18,6 +19,7 @@ import { z } from 'zod'
 import type { UserLevel, Equipment } from '@/types/domain'
 import type { SegmentedOption } from '@/types/components'
 
+const router = useRouter()
 const preferencesStore = usePreferencesStore()
 
 const levelOptions: SegmentedOption[] = [
@@ -83,6 +85,19 @@ function handleSoundToggle(val: boolean) {
 
 function handleVibrationToggle(val: boolean) {
   preferencesStore.setToggles(preferencesStore.preferences.soundEnabled, val)
+}
+
+function handleReplayOnboarding() {
+  preferencesStore.resetOnboarding()
+  showFeedback('Tutorial de boas-vindas reiniciado! Redirecionando...')
+  setTimeout(() => {
+    router.push('/')
+  }, 1000)
+}
+
+function handleReenableSessionTips() {
+  preferencesStore.resetSessionTour()
+  showFeedback('Dicas e guia da tela de treino reativados!')
 }
 
 // Backup Schema para validação rigorosa na importação
@@ -272,6 +287,27 @@ function handleConfirmReset() {
         <p class="text-[11px] text-ink-muted italic pt-1">
           * Nota: alertas sonoros e vibrações podem ser limitados pelo navegador caso o app seja colocado em segundo plano.
         </p>
+      </div>
+    </AppCard>
+
+    <!-- Help & Tutorials Card -->
+    <AppCard title="Ajuda &amp; Tutoriais" eyebrow="Aprenda a Usar o Spectra" dot-color="ink">
+      <div class="space-y-3">
+        <p class="text-xs text-ink-muted leading-relaxed">
+          Deseja rever as explicações de boas-vindas do app ou reativar as dicas da tela de execução de treino?
+        </p>
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+          <AppButton variant="outline" size="sm" @click="handleReplayOnboarding">
+            <AppIcon name="replay" :size="16" />
+            Rever Boas-Vindas
+          </AppButton>
+
+          <AppButton variant="outline" size="sm" @click="handleReenableSessionTips">
+            <AppIcon name="help" :size="16" />
+            Reativar Dicas de Treino
+          </AppButton>
+        </div>
       </div>
     </AppCard>
 

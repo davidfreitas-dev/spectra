@@ -16,6 +16,7 @@ export const PreferencesSchema = z.object({
   soundEnabled: z.boolean().default(true),
   vibrationEnabled: z.boolean().default(true),
   onboardingDone: z.boolean().default(false),
+  firstSessionTourDone: z.boolean().default(false),
 })
 
 export type Preferences = z.infer<typeof PreferencesSchema>

@@ -24,6 +24,8 @@ export interface SegmentedOption {
 
 export type ChipVariant = 'rounded' | 'pill' | 'tag'
 
+export type AlertVariant = 'primary' | 'success' | 'info' | 'danger'
+
 export type StatusBadgeType =
   | 'completed'
   | 'in_progress'

@@ -16,7 +16,8 @@ import {
   WorkoutPreSummaryModal,
   OnboardingModal,
 } from '@/components'
-import type { Workout, UserLevel, Equipment } from '@/types/domain'
+import type { OnboardingCompleteEvent } from '@/components/OnboardingModal.vue'
+import type { Workout } from '@/types/domain'
 
 const route = useRoute()
 const router = useRouter()
@@ -29,6 +30,7 @@ const showScheduleModal = ref(false)
 const selectedDayKey = ref<string | null>(null)
 const showPreSummaryModal = ref(false)
 const workoutForSummary = ref<Workout | null>(null)
+const showWelcomeBanner = ref(false)
 
 onMounted(() => {
   preferencesStore.load()
@@ -143,8 +145,14 @@ function handleDismissSuggestion(suggestion: ProgressionSuggestion) {
   }
 }
 
-function handleOnboardingComplete(data: { level: UserLevel; equipment: Equipment[] }) {
+function handleOnboardingComplete(data: OnboardingCompleteEvent) {
   preferencesStore.completeOnboarding(data.level, data.equipment)
+
+  if (data.action === 'start-now') {
+    handleStartTodayWorkout()
+  } else {
+    showWelcomeBanner.value = true
+  }
 }
 
 function formatSessionDate(isoString: string): string {
@@ -191,7 +199,7 @@ function formatSessionDate(isoString: string): string {
     <!-- Active Session Resume Banner (if any) -->
     <div
       v-if="sessionsStore.activeSession"
-      class="p-4 sm:p-5 rounded-2xl border-2 border-primary-container bg-primary-container/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_4px_0_0_#111111]"
+      class="p-4 sm:p-5 rounded-2xl border-2 border-primary-container bg-primary-container/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_3px_0_0_#f26a21]"
     >
       <div class="flex items-center gap-3">
         <span class="w-3 h-3 rounded-full bg-primary-container animate-pulse shrink-0" />
@@ -217,6 +225,48 @@ function formatSessionDate(isoString: string): string {
         <AppIcon name="play" :size="20" />
         Retomar Treino
       </AppButton>
+    </div>
+
+    <!-- First Session Welcome Banner (when user finishes onboarding with 'explore') -->
+    <div
+      v-if="showWelcomeBanner && !sessionsStore.activeSession"
+      class="p-4 sm:p-5 rounded-2xl border-2 border-primary-container bg-primary-container/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_3px_0_0_#f26a21] animate-in fade-in"
+    >
+      <div class="flex items-start gap-3">
+        <div class="w-10 h-10 rounded-xl bg-primary-container/20 border border-primary-container flex items-center justify-center text-primary-container shrink-0 mt-0.5">
+          <AppIcon name="zap" :size="20" />
+        </div>
+        <div>
+          <span class="font-eyebrow text-[10px] uppercase font-bold text-primary-container tracking-wider block">
+            Pronto para o 1º Treino
+          </span>
+          <h2 class="font-display text-base sm:text-lg font-bold text-ink">
+            Seu treino de hoje já está preparado!
+          </h2>
+          <p class="text-xs text-ink-muted mt-0.5">
+            Ao iniciar, nosso guia interativo mostrará como registrar séries e cronometrar o descanso.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
+        <AppButton
+          variant="outline"
+          size="sm"
+          @click="showWelcomeBanner = false"
+        >
+          Dispensar
+        </AppButton>
+        <AppButton
+          v-if="todayWorkout"
+          variant="fill"
+          size="sm"
+          @click="handleStartTodayWorkout"
+        >
+          <AppIcon name="play" :size="16" />
+          Iniciar 1º Treino
+        </AppButton>
+      </div>
     </div>
 
     <!-- Weekly Calendar Strip (Segunda a Domingo) -->
