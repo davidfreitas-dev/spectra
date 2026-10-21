@@ -190,10 +190,11 @@ const estimatedDurationMinutes = computed(() => {
           variant="fill"
           size="lg"
           class="flex-1"
+          data-tour="pre-summary-start-btn"
           @click="emit('start')"
         >
           <AppIcon name="play" :size="20" />
-          Começar Treino
+          Iniciar Treino
         </AppButton>
       </div>
     </div>

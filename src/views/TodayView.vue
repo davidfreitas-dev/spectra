@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { usePreferencesStore } from '@/stores/preferencesStore'
 import { useWorkoutsStore } from '@/stores/workoutsStore'
 import { useSessionsStore, type ProgressionSuggestion } from '@/stores/sessionsStore'
+import { useTourStore } from '@/stores/tourStore'
 import { DAYS_OF_WEEK } from '@/constants/domain'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import {
@@ -15,6 +16,7 @@ import {
   ScheduleDayModal,
   WorkoutPreSummaryModal,
   OnboardingModal,
+  AppSpotlightOverlay,
 } from '@/components'
 import type { OnboardingCompleteEvent } from '@/components/OnboardingModal.vue'
 import type { Workout } from '@/types/domain'
@@ -24,6 +26,7 @@ const router = useRouter()
 const preferencesStore = usePreferencesStore()
 const workoutsStore = useWorkoutsStore()
 const sessionsStore = useSessionsStore()
+const tourStore = useTourStore()
 
 // Modais
 const showScheduleModal = ref(false)
@@ -92,6 +95,10 @@ function handleAssignDayWorkout(workoutId: string | null) {
 }
 
 function handleStartTodayWorkout() {
+  if (tourStore.isTourActive && ['today-schedule', 'today-weekly-goal', 'today-start'].includes(tourStore.currentStepKey)) {
+    tourStore.setStep('pre-summary-start')
+  }
+
   if (sessionsStore.activeSession) {
     router.push('/session')
   } else if (todayWorkout.value) {
@@ -124,6 +131,9 @@ watch(
 
 function handleConfirmStartWorkout() {
   if (!workoutForSummary.value) return
+  if (tourStore.isTourActive && tourStore.currentStepKey === 'pre-summary-start') {
+    tourStore.setStep('session-exercise')
+  }
   sessionsStore.startSession(workoutForSummary.value)
   showPreSummaryModal.value = false
   router.push('/session')
@@ -148,8 +158,14 @@ function handleDismissSuggestion(suggestion: ProgressionSuggestion) {
 function handleOnboardingComplete(data: OnboardingCompleteEvent) {
   preferencesStore.completeOnboarding(data.level, data.equipment)
 
-  if (data.action === 'start-now') {
-    handleStartTodayWorkout()
+  // Garante que o dia de hoje tem um treino agendado para o 1º treino guiado
+  if (!preferencesStore.preferences.schedule?.[todayKey.value]) {
+    const defaultWorkout = workoutsStore.workouts[0]?.id || 'preset-fullbody-beginner'
+    preferencesStore.setDayWorkout(todayKey.value, defaultWorkout)
+  }
+
+  if (data.action === 'interactive-tour') {
+    tourStore.startTour()
   } else {
     showWelcomeBanner.value = true
   }
@@ -264,13 +280,17 @@ function formatSessionDate(isoString: string): string {
           @click="handleStartTodayWorkout"
         >
           <AppIcon name="play" :size="16" />
-          Iniciar 1º Treino
+          Iniciar Treino
         </AppButton>
       </div>
     </div>
 
     <!-- Weekly Calendar Strip (Segunda a Domingo) -->
-    <AppCard title="Agenda da Semana" eyebrow="Toque em um dia para agendar">
+    <AppCard
+      title="Agenda da Semana"
+      eyebrow="Toque em um dia para agendar"
+      data-tour="today-schedule"
+    >
       <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
         <button
           v-for="day in DAYS_OF_WEEK"
@@ -304,7 +324,11 @@ function formatSessionDate(isoString: string): string {
     </AppCard>
 
     <!-- Weekly Target & Progress Card -->
-    <AppCard title="Meta Semanal" eyebrow="Derivada dos dias agendados">
+    <AppCard
+      title="Meta Semanal"
+      eyebrow="Derivada dos dias agendados"
+      data-tour="today-weekly-goal"
+    >
       <div v-if="weeklyGoal > 0" class="space-y-4">
         <AppProgressBar
           :value="completedCount"
@@ -364,13 +388,14 @@ function formatSessionDate(isoString: string): string {
             variant="fill"
             size="lg"
             class="w-full"
+            data-tour="today-start-btn"
             @click="handleStartTodayWorkout"
           >
             <AppIcon
               :name="sessionsStore.activeSession ? 'replay' : 'play'"
               :size="20"
             />
-            <span>{{ sessionsStore.activeSession ? 'Retomar Treino em Andamento' : 'Iniciar Treino de Hoje' }}</span>
+            <span>{{ sessionsStore.activeSession ? 'Retomar Treino' : 'Iniciar Treino' }}</span>
           </AppButton>
         </div>
       </div>
@@ -439,5 +464,11 @@ function formatSessionDate(isoString: string): string {
       :is-open="preferencesStore.isLoaded && !preferencesStore.preferences.onboardingDone"
       @complete="handleOnboardingComplete"
     />
+
+    <!-- Interactive Spotlight Overlay (Initial Screen & Modal) -->
+    <AppSpotlightOverlay step-key="today-schedule" />
+    <AppSpotlightOverlay step-key="today-weekly-goal" />
+    <AppSpotlightOverlay step-key="today-start" @next="handleStartTodayWorkout" />
+    <AppSpotlightOverlay step-key="pre-summary-start" />
   </div>
 </template>

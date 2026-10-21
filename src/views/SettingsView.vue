@@ -13,6 +13,7 @@ import {
 } from '@/components'
 import { StorageService } from '@/services/storageService'
 import { usePreferencesStore } from '@/stores/preferencesStore'
+import { useTourStore } from '@/stores/tourStore'
 import { CURRENT_SCHEMA_VERSION } from '@/constants/domain'
 import { PreferencesSchema, WorkoutSchema, SessionSchema } from '@/types/domain'
 import { z } from 'zod'
@@ -21,6 +22,7 @@ import type { SegmentedOption } from '@/types/components'
 
 const router = useRouter()
 const preferencesStore = usePreferencesStore()
+const tourStore = useTourStore()
 
 const levelOptions: SegmentedOption[] = [
   { value: 'beginner', label: 'Iniciante' },
@@ -98,6 +100,15 @@ function handleReplayOnboarding() {
 function handleReenableSessionTips() {
   preferencesStore.resetSessionTour()
   showFeedback('Dicas e guia da tela de treino reativados!')
+}
+
+function handleStartInteractiveTour() {
+  preferencesStore.resetSessionTour()
+  tourStore.startTour()
+  showFeedback('Tour interativo ativado! Redirecionando para a tela Hoje...')
+  setTimeout(() => {
+    router.push('/')
+  }, 700)
 }
 
 // Backup Schema para validação rigorosa na importação
@@ -298,6 +309,11 @@ function handleConfirmReset() {
         </p>
 
         <div class="flex flex-wrap items-center gap-3 pt-2">
+          <AppButton variant="fill" size="sm" @click="handleStartInteractiveTour">
+            <AppIcon name="zap" :size="16" />
+            Iniciar Tour Prático (Onde Clicar)
+          </AppButton>
+
           <AppButton variant="outline" size="sm" @click="handleReplayOnboarding">
             <AppIcon name="replay" :size="16" />
             Rever Boas-Vindas

@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionsStore } from '@/stores/sessionsStore'
 import { usePreferencesStore } from '@/stores/preferencesStore'
+import { useTourStore } from '@/stores/tourStore'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { useWakeLock } from '@/composables/useWakeLock'
 import { useSound } from '@/composables/useSound'
@@ -14,12 +15,14 @@ import {
   AppIcon,
   ExerciseDetailModal,
   FirstSessionGuideModal,
+  AppSpotlightOverlay,
 } from '@/components'
 import type { SessionExercise, ExerciseCatalogItem } from '@/types/domain'
 
 const router = useRouter()
 const sessionsStore = useSessionsStore()
 const preferencesStore = usePreferencesStore()
+const tourStore = useTourStore()
 const { requestWakeLock, releaseWakeLock } = useWakeLock()
 const { playTimerComplete, playSetComplete } = useSound()
 
@@ -50,9 +53,11 @@ onMounted(async () => {
     return
   }
 
-  // Se for o primeiro treino do usuário, abre automaticamente o guia interativo
+  // Se for a primeira sessão do usuário e o tour estiver ativo ou pendente
   if (!preferencesStore.preferences.firstSessionTourDone) {
-    showGuideModal.value = true
+    if (!tourStore.isTourActive) {
+      tourStore.setStep('session-exercise')
+    }
   }
 
   // Ativa Wake Lock para manter a tela do celular ligada durante o treino
@@ -182,6 +187,11 @@ function handleCompleteSet() {
 
   sessionsStore.recordCurrentSet(currentActualInput.value)
 
+  // Avança o tour se estiver no passo de concluir série
+  if (tourStore.isTourActive && ['session-exercise', 'session-stepper', 'session-complete-set'].includes(tourStore.currentStepKey)) {
+    tourStore.setStep('session-rest')
+  }
+
   // Se o descanso não for disparado (restSeconds == 0), avança para a próxima série
   if (!currentExercise.value || currentExercise.value.restSeconds === 0) {
     const isFinished = sessionsStore.advanceToNextSet()
@@ -203,6 +213,9 @@ function handleAddRestTime() {
 }
 
 function handleSkipRest() {
+  if (tourStore.isTourActive && tourStore.currentStepKey === 'session-rest') {
+    tourStore.finishTour()
+  }
   const isFinished = sessionsStore.advanceToNextSet()
   if (isFinished) {
     showSummaryModal.value = true
@@ -365,7 +378,10 @@ function openExerciseDetail() {
       </div>
 
       <!-- Rest Controls -->
-      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+      <div
+        class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2"
+        data-tour="session-rest-controls"
+      >
         <AppButton
           variant="outline"
           size="lg"
@@ -394,7 +410,10 @@ function openExerciseDetail() {
       class="p-5 sm:p-8 rounded-2xl border-2 border-border-primary bg-surface shadow-[0_6px_0_0_#111111] space-y-6"
     >
       <!-- Exercise Title & Instructions link -->
-      <div class="flex items-start justify-between gap-3">
+      <div
+        class="flex items-start justify-between gap-3"
+        data-tour="session-exercise-header"
+      >
         <div>
           <span class="font-eyebrow text-[10px] uppercase font-bold text-primary-container tracking-wider block mb-0.5">
             Exercício {{ currentExerciseIndex + 1 }} de {{ session.exercises.length }}
@@ -469,7 +488,7 @@ function openExerciseDetail() {
       </div>
 
       <!-- REPS EXERCISE / RESULT STEPPER -->
-      <div class="space-y-3 pt-2">
+      <div class="space-y-3 pt-2" data-tour="session-stepper">
         <div class="flex items-center justify-between">
           <span class="font-eyebrow text-xs uppercase font-bold text-ink-muted">
             Meta Planejada:
@@ -505,6 +524,7 @@ function openExerciseDetail() {
           variant="fill"
           size="lg"
           class="w-full sm:flex-1"
+          data-tour="session-complete-btn"
           @click="handleCompleteSet"
         >
           <AppIcon name="check" :size="20" />
@@ -721,5 +741,11 @@ function openExerciseDetail() {
       @close="handleCompleteGuide"
       @complete="handleCompleteGuide"
     />
+
+    <!-- Interactive Tour Spotlight Overlays (Session Execution) -->
+    <AppSpotlightOverlay step-key="session-exercise" />
+    <AppSpotlightOverlay step-key="session-stepper" />
+    <AppSpotlightOverlay step-key="session-complete-set" />
+    <AppSpotlightOverlay step-key="session-rest" />
   </div>
 </template>
