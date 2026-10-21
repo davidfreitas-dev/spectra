@@ -37,7 +37,6 @@ withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   (e: 'nav-click', item: NavItem): void
-  (e: 'sign-up'): void
   (e: 'user-click'): void
   (e: 'start-today'): void
 }>()
@@ -53,12 +52,6 @@ function isItemActive(item: NavItem): boolean {
     return route?.path === item.to || route?.path?.startsWith(item.to + '/')
   }
   return false
-}
-
-function handleSignUp() {
-  emit('sign-up')
-  router.push('/workouts')
-  mobileMenuOpen.value = false
 }
 
 function goToSettings() {
@@ -159,7 +152,7 @@ watch(
           <AppButton
             variant="fill"
             size="sm"
-            @click="handleSignUp"
+            @click="handleStartTodayWorkout"
           >
             <AppIcon name="play" :size="16" />
             <span>{{ signUpText }}</span>
@@ -174,7 +167,7 @@ watch(
             icon-only
             title="Iniciar Treino"
             aria-label="Iniciar Treino"
-            @click="handleSignUp"
+            @click="handleStartTodayWorkout"
           >
             <AppIcon name="play" :size="18" />
           </AppButton>

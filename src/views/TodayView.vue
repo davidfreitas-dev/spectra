@@ -79,6 +79,13 @@ function openScheduleForDay(dayKey: string) {
 function handleAssignDayWorkout(workoutId: string | null) {
   if (selectedDayKey.value) {
     preferencesStore.setDayWorkout(selectedDayKey.value, workoutId)
+    if (selectedDayKey.value === todayKey.value && workoutId) {
+      const assigned = workoutsStore.getWorkoutById(workoutId)
+      if (assigned) {
+        workoutForSummary.value = assigned
+        showPreSummaryModal.value = true
+      }
+    }
   }
 }
 
@@ -88,6 +95,12 @@ function handleStartTodayWorkout() {
   } else if (todayWorkout.value) {
     workoutForSummary.value = todayWorkout.value
     showPreSummaryModal.value = true
+  } else {
+    if (workoutsStore.workouts.length > 0) {
+      openScheduleForDay(todayKey.value)
+    } else {
+      router.push('/workouts')
+    }
   }
 }
 
