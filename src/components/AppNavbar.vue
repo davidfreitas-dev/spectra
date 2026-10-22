@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import AppButton from './AppButton.vue'
 import AppIcon from './AppIcon.vue'
 
@@ -44,7 +42,6 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const router = useRouter()
-const mobileMenuOpen = ref(false)
 
 function isItemActive(item: NavItem): boolean {
   if (item.active !== undefined) return item.active
@@ -56,47 +53,23 @@ function isItemActive(item: NavItem): boolean {
 }
 
 function goToSettings() {
-  mobileMenuOpen.value = false
   emit('user-click')
   router.push('/settings')
 }
 
 function handleStartTodayWorkout() {
-  mobileMenuOpen.value = false
   emit('start-today')
   router.push({ path: '/', query: { start: 'true', _t: Date.now().toString() } })
 }
-
-// Bloqueia o scroll do body quando o menu mobile estiver aberto
-useBodyScrollLock(mobileMenuOpen)
-
-// Fecha o menu móvel ao mudar de rota
-watch(
-  () => route.path,
-  () => {
-    mobileMenuOpen.value = false
-  }
-)
 </script>
 
 <template>
   <header class="sticky top-0 left-0 right-0 h-16 bg-surface/95 backdrop-blur-xl border-b border-border-grid z-50 select-none px-4 sm:px-6 lg:px-8">
-    <div :class="[maxWidth, 'relative mx-auto h-full flex items-center justify-between gap-4']">
-      <!-- Left: Mobile Hamburger & Logo & Navigation -->
-      <div class="flex items-center gap-2.5 sm:gap-6 lg:gap-8">
-        <!-- Mobile Menu Toggle Button (Left of Logo on Mobile) -->
-        <button
-          type="button"
-          class="md:hidden w-8 h-8 rounded-lg bg-bg-alternate border border-border-primary flex items-center justify-center text-ink shadow-[0_1px_0_0_#111111] active:translate-y-px transition-all cursor-pointer"
-          :aria-expanded="mobileMenuOpen"
-          aria-label="Abrir menu de navegação"
-          @click="mobileMenuOpen = !mobileMenuOpen"
-        >
-          <AppIcon :name="mobileMenuOpen ? 'close' : 'menu'" :size="18" />
-        </button>
-
-        <!-- Brand Logo (Centered on Mobile, Flowing on Desktop) -->
-        <RouterLink to="/" class="flex items-center gap-2 group outline-none md:static absolute left-1/2 -translate-x-1/2 md:translate-x-0">
+    <div :class="[maxWidth, 'mx-auto h-full flex items-center justify-between gap-4']">
+      <!-- Left: Logo & Desktop Navigation Links -->
+      <div class="flex items-center gap-6 lg:gap-8">
+        <!-- Brand Logo (Natural Alignment) -->
+        <RouterLink to="/" class="flex items-center gap-2 group outline-none">
           <div class="grid grid-cols-2 gap-0.5 w-5 h-5">
             <span class="w-2 h-2 rounded-xs bg-primary-container transition-transform group-hover:scale-110" />
             <span class="w-2 h-2 rounded-xs bg-primary-container transition-transform group-hover:scale-110" />
@@ -114,7 +87,7 @@ watch(
             <RouterLink
               v-if="item.to"
               :to="item.to"
-              class="px-3.5 py-1 rounded-full font-button-text text-xs transition-all"
+              class="px-3.5 py-1 rounded-full font-button-text text-xs transition-all cursor-pointer"
               :class="isItemActive(item)
                 ? 'border border-ink bg-surface shadow-[0_2px_0_0_#111111] text-ink font-bold'
                 : 'text-ink-muted hover:text-ink font-medium'"
@@ -125,7 +98,7 @@ watch(
             <a
               v-else
               :href="item.href || '#'"
-              class="px-3.5 py-1 rounded-full font-button-text text-xs transition-all"
+              class="px-3.5 py-1 rounded-full font-button-text text-xs transition-all cursor-pointer"
               :class="isItemActive(item)
                 ? 'border border-ink bg-surface shadow-[0_2px_0_0_#111111] text-ink font-bold'
                 : 'text-ink-muted hover:text-ink font-medium'"
@@ -186,80 +159,5 @@ watch(
         </AppButton>
       </div>
     </div>
-
-    <!-- Fullscreen Mobile Menu Overlay (Matching Reference Design) -->
-    <teleport to="body">
-      <transition
-        enter-active-class="transition duration-200 ease-out"
-        enter-from-class="opacity-0 scale-[0.98]"
-        enter-to-class="opacity-100 scale-100"
-        leave-active-class="transition duration-150 ease-in"
-        leave-from-class="opacity-100 scale-100"
-        leave-to-class="opacity-0 scale-[0.98]"
-      >
-        <div
-          v-if="mobileMenuOpen"
-          class="fixed inset-0 z-50 bg-surface flex flex-col justify-between p-6 sm:p-8 select-none overflow-y-auto"
-        >
-          <!-- Top Row: Brand Logo (Left), Close Button (Right) -->
-          <div class="flex items-center justify-between">
-            <!-- Brand Logo (Left-aligned) -->
-            <RouterLink to="/" class="flex items-center gap-2 group outline-none" @click="mobileMenuOpen = false">
-              <div class="grid grid-cols-2 gap-0.5 w-5 h-5">
-                <span class="w-2 h-2 rounded-xs bg-primary-container transition-transform group-hover:scale-110" />
-                <span class="w-2 h-2 rounded-xs bg-primary-container transition-transform group-hover:scale-110" />
-                <span class="w-2 h-2 rounded-xs bg-primary-container transition-transform group-hover:scale-110" />
-                <span class="w-2 h-2 rounded-xs bg-primary-container transition-transform group-hover:scale-110" />
-              </div>
-              <span class="font-headline-md text-base sm:text-lg font-bold tracking-tight text-ink">
-                {{ brandName }}<span class="text-primary-container">.</span>
-              </span>
-            </RouterLink>
-
-            <!-- Close Button (Right-aligned) -->
-            <button
-              type="button"
-              class="w-10 h-10 flex items-center justify-end text-primary-container hover:opacity-75 transition-opacity cursor-pointer outline-none"
-              aria-label="Fechar menu"
-              @click="mobileMenuOpen = false"
-            >
-              <AppIcon name="close" :size="24" stroke-width="2.5" />
-            </button>
-          </div>
-
-          <!-- Center Content: Primary Nav Links -->
-          <div class="my-auto py-8 flex flex-col items-center text-center space-y-7">
-            <!-- Primary Navigation Links (Spacious, Uppercase, Centered) -->
-            <nav class="flex flex-col items-center space-y-6">
-              <RouterLink
-                v-for="item in navItems"
-                :key="item.label"
-                :to="item.to || '/'"
-                class="font-display text-sm tracking-[0.28em] font-bold uppercase transition-colors"
-                :class="isItemActive(item)
-                  ? 'text-primary-container font-black'
-                  : 'text-ink hover:text-primary-container'"
-                @click="mobileMenuOpen = false"
-              >
-                {{ item.label }}
-              </RouterLink>
-            </nav>
-          </div>
-
-          <!-- Bottom: Iniciar Treino do Dia Action Button -->
-          <div class="w-full max-w-xs mx-auto pb-4">
-            <AppButton
-              variant="fill"
-              size="lg"
-              class="w-full"
-              @click="handleStartTodayWorkout"
-            >
-              <AppIcon name="play" :size="20" />
-              Iniciar Treino do Dia
-            </AppButton>
-          </div>
-        </div>
-      </transition>
-    </teleport>
   </header>
 </template>

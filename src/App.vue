@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RouterView, useRouter } from 'vue-router'
-import { AppNavbar } from '@/components'
+import { RouterView, useRoute, useRouter } from 'vue-router'
+import { AppNavbar, AppTabBar } from '@/components'
 
+const route = useRoute()
 const router = useRouter()
 const transitionName = ref('page-slide-left')
 
@@ -28,15 +29,18 @@ router.beforeEach((to, from) => {
     <!-- Universal Top Navbar across all views -->
     <AppNavbar />
 
-    <!-- Main Content Area -->
-    <main class="flex-1 pb-10 overflow-x-clip">
-      <RouterView v-slot="{ Component, route }">
+    <!-- Main Content Area with safe bottom spacing for mobile tab bar -->
+    <main class="flex-1 pb-24 md:pb-10 overflow-x-clip">
+      <RouterView v-slot="{ Component, route: currentRoute }">
         <Transition :name="transitionName" mode="out-in">
-          <div :key="route.path">
+          <div :key="currentRoute.path">
             <component :is="Component" />
           </div>
         </Transition>
       </RouterView>
     </main>
+
+    <!-- Mobile Bottom Tabs Bar (Hidden during active workout session) -->
+    <AppTabBar v-if="route.path !== '/session'" />
   </div>
 </template>

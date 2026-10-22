@@ -1,4 +1,5 @@
 export { default as AppNavbar } from './AppNavbar.vue'
+export { default as AppTabBar } from './AppTabBar.vue'
 export { default as AppButton } from './AppButton.vue'
 export { default as AppInput } from './AppInput.vue'
 export { default as AppStepper } from './AppStepper.vue'

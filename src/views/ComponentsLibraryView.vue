@@ -15,6 +15,7 @@ import {
   AppCheckbox,
   AppAlert,
   AppIcon,
+  AppTabBar,
 } from '@/components'
 import type { SegmentedOption, SelectOption } from '@/types'
 
@@ -1151,6 +1152,24 @@ const swatches = [
                 >
                   Mantenha as escápulas engajadas e evite hiperestender os cotovelos no final do movimento.
                 </AppAlert>
+              </div>
+            </div>
+          </AppCard>
+        </div>
+
+        <!-- Mobile Navigation Tab Bar Showcase -->
+        <div class="mt-8">
+          <h3 class="font-headline text-sm font-bold text-ink uppercase tracking-wider mb-2">
+            Navegação Inferior Mobile (AppTabBar)
+          </h3>
+          <p class="font-body text-xs text-ink-muted mb-4">
+            Barra fixa no rodapé ativa exclusivamente em celulares (&lt; md), substituindo o antigo menu hamburger com acesso direto com uma só mão às 4 abas centrais do app.
+          </p>
+          <AppCard>
+            <div class="p-4 bg-bg-alternate rounded-lg border border-border-grid">
+              <p class="text-xs text-ink-muted mb-3 font-mono">Exibição de referência inline:</p>
+              <div class="relative max-w-sm mx-auto overflow-hidden rounded-xl border border-border-grid bg-surface shadow-xs">
+                <AppTabBar class="static! shadow-none! border-t-0! block!" />
               </div>
             </div>
           </AppCard>
