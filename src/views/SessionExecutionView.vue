@@ -7,6 +7,7 @@ import { useTourStore } from '@/stores/tourStore'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { useWakeLock } from '@/composables/useWakeLock'
 import { useSound } from '@/composables/useSound'
+import { useConfetti } from '@/composables/useConfetti'
 import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import {
   AppButton,
@@ -24,7 +25,8 @@ const sessionsStore = useSessionsStore()
 const preferencesStore = usePreferencesStore()
 const tourStore = useTourStore()
 const { requestWakeLock, releaseWakeLock } = useWakeLock()
-const { playTimerComplete, playSetComplete } = useSound()
+const { playTimerComplete, playSetComplete, playCelebration } = useSound()
+const { fireCelebrationBurst } = useConfetti()
 
 // Modais locais
 const showQuitModal = ref(false)
@@ -66,6 +68,14 @@ onMounted(async () => {
   clockInterval = setInterval(() => {
     now.value = Date.now()
   }, 250)
+
+  // Se havia um descanso ativo que já expirou enquanto a página esteve inativa/fechada
+  if (session.value?.current?.restEndsAt && session.value.current.restEndsAt <= Date.now()) {
+    const isFinished = sessionsStore.advanceToNextSet()
+    if (isFinished) {
+      showSummaryModal.value = true
+    }
+  }
 
   // Inicializa stepper com a meta atual
   syncInputWithCurrentSet()
@@ -133,10 +143,32 @@ const isExerciseTimerRunning = computed(() => {
   return exerciseEndsAt.value !== null && exerciseRemainingSeconds.value > 0
 })
 
-// Dispara som ao zerar o descanso
+// Rótulo da próxima série durante o intervalo de descanso
+const nextSetLabel = computed(() => {
+  if (!session.value || !currentExercise.value) return ''
+  if (currentSetIndex.value + 1 < currentExercise.value.sets.length) {
+    return `Próximo: ${currentExercise.value.name} (Série ${currentSetIndex.value + 2} de ${currentExercise.value.plannedSets})`
+  }
+  const nextEx = session.value.exercises[currentExerciseIndex.value + 1]
+  if (nextEx) {
+    return `Próximo exercício: ${nextEx.name}`
+  }
+  return 'Próximo: Conclusão do Treino'
+})
+
+// Dispara som e avança para a próxima série ao zerar o descanso
 watch(restRemainingSeconds, (sec, oldSec) => {
-  if (oldSec > 0 && sec === 0 && preferencesStore.preferences.soundEnabled) {
-    playTimerComplete()
+  if (oldSec > 0 && sec === 0 && restEndsAt.value !== null) {
+    if (preferencesStore.preferences.soundEnabled) {
+      playTimerComplete()
+    }
+    if (tourStore.isTourActive && tourStore.currentStepKey === 'session-rest') {
+      tourStore.finishTour()
+    }
+    const isFinished = sessionsStore.advanceToNextSet()
+    if (isFinished) {
+      showSummaryModal.value = true
+    }
   }
 })
 
@@ -275,7 +307,12 @@ const sessionDurationFormatted = computed(() => {
 // Recordes batidos na sessão atual
 const beatenRecords = computed(() => {
   if (!session.value) return []
-  const list: { exerciseName: string; value: number; unit: string }[] = []
+  const list: {
+    exerciseName: string
+    value: number
+    unit: string
+    previousValue: number | null
+  }[] = []
 
   for (const ex of session.value.exercises) {
     const previousPR = sessionsStore.getPersonalRecord(ex.exerciseId)
@@ -292,11 +329,46 @@ const beatenRecords = computed(() => {
         exerciseName: ex.name,
         value: bestInSession,
         unit: ex.measurementType === 'reps' ? 'reps' : 's',
+        previousValue: previousPR,
       })
     }
   }
 
   return list
+})
+
+// Marcas alcançadas com a conclusão desta sessão
+const isFirstSession = computed(() => sessionsStore.sessions.length === 0)
+
+const isWeeklyGoalCompleted = computed(() => {
+  const goal = preferencesStore.weeklyGoal
+  if (goal <= 0) return false
+  return sessionsStore.completedThisWeek + 1 >= goal
+})
+
+const totalMilestoneCount = computed(() => {
+  const count = sessionsStore.sessions.length + 1
+  return [5, 10, 25, 50, 100].includes(count) ? count : null
+})
+
+// Verifica se alguma marca importante foi atingida nesta sessão
+const hasMilestoneAchieved = computed(() => {
+  return (
+    beatenRecords.value.length > 0 ||
+    isWeeklyGoalCompleted.value ||
+    isFirstSession.value ||
+    totalMilestoneCount.value !== null
+  )
+})
+
+// Dispara celebração com chuva de confetti e som festivo automaticamente quando marcas forem atingidas
+watch(showSummaryModal, (isOpen) => {
+  if (isOpen && hasMilestoneAchieved.value) {
+    fireCelebrationBurst()
+    if (preferencesStore.preferences.soundEnabled) {
+      playCelebration()
+    }
+  }
 })
 
 function openExerciseDetail() {
@@ -356,7 +428,7 @@ function openExerciseDetail() {
     <!-- REST OVERLAY / STATE -->
     <div
       v-if="isRestActive"
-      class="p-6 sm:p-10 rounded-2xl border-2 border-primary-container bg-surface shadow-[0_8px_0_0_#111111] text-center space-y-6 animate-in fade-in zoom-in-95 duration-150"
+      class="p-6 sm:p-10 rounded-2xl border-2 border-border-primary bg-surface shadow-[0_8px_0_0_#111111] text-center space-y-6 animate-in fade-in zoom-in-95 duration-150"
     >
       <div class="space-y-1">
         <span class="font-eyebrow text-xs uppercase font-bold text-primary-container tracking-wider block">
@@ -373,7 +445,7 @@ function openExerciseDetail() {
           {{ formatTime(restRemainingSeconds) }}
         </div>
         <span class="text-xs text-ink-muted font-bold mt-2 block">
-          Próximo: {{ currentExercise?.name }} (Série {{ currentSetIndex + 1 }} de {{ currentExercise?.plannedSets }})
+          {{ nextSetLabel }}
         </span>
       </div>
 
@@ -640,27 +712,183 @@ function openExerciseDetail() {
             </div>
           </div>
 
-          <!-- Beaten Records Badges (if any) -->
+          <!-- First Session Celebration Card -->
           <div
-            v-if="beatenRecords.length > 0"
-            class="p-4 rounded-xl border-2 border-primary-container bg-primary-container/10 space-y-2"
+            v-if="isFirstSession"
+            class="p-4 sm:p-5 rounded-2xl border-2 border-border-primary bg-surface shadow-[0_4px_0_0_#111111] space-y-3"
           >
-            <div class="flex items-center gap-2">
-              <AppIcon name="medal" :size="16" class="text-primary-container" />
-              <span class="font-bold text-xs uppercase text-primary-container tracking-wider">
-                Novo Recorde Pessoal Batido!
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-primary-container text-on-primary border border-border-primary flex items-center justify-center shrink-0 shadow-[0_2px_0_0_#111111]"
+                >
+                  <AppIcon name="trophy" :size="22" />
+                </div>
+                <div>
+                  <span class="font-eyebrow text-[10px] font-bold text-primary-container uppercase tracking-wider block">
+                    Marco Histórico
+                  </span>
+                  <h3 class="font-display text-base sm:text-lg font-black text-ink leading-tight">
+                    Primeiro Treino Concluído!
+                  </h3>
+                </div>
+              </div>
+              <span
+                class="px-2 py-0.5 rounded-md bg-primary-soft border border-border-primary text-primary font-eyebrow text-[10px] font-bold uppercase shadow-[0_1.5px_0_0_#111111] shrink-0 self-start"
+              >
+                Início da Jornada
               </span>
             </div>
-            <div class="space-y-1">
+
+            <p class="text-xs text-ink-muted font-medium leading-relaxed">
+              Parabéns pelo primeiro passo! Seu hábito de treino e sua evolução na calistenia começam oficialmente agora.
+            </p>
+
+            <div class="p-2.5 rounded-xl bg-bg-alternate border border-border-grid flex items-center gap-2">
+              <AppIcon name="flame" :size="16" class="text-primary-container shrink-0" />
+              <span class="text-xs font-bold text-ink">
+                Continue firme para construir sua consistência semanal.
+              </span>
+            </div>
+          </div>
+
+          <!-- Weekly Goal Milestone Card -->
+          <div
+            v-if="isWeeklyGoalCompleted"
+            class="p-4 sm:p-5 rounded-2xl border-2 border-border-primary bg-surface shadow-[0_4px_0_0_#111111] space-y-3"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-success text-on-success border border-border-primary flex items-center justify-center shrink-0 shadow-[0_2px_0_0_#111111]"
+                >
+                  <AppIcon name="check" :size="22" />
+                </div>
+                <div>
+                  <span class="font-eyebrow text-[10px] font-bold text-success uppercase tracking-wider block">
+                    Meta Semanal
+                  </span>
+                  <h3 class="font-display text-base sm:text-lg font-black text-ink leading-tight">
+                    Meta Semanal Conquistada!
+                  </h3>
+                </div>
+              </div>
+              <span
+                class="px-2 py-0.5 rounded-md bg-success-container text-success font-eyebrow text-[10px] font-bold uppercase border border-border-primary shadow-[0_1.5px_0_0_#111111] shrink-0 self-start"
+              >
+                100% Concluído
+              </span>
+            </div>
+
+            <p class="text-xs text-ink-muted font-medium leading-relaxed">
+              Você completou todos os treinos programados na sua agenda para esta semana!
+            </p>
+          </div>
+
+          <!-- Total Workouts Milestone Card -->
+          <div
+            v-if="totalMilestoneCount"
+            class="p-4 sm:p-5 rounded-2xl border-2 border-border-primary bg-surface shadow-[0_4px_0_0_#111111] space-y-3"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-warning text-on-warning border border-border-primary flex items-center justify-center shrink-0 shadow-[0_2px_0_0_#111111]"
+                >
+                  <AppIcon name="star" :size="22" />
+                </div>
+                <div>
+                  <span class="font-eyebrow text-[10px] font-bold text-warning uppercase tracking-wider block">
+                    Consistência
+                  </span>
+                  <h3 class="font-display text-base sm:text-lg font-black text-ink leading-tight">
+                    Marco Histórico: {{ totalMilestoneCount }}º Treino!
+                  </h3>
+                </div>
+              </div>
+              <span
+                class="px-2 py-0.5 rounded-md bg-warning-container text-on-warning font-eyebrow text-[10px] font-bold uppercase border border-border-primary shadow-[0_1.5px_0_0_#111111] shrink-0 self-start"
+              >
+                {{ totalMilestoneCount }} Treinos
+              </span>
+            </div>
+
+            <p class="text-xs text-ink-muted font-medium leading-relaxed">
+              Dedicação de elite! Você alcançou a marca de {{ totalMilestoneCount }} treinos realizados no Spectra.
+            </p>
+          </div>
+
+          <!-- Beaten Records (PR) Card -->
+          <div
+            v-if="beatenRecords.length > 0"
+            class="p-4 sm:p-5 rounded-2xl border-2 border-border-primary bg-surface shadow-[0_4px_0_0_#111111] space-y-3.5"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-primary-container text-on-primary border border-border-primary flex items-center justify-center shrink-0 shadow-[0_2px_0_0_#111111]"
+                >
+                  <AppIcon name="medal" :size="22" />
+                </div>
+                <div>
+                  <span class="font-eyebrow text-[10px] font-bold text-primary-container uppercase tracking-wider block">
+                    Evolução Muscular
+                  </span>
+                  <h3 class="font-display text-base sm:text-lg font-black text-ink leading-tight">
+                    Novo Recorde Pessoal!
+                  </h3>
+                </div>
+              </div>
+              <span
+                class="px-2.5 py-0.5 rounded-md bg-warning-container text-on-warning font-eyebrow text-[10px] font-bold uppercase border border-border-primary shadow-[0_1.5px_0_0_#111111] shrink-0 self-start"
+              >
+                {{ beatenRecords.length }} {{ beatenRecords.length > 1 ? 'Recordes' : 'Recorde' }}
+              </span>
+            </div>
+
+            <p class="text-xs text-ink-muted font-medium leading-relaxed">
+              Você superou sua maior marca registrada em séries individuais deste treino:
+            </p>
+
+            <!-- Lista de recordes limpa e leve com divisores sutis -->
+            <div class="divide-y divide-border-grid border-t border-border-grid py-1">
               <div
                 v-for="(rec, idx) in beatenRecords"
                 :key="idx"
-                class="flex items-center justify-between text-xs font-bold text-ink"
+                class="py-2.5 first:pt-2 last:pb-0 flex items-center justify-between gap-3"
               >
-                <span>{{ rec.exerciseName }}</span>
-                <span class="text-primary-container font-metric-number">
-                  {{ rec.value }} {{ rec.unit }}
-                </span>
+                <div class="space-y-0.5 min-w-0">
+                  <span class="font-display text-xs sm:text-sm font-bold text-ink truncate block">
+                    {{ rec.exerciseName }}
+                  </span>
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span
+                      v-if="rec.previousValue"
+                      class="inline-flex items-center gap-1 font-eyebrow text-[10px] text-success uppercase tracking-wider font-bold"
+                    >
+                      <AppIcon name="trending_up" :size="12" class="shrink-0" />
+                      +{{ rec.value - rec.previousValue }} {{ rec.unit }}
+                    </span>
+                    <span
+                      v-if="rec.previousValue"
+                      class="text-[10px] font-medium text-ink-muted"
+                    >
+                      (era {{ rec.previousValue }} {{ rec.unit }})
+                    </span>
+                    <span
+                      v-else
+                      class="font-eyebrow text-[10px] text-success uppercase tracking-wider font-bold block"
+                    >
+                      ★ Primeiro recorde registrado
+                    </span>
+                  </div>
+                </div>
+
+                <div class="text-right shrink-0">
+                  <span class="font-metric-number text-base sm:text-lg font-black text-primary-container tracking-tight block">
+                    {{ rec.value }} <span class="text-xs font-bold text-ink-muted">{{ rec.unit }}</span>
+                  </span>
+                </div>
               </div>
             </div>
           </div>

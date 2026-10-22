@@ -20,6 +20,8 @@ import {
 } from '@/components'
 import type { OnboardingCompleteEvent } from '@/components/OnboardingModal.vue'
 import type { Workout, WorkoutItem } from '@/types/domain'
+import { useConfetti } from '@/composables/useConfetti'
+import { useSound } from '@/composables/useSound'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,6 +29,15 @@ const preferencesStore = usePreferencesStore()
 const workoutsStore = useWorkoutsStore()
 const sessionsStore = useSessionsStore()
 const tourStore = useTourStore()
+const { fireCelebrationBurst } = useConfetti()
+const { playCelebration } = useSound()
+
+function handleCelebrateWeeklyGoal() {
+  fireCelebrationBurst()
+  if (preferencesStore.preferences.soundEnabled) {
+    playCelebration()
+  }
+}
 
 // Modais
 const showScheduleModal = ref(false)
@@ -398,6 +409,33 @@ function formatSessionDate(isoString: string): string {
           :status-text="`${Math.min(100, Math.round((completedCount / weeklyGoal) * 100))}% concluído`"
           variant="success"
         />
+
+        <!-- Banner comemorativo de meta batida -->
+        <div
+          v-if="completedCount >= weeklyGoal"
+          class="p-3.5 rounded-xl border-2 border-border-primary bg-primary-container/10 flex items-center justify-between gap-3 shadow-[0_2px_0_0_#111111]"
+        >
+          <div class="flex items-center gap-2.5">
+            <span class="text-xl">🏆</span>
+            <div>
+              <span class="font-bold text-xs text-ink block">
+                Meta Semanal Conquistada!
+              </span>
+              <span class="text-[11px] text-ink-muted font-medium block">
+                Você cumpriu todos os treinos desta semana.
+              </span>
+            </div>
+          </div>
+          <AppButton
+            variant="outline"
+            size="sm"
+            class="shrink-0"
+            @click="handleCelebrateWeeklyGoal"
+          >
+            Comemorar 🎉
+          </AppButton>
+        </div>
+
         <p class="font-body text-xs text-ink-muted leading-relaxed">
           Sua meta é calculada automaticamente a partir da sua agenda. Sessões concluídas contam para a semana atual (segunda a domingo).
         </p>

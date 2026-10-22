@@ -55,8 +55,25 @@ export function useSound() {
     }
   }
 
+  function playCelebration() {
+    // Arpejo festivo de celebração (C5 -> E5 -> G5 -> C6)
+    const notes = [523.25, 659.25, 783.99, 1046.50]
+    notes.forEach((freq, idx) => {
+      setTimeout(() => playBeep(freq, 0.14, 'triangle'), idx * 90)
+    })
+
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try {
+        navigator.vibrate([100, 50, 100, 50, 200])
+      } catch {
+        // Ignora
+      }
+    }
+  }
+
   return {
     playTimerComplete,
     playSetComplete,
+    playCelebration,
   }
 }
