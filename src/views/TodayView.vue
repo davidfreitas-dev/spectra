@@ -15,10 +15,11 @@ import {
   AppIcon,
   ScheduleDayModal,
   OnboardingModal,
+  WorkoutEditorModal,
   AppSpotlightOverlay,
 } from '@/components'
 import type { OnboardingCompleteEvent } from '@/components/OnboardingModal.vue'
-import type { Workout } from '@/types/domain'
+import type { Workout, WorkoutItem } from '@/types/domain'
 
 const route = useRoute()
 const router = useRouter()
@@ -31,6 +32,7 @@ const tourStore = useTourStore()
 const showScheduleModal = ref(false)
 const selectedDayKey = ref<string | null>(null)
 const showWelcomeBanner = ref(false)
+const showWorkoutEditor = ref(false)
 
 onMounted(() => {
   preferencesStore.load()
@@ -135,17 +137,52 @@ function handleDismissSuggestion(suggestion: ProgressionSuggestion) {
   }
 }
 
-function handleOnboardingComplete(data: OnboardingCompleteEvent) {
-  preferencesStore.completeOnboarding(data.level, data.equipment)
+function handleOpenEditTodayWorkout() {
+  if (todayWorkout.value) {
+    showWorkoutEditor.value = true
+  }
+}
 
-  // Garante que o dia de hoje tem um treino agendado para o 1º treino guiado
-  if (!preferencesStore.preferences.schedule?.[todayKey.value]) {
-    const defaultWorkout = workoutsStore.workouts[0]?.id || 'preset-fullbody-beginner'
-    preferencesStore.setDayWorkout(todayKey.value, defaultWorkout)
+function handleSaveWorkout(data: { id?: string; name: string; items: WorkoutItem[] }) {
+  workoutsStore.saveWorkout(data)
+  showWorkoutEditor.value = false
+}
+
+function handleOnboardingComplete(data: OnboardingCompleteEvent) {
+  // Prepara o treino recomendado baseado no nível se o usuário escolheu 'recommended'
+  let targetWorkoutId: string | null = null
+
+  if (data.startChoice === 'recommended') {
+    let presetId = 'preset-fullbody-beginner'
+    if (data.level === 'intermediate') presetId = 'preset-push-intermediate'
+    else if (data.level === 'advanced') presetId = 'preset-pull-core'
+
+    // Procura se já tem nos treinos salvos ou copia
+    const existing = workoutsStore.workouts.find((w) => w.id === presetId || w.name.includes('Iniciante') || w.name.includes('Empurrada') || w.name.includes('Puxada'))
+    if (existing) {
+      targetWorkoutId = existing.id
+    } else {
+      const copied = workoutsStore.copyPreset(presetId)
+      targetWorkoutId = copied ? copied.id : workoutsStore.workouts[0]?.id || presetId
+    }
   }
 
-  if (data.action === 'interactive-tour') {
-    tourStore.startTour()
+  // Monta a agenda semanal baseada estritamente nos dias selecionados no onboarding
+  const newSchedule: Record<string, string | null> = {}
+  for (const day of DAYS_OF_WEEK) {
+    if (data.selectedDays.includes(day.key)) {
+      newSchedule[day.key] = targetWorkoutId
+    } else {
+      newSchedule[day.key] = null
+    }
+  }
+
+  preferencesStore.completeOnboarding(data.level, data.equipment, newSchedule)
+
+  if (data.startChoice === 'presets') {
+    router.push('/workouts?tab=presets')
+  } else if (data.startChoice === 'custom') {
+    router.push('/workouts?create=true')
   } else {
     showWelcomeBanner.value = true
   }
@@ -223,35 +260,79 @@ function formatSessionDate(isoString: string): string {
       </AppButton>
     </div>
 
-    <!-- First Session Welcome Banner (when user finishes onboarding with 'explore') -->
+    <!-- First Session Welcome Banner -->
     <div
       v-if="showWelcomeBanner && !sessionsStore.activeSession"
-      class="p-4 sm:p-5 rounded-2xl border-2 border-primary-container bg-primary-container/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-[0_3px_0_0_#f26a21] animate-in fade-in"
+      class="p-5 rounded-2xl border-2 border-primary-container bg-primary-container/10 space-y-4 shadow-[0_3px_0_0_#f26a21] animate-in fade-in"
     >
-      <div class="flex items-start gap-3">
-        <div class="w-10 h-10 rounded-xl bg-primary-container/20 border border-primary-container flex items-center justify-center text-primary-container shrink-0 mt-0.5">
-          <AppIcon name="zap" :size="20" />
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-primary-container/20 border border-primary-container flex items-center justify-center text-primary-container shrink-0 mt-0.5">
+            <AppIcon name="zap" :size="20" />
+          </div>
+          <div>
+            <span class="font-eyebrow text-[10px] uppercase font-bold text-primary-container tracking-wider block">
+              Bem-vindo ao Spectra
+            </span>
+            <h2 class="font-display text-base sm:text-lg font-bold text-ink">
+              Sua rotina está configurada e você tem o controle total!
+            </h2>
+            <p class="text-xs text-ink-muted mt-0.5">
+              Criamos o seu ponto de partida. Veja como aproveitar o app ao máximo:
+            </p>
+          </div>
         </div>
-        <div>
-          <span class="font-eyebrow text-[10px] uppercase font-bold text-primary-container tracking-wider block">
-            Pronto para o 1º Treino
-          </span>
-          <h2 class="font-display text-base sm:text-lg font-bold text-ink">
-            Seu treino de hoje já está preparado!
-          </h2>
-          <p class="text-xs text-ink-muted mt-0.5">
-            Ao iniciar, nosso guia interativo mostrará como registrar séries e cronometrar o descanso.
+
+        <button
+          type="button"
+          class="text-ink-muted hover:text-ink p-1 rounded-lg transition-colors cursor-pointer shrink-0"
+          title="Dispensar banner"
+          @click="showWelcomeBanner = false"
+        >
+          <AppIcon name="close" :size="18" />
+        </button>
+      </div>
+
+      <!-- 3 Pílulas de Recursos -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+        <div class="p-3 rounded-xl bg-surface/90 border border-border-grid space-y-1">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-ink">
+            <AppIcon name="edit" :size="14" class="text-primary-container" />
+            <span>Personalize Tudo</span>
+          </div>
+          <p class="text-[11px] text-ink-muted leading-relaxed">
+            Toque em "Personalizar" para alterar séries, repetições e tempos de descanso.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-surface/90 border border-border-grid space-y-1">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-ink">
+            <AppIcon name="body" :size="14" class="text-primary-container" />
+            <span>+40 Exercícios</span>
+          </div>
+          <p class="text-[11px] text-ink-muted leading-relaxed">
+            Consulte a biblioteca para aprender posturas corretas e variações de calistenia.
+          </p>
+        </div>
+
+        <div class="p-3 rounded-xl bg-surface/90 border border-border-grid space-y-1">
+          <div class="flex items-center gap-1.5 font-bold text-xs text-ink">
+            <AppIcon name="trending_up" :size="14" class="text-primary-container" />
+            <span>Evolução Real</span>
+          </div>
+          <p class="text-[11px] text-ink-muted leading-relaxed">
+            O app calcula seus recordes (PRs) e sugere novas repetições automaticamente.
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 w-full sm:w-auto justify-end shrink-0">
+      <div class="flex items-center justify-end gap-2 pt-1">
         <AppButton
           variant="outline"
           size="sm"
           @click="showWelcomeBanner = false"
         >
-          Dispensar
+          Entendi
         </AppButton>
         <AppButton
           v-if="todayWorkout"
@@ -260,7 +341,7 @@ function formatSessionDate(isoString: string): string {
           @click="handleStartTodayWorkout"
         >
           <AppIcon name="play" :size="16" />
-          Iniciar Treino
+          Iniciar Treino de Hoje
         </AppButton>
       </div>
     </div>
@@ -387,6 +468,21 @@ function formatSessionDate(isoString: string): string {
           </div>
         </div>
 
+        <!-- Dica de Personalização -->
+        <div class="px-3 py-2 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-between gap-2 text-xs text-ink-muted">
+          <div class="flex items-center gap-2">
+            <AppIcon name="edit" :size="14" class="text-primary-container shrink-0" />
+            <span>Séries, repetições e tempos de descanso são 100% personalizáveis.</span>
+          </div>
+          <button
+            type="button"
+            class="text-xs font-bold text-primary-container hover:underline cursor-pointer shrink-0 hidden sm:inline"
+            @click="handleOpenEditTodayWorkout"
+          >
+            Editar agora
+          </button>
+        </div>
+
         <div class="divide-y divide-border-grid">
           <div
             v-for="(item, idx) in todayWorkout.items"
@@ -413,8 +509,19 @@ function formatSessionDate(isoString: string): string {
           </div>
         </div>
 
-        <!-- Action Button -->
-        <div class="pt-4 border-t border-border-grid">
+        <!-- Action Buttons: Personalizar e Iniciar -->
+        <div class="pt-4 border-t border-border-grid grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <AppButton
+            variant="outline"
+            size="lg"
+            class="w-full"
+            title="Personalizar séries, repetições e descanso deste treino"
+            @click="handleOpenEditTodayWorkout"
+          >
+            <AppIcon name="edit" :size="18" />
+            <span>Personalizar Treino</span>
+          </AppButton>
+
           <AppButton
             variant="fill"
             size="lg"
@@ -440,11 +547,30 @@ function formatSessionDate(isoString: string): string {
     >
       <div class="space-y-4">
         <p class="text-sm text-ink-muted leading-relaxed">
-          Nenhum treino agendado para hoje. Músculos se desenvolvem durante o descanso! Caso queira treinar mesmo assim, escolha um treino avulso na biblioteca de treinos.
+          Nenhum treino agendado para hoje. Músculos se desenvolvem durante o descanso! Caso queira treinar mesmo assim, você pode agendar um treino para hoje ou escolher um treino avulso na biblioteca.
         </p>
-        <AppButton variant="outline" size="md" @click="router.push('/workouts')">
-          Escolher Treino Avulso
-        </AppButton>
+
+        <div class="flex flex-col sm:flex-row items-center gap-2.5">
+          <AppButton
+            variant="fill"
+            size="md"
+            class="w-full sm:w-auto"
+            @click="openScheduleForDay(todayKey)"
+          >
+            <AppIcon name="calendar" :size="16" />
+            Agendar Treino para Hoje
+          </AppButton>
+
+          <AppButton
+            variant="outline"
+            size="md"
+            class="w-full sm:w-auto"
+            @click="router.push('/workouts')"
+          >
+            <AppIcon name="dumbbell" :size="16" />
+            Escolher Treino Avulso
+          </AppButton>
+        </div>
       </div>
     </AppCard>
 
@@ -479,7 +605,16 @@ function formatSessionDate(isoString: string): string {
       @explore-workouts="router.push('/workouts')"
     />
 
-    <!-- Onboarding Modal (Step 1 & 2 on first launch) -->
+    <!-- Workout Editor Modal (Direto da tela Hoje) -->
+    <WorkoutEditorModal
+      :is-open="showWorkoutEditor"
+      :workout-to-edit="todayWorkout"
+      :user-equipment="preferencesStore.preferences.equipment"
+      @close="showWorkoutEditor = false"
+      @save="handleSaveWorkout"
+    />
+
+    <!-- Onboarding Modal (Step 1 to 4 on first launch) -->
     <OnboardingModal
       :is-open="preferencesStore.isLoaded && !preferencesStore.preferences.onboardingDone"
       @complete="handleOnboardingComplete"

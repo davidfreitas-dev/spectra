@@ -52,15 +52,23 @@ onMounted(() => {
   workoutsStore.load()
   preferencesStore.load()
   sessionsStore.load()
+  if (route.query.tab === 'presets') {
+    activeTab.value = 'presets'
+  }
   if (route.query.create === 'true') {
     handleNewWorkout()
   }
 })
 
 watch(
-  () => route.query.create,
-  (val) => {
-    if (val === 'true') {
+  () => [route.query.create, route.query.tab],
+  ([createVal, tabVal]) => {
+    if (tabVal === 'presets') {
+      activeTab.value = 'presets'
+    } else if (tabVal === 'user') {
+      activeTab.value = 'user'
+    }
+    if (createVal === 'true') {
       handleNewWorkout()
     }
   }
@@ -266,7 +274,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
               <div
                 v-for="item in workout.items"
                 :key="item.id"
-                class="p-2.5 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-between"
+                class="py-2.5 px-3 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-between"
               >
                 <div>
                   <div class="font-bold text-xs text-ink">
@@ -359,6 +367,14 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
 
     <!-- Preset Workouts Tab -->
     <div v-else class="space-y-4">
+      <div class="p-3.5 rounded-xl border border-border-grid bg-bg-alternate flex items-start gap-3">
+        <AppIcon name="copy" :size="18" class="text-primary-container shrink-0 mt-0.5" />
+        <div class="text-xs text-ink-muted leading-relaxed">
+          <strong class="text-ink font-bold">Modelos testados para evolução consistente.</strong>
+          Toque em <span class="font-bold text-ink">"Copiar Treino"</span> para personalizar séries, repetições, tempos de descanso e agendar na sua semana.
+        </div>
+      </div>
+
       <div
         v-for="preset in workoutsStore.presets"
         :key="preset.id"
@@ -387,7 +403,7 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
               <div
                 v-for="item in preset.items"
                 :key="item.id"
-                class="p-2.5 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-between"
+                class="py-2.5 px-3 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-between"
               >
                 <div>
                   <div class="font-bold text-xs text-ink">

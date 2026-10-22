@@ -4,6 +4,7 @@ import { DOMAIN_LIMITS } from '@/constants/domain'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import {
   AppButton,
+  AppCard,
   AppInput,
   AppStepper,
   AppIcon,
@@ -38,18 +39,8 @@ watch(
         workoutName.value = props.workoutToEdit.name
         items.value = props.workoutToEdit.items.map((it) => ({ ...it }))
       } else {
-        workoutName.value = 'Novo Treino'
-        // Item inicial padrão (flexão ou primeiro exercício do catálogo)
-        const defaultEx = EXERCISE_CATALOG[0]
-        items.value = [
-          {
-            id: `item-${Date.now()}`,
-            exerciseId: defaultEx.id,
-            sets: DOMAIN_LIMITS.SETS.DEFAULT,
-            target: DOMAIN_LIMITS.REPS.DEFAULT,
-            restSeconds: DOMAIN_LIMITS.REST_SECONDS.DEFAULT,
-          },
-        ]
+        workoutName.value = ''
+        items.value = []
       }
       errorMessage.value = ''
     }
@@ -82,10 +73,6 @@ function handleAddExercise(exercise: ExerciseCatalogItem) {
 }
 
 function removeItem(index: number) {
-  if (items.value.length <= 1) {
-    errorMessage.value = 'O treino deve conter pelo menos 1 exercício.'
-    return
-  }
   items.value.splice(index, 1)
 }
 
@@ -237,24 +224,36 @@ function handleBackdropClick(e: MouseEvent) {
           </AppButton>
         </div>
 
-        <!-- Items Cards -->
-        <div class="space-y-3">
-          <div
+        <!-- Items Cards or Empty State -->
+        <div v-if="items.length === 0" class="p-8 rounded-2xl border-2 border-dashed border-border-grid bg-bg-alternate/40 flex flex-col items-center justify-center text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-primary-soft flex items-center justify-center text-primary-container pointer-events-none select-none" aria-hidden="true">
+            <AppIcon name="dumbbell" :size="22" />
+          </div>
+          <div class="space-y-1">
+            <h4 class="font-bold text-sm text-ink">Nenhum exercício adicionado ainda</h4>
+            <p class="text-xs text-ink-muted max-w-xs">
+              Escolha movimentos da nossa biblioteca para compor suas séries e repetições.
+            </p>
+          </div>
+          <AppButton
+            variant="fill"
+            size="sm"
+            @click="showSelector = true"
+          >
+            <AppIcon name="plus" :size="16" />
+            Adicionar Primeiro Exercício
+          </AppButton>
+        </div>
+
+        <div v-else class="space-y-3">
+          <AppCard
             v-for="(item, index) in items"
             :key="item.id"
-            class="p-4 rounded-xl border border-border-grid bg-surface hover:border-border-primary transition-all shadow-[0_2px_0_0_#111111]"
+            :eyebrow="`Exercício #${index + 1}`"
+            :title="getCatalogExercise(item.exerciseId)?.name || 'Exercício'"
+            dot-color="primary"
           >
-            <!-- Card Header: Exercise Name & Controls -->
-            <div class="flex items-center justify-between pb-3 border-b border-border-grid">
-              <div class="flex items-center gap-2">
-                <span class="w-6 h-6 rounded-md bg-bg-alternate border border-border-grid flex items-center justify-center font-metric-number text-xs font-bold text-ink">
-                  {{ index + 1 }}
-                </span>
-                <span class="font-bold text-sm text-ink">
-                  {{ getCatalogExercise(item.exerciseId)?.name || 'Exercício' }}
-                </span>
-              </div>
-
+            <template #header-right>
               <!-- Reorder and Delete Actions -->
               <div class="flex items-center gap-1">
                 <button
@@ -284,10 +283,10 @@ function handleBackdropClick(e: MouseEvent) {
                   <AppIcon name="trash" :size="14" />
                 </button>
               </div>
-            </div>
+            </template>
 
             <!-- Configuration Steppers Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <!-- Sets Stepper -->
               <div>
                 <label class="block text-[11px] font-bold uppercase text-ink-muted mb-1">
@@ -338,7 +337,7 @@ function handleBackdropClick(e: MouseEvent) {
                 />
               </div>
             </div>
-          </div>
+          </AppCard>
         </div>
       </div>
 

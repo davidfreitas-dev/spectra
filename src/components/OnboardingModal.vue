@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { ref, toRef } from 'vue'
+import { ref, computed, toRef } from 'vue'
 import { AppButton, AppCheckbox } from '@/components'
 import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
+import { DAYS_OF_WEEK } from '@/constants/domain'
+import { PRESET_WORKOUTS } from '@/data/presetWorkouts'
 import AppIcon from './AppIcon.vue'
 import type { AppIconName } from './icons'
 import type { UserLevel, Equipment } from '@/types/domain'
@@ -9,7 +11,8 @@ import type { UserLevel, Equipment } from '@/types/domain'
 export interface OnboardingCompleteEvent {
   level: UserLevel
   equipment: Equipment[]
-  action: 'interactive-tour' | 'explore'
+  selectedDays: string[]
+  startChoice: 'recommended' | 'presets' | 'custom'
 }
 
 const props = defineProps<{
@@ -22,9 +25,10 @@ const emit = defineEmits<{
 
 useBodyScrollLock(toRef(props, 'isOpen'))
 
-const step = ref<1 | 2 | 3>(1)
+const step = ref<1 | 2 | 3 | 4>(1)
 const selectedLevel = ref<UserLevel>('beginner')
 const selectedEquipment = ref<Equipment[]>(['none'])
+const selectedDays = ref<string[]>(['monday', 'wednesday', 'friday'])
 
 const levels: { value: UserLevel; label: string; desc: string }[] = [
   {
@@ -51,6 +55,17 @@ const equipmentOptions: { value: Equipment; label: string; icon: AppIconName }[]
   { value: 'rope', label: 'Corda de Pular', icon: 'flame' },
 ]
 
+// Treino recomendado baseado no nível
+const recommendedPreset = computed(() => {
+  if (selectedLevel.value === 'beginner') {
+    return PRESET_WORKOUTS[0] || null // Full Body Iniciante
+  } else if (selectedLevel.value === 'intermediate') {
+    return PRESET_WORKOUTS[1] || PRESET_WORKOUTS[0] // Empurrada Intermediária
+  } else {
+    return PRESET_WORKOUTS[2] || PRESET_WORKOUTS[0] // Puxada & Core
+  }
+})
+
 function toggleEquipment(eq: Equipment) {
   if (eq === 'none') {
     selectedEquipment.value = ['none']
@@ -70,11 +85,22 @@ function toggleEquipment(eq: Equipment) {
   selectedEquipment.value = list
 }
 
-function handleFinish(action: 'interactive-tour' | 'explore') {
+function toggleDay(dayKey: string) {
+  if (selectedDays.value.includes(dayKey)) {
+    if (selectedDays.value.length > 1) {
+      selectedDays.value = selectedDays.value.filter((d) => d !== dayKey)
+    }
+  } else {
+    selectedDays.value.push(dayKey)
+  }
+}
+
+function handleFinish(startChoice: 'recommended' | 'presets' | 'custom') {
   emit('complete', {
     level: selectedLevel.value,
     equipment: selectedEquipment.value,
-    action,
+    selectedDays: selectedDays.value,
+    startChoice,
   })
 }
 </script>
@@ -93,16 +119,17 @@ function handleFinish(action: 'interactive-tour' | 'explore') {
         <div class="p-5 border-b border-border-grid bg-bg-alternate shrink-0">
           <div class="flex items-center justify-between">
             <span class="font-eyebrow text-[10px] text-primary-container font-bold uppercase tracking-wider">
-              Boas-vindas ao Spectra • Passo {{ step }} de 3
+              Boas-vindas ao Spectra • Passo {{ step }} de 4
             </span>
             <span class="font-metric-number text-xs font-bold text-ink">
-              {{ step }}/3
+              {{ step }}/4
             </span>
           </div>
           <h2 class="font-display text-lg sm:text-xl font-bold text-ink mt-1">
             <template v-if="step === 1">Qual é o seu nível atual?</template>
             <template v-else-if="step === 2">Quais equipamentos você tem?</template>
-            <template v-else>Tudo Pronto para o 1º Treino!</template>
+            <template v-else-if="step === 3">Em quais dias pretende treinar?</template>
+            <template v-else>Como prefere começar sua rotina?</template>
           </h2>
         </div>
 
@@ -111,7 +138,7 @@ function handleFinish(action: 'interactive-tour' | 'explore') {
           <!-- Passo 1: Nível -->
           <div v-if="step === 1" class="space-y-3 animate-in fade-in duration-150">
             <p class="text-xs text-ink-muted">
-              Seu nível personaliza os treinos recomendados e os filtros da biblioteca. Você poderá alterar quando quiser.
+              Seu nível calibra as recomendações e os filtros da biblioteca. Você poderá alterar quando quiser nas configurações.
             </p>
 
             <div class="space-y-2.5">
@@ -178,61 +205,174 @@ function handleFinish(action: 'interactive-tour' | 'explore') {
             </div>
           </div>
 
-          <!-- Passo 3: Decisão & Início do Tour -->
-          <div v-else class="space-y-5 animate-in fade-in duration-150 text-center py-2">
-            <div class="flex flex-col items-center gap-2">
-              <span class="w-14 h-14 rounded-2xl bg-primary-container/15 border-2 border-primary-container flex items-center justify-center text-primary-container shadow-[0_3px_0_0_#f26a21]">
-                <AppIcon name="zap" :size="28" />
-              </span>
-              <h3 class="font-display font-bold text-lg text-ink pt-1">
-                Rotina Pronta para Você!
-              </h3>
-              <p class="text-xs text-ink-muted max-w-sm leading-relaxed">
-                Vamos te guiar com um holofote na tela indicando exatamente onde clicar para iniciar e registrar sua primeira série.
+          <!-- Passo 3: Dias da Semana (Agenda) -->
+          <div v-else-if="step === 3" class="space-y-4 animate-in fade-in duration-150">
+            <p class="text-xs text-ink-muted">
+              A consistência é o pilar da calistenia. Selecione os dias em que pretende treinar:
+            </p>
+
+            <!-- Grid de Dias da Semana -->
+            <div class="grid grid-cols-7 gap-1.5 sm:gap-2">
+              <button
+                v-for="day in DAYS_OF_WEEK"
+                :key="day.key"
+                type="button"
+                class="flex flex-col items-center justify-center py-3 px-1 rounded-xl border text-center transition-all cursor-pointer"
+                :class="selectedDays.includes(day.key)
+                  ? 'bg-primary-container text-on-primary border-border-primary shadow-[0_2px_0_0_#111111] font-bold'
+                  : 'bg-surface text-ink border-border-grid hover:border-border-primary hover:bg-bg-alternate'"
+                @click="toggleDay(day.key)"
+              >
+                <span
+                  class="font-eyebrow text-[9px] uppercase tracking-wider block"
+                  :class="selectedDays.includes(day.key) ? 'text-on-primary' : 'text-ink-muted'"
+                >
+                  {{ day.shortLabel }}
+                </span>
+                <span class="font-metric-number text-xs font-bold mt-1">
+                  {{ day.shortLabel.substring(0, 1) }}
+                </span>
+              </button>
+            </div>
+
+            <!-- Resumo da Meta Semanal Derivada -->
+            <div class="p-3.5 rounded-xl border border-border-grid bg-bg-alternate space-y-1.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <AppIcon name="calendar" :size="16" class="text-primary-container" />
+                  <span class="font-bold text-xs text-ink">Sua Meta Semanal:</span>
+                </div>
+                <span class="font-metric-number text-xs font-bold text-primary-container bg-primary-container/15 px-2 py-0.5 rounded-md border border-primary-container/30">
+                  {{ selectedDays.length }} {{ selectedDays.length === 1 ? 'treino' : 'treinos' }} por semana
+                </span>
+              </div>
+
+              <p class="text-[11px] text-ink-muted leading-relaxed">
+                Essa frequência define sua meta automática. Você poderá ajustar os dias e horários da sua agenda quando quiser.
               </p>
             </div>
+          </div>
+
+          <!-- Passo 4: Como prefere começar (Liberdade e Escolha) -->
+          <div v-else class="space-y-3.5 animate-in fade-in duration-150">
+            <p class="text-xs text-ink-muted">
+              Você tem total liberdade no Spectra. Escolha como quer dar o primeiro passo:
+            </p>
+
+            <!-- Opção 1: Treino Recomendado (Destaque) -->
+            <div
+              class="p-4 rounded-xl border-2 border-primary-container bg-primary-container/10 shadow-[0_3px_0_0_#f26a21] space-y-3 text-left transition-all"
+            >
+              <div class="flex items-start justify-between gap-2">
+                <div>
+                  <div class="inline-flex items-center gap-1 bg-primary-container text-on-primary text-[9px] font-bold px-2 py-0.5 rounded font-eyebrow uppercase tracking-wider mb-1">
+                    <AppIcon name="zap" :size="12" />
+                    Recomendado
+                  </div>
+                  <h3 class="font-display font-bold text-sm sm:text-base text-ink">
+                    {{ recommendedPreset?.name || 'Iniciante — Corpo Todo' }}
+                  </h3>
+                  <p class="text-xs text-ink-muted mt-0.5">
+                    {{ recommendedPreset?.items.length || 4 }} exercícios estruturados para o seu nível e equipamentos.
+                  </p>
+                </div>
+              </div>
+
+              <div class="p-2.5 rounded-lg bg-surface/80 border border-border-grid text-[11px] text-ink-muted flex items-start gap-2">
+                <AppIcon name="edit" :size="15" class="text-primary-container shrink-0 mt-0.5" />
+                <span>
+                  <strong>100% Personalizável:</strong> você poderá alterar séries, repetições e tempos de descanso a qualquer momento no editor.
+                </span>
+              </div>
+
+              <AppButton
+                variant="fill"
+                size="md"
+                class="w-full"
+                @click="handleFinish('recommended')"
+              >
+                <AppIcon name="play" :size="16" />
+                Começar com este Treino
+              </AppButton>
+            </div>
+
+            <!-- Opção 2: Explorar Modelos Prontos -->
+            <button
+              type="button"
+              class="w-full text-left p-3.5 rounded-xl border border-border-grid bg-surface hover:bg-bg-alternate hover:border-border-primary transition-all cursor-pointer flex items-center justify-between gap-3 group"
+              @click="handleFinish('presets')"
+            >
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-center text-ink shrink-0 mt-0.5 group-hover:bg-surface">
+                  <AppIcon name="copy" :size="18" />
+                </div>
+                <div>
+                  <h4 class="font-bold text-xs sm:text-sm text-ink">
+                    Explorar Modelos Prontos
+                  </h4>
+                  <p class="text-[11px] text-ink-muted mt-0.5 leading-relaxed">
+                    Veja opções de Fullbody, Empurrada, Puxada e Pernas para copiar e ajustar.
+                  </p>
+                </div>
+              </div>
+
+              <AppIcon name="arrow_right" :size="16" class="text-ink-muted group-hover:text-primary-container shrink-0" />
+            </button>
+
+            <!-- Opção 3: Montar do Zero -->
+            <button
+              type="button"
+              class="w-full text-left p-3.5 rounded-xl border border-border-grid bg-surface hover:bg-bg-alternate hover:border-border-primary transition-all cursor-pointer flex items-center justify-between gap-3 group"
+              @click="handleFinish('custom')"
+            >
+              <div class="flex items-start gap-3">
+                <div class="w-9 h-9 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-center text-ink shrink-0 mt-0.5 group-hover:bg-surface">
+                  <AppIcon name="sliders" :size="18" />
+                </div>
+                <div>
+                  <h4 class="font-bold text-xs sm:text-sm text-ink">
+                    Montar Meu Próprio Treino do Zero
+                  </h4>
+                  <p class="text-[11px] text-ink-muted mt-0.5 leading-relaxed">
+                    Escolha exercícios da nossa biblioteca de +40 movimentos e defina suas metas.
+                  </p>
+                </div>
+              </div>
+
+              <AppIcon name="arrow_right" :size="16" class="text-ink-muted group-hover:text-primary-container shrink-0" />
+            </button>
           </div>
         </div>
 
         <!-- Footer / Navigation -->
         <div class="p-5 border-t border-border-grid bg-bg-alternate shrink-0">
-          <!-- Passos 1 e 2 -->
-          <div v-if="step < 3" class="flex items-center justify-between">
-            <div v-if="step === 1">
-              <span class="text-[11px] text-ink-muted">Leva apenas 30 segundos</span>
-            </div>
-            <div v-else>
-              <AppButton variant="outline" size="sm" @click="step--">
+          <div class="flex items-center justify-between">
+            <div>
+              <span v-if="step === 1" class="text-[11px] text-ink-muted">Leva apenas 1 minuto</span>
+              <AppButton
+                v-else
+                variant="outline"
+                size="sm"
+                @click="step--"
+              >
                 Voltar
               </AppButton>
             </div>
 
-            <AppButton variant="fill" size="md" @click="step++">
-              Avançar
-              <AppIcon name="arrow_right" :size="16" />
-            </AppButton>
-          </div>
-
-          <!-- Passo 3: Sem botão voltar, botões empilhados 100% largura -->
-          <div v-else class="flex flex-col gap-2.5 w-full">
-            <AppButton
-              variant="fill"
-              size="md"
-              class="w-full"
-              @click="handleFinish('interactive-tour')"
-            >
-              <AppIcon name="play" :size="16" />
-              Iniciar Tour Prático Agora
-            </AppButton>
-
-            <AppButton
-              variant="outline"
-              size="md"
-              class="w-full"
-              @click="handleFinish('explore')"
-            >
-              Explorar Sem o Tour
-            </AppButton>
+            <div v-if="step < 4">
+              <AppButton
+                variant="fill"
+                size="md"
+                :disabled="step === 3 && selectedDays.length === 0"
+                @click="step++"
+              >
+                Avançar
+                <AppIcon name="arrow_right" :size="16" />
+              </AppButton>
+            </div>
+            <div v-else>
+              <span class="text-[11px] text-ink-muted">Escolha uma opção acima</span>
+            </div>
           </div>
         </div>
       </div>

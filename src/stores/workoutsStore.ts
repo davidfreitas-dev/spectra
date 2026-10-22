@@ -13,16 +13,7 @@ export const useWorkoutsStore = defineStore('workouts', () => {
     if (saved.length > 0) {
       workouts.value = saved
     } else {
-      // Cria primeiro treino do usuário copiando o preset de iniciante
-      const initial: Workout = {
-        ...PRESET_WORKOUTS[0],
-        id: `workout-${Date.now()}`,
-        name: 'Iniciante — Corpo Todo (Meu Treino)',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      }
-      workouts.value = [initial]
-      StorageService.saveWorkouts(workouts.value)
+      workouts.value = []
     }
     isLoaded.value = true
   }

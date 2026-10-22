@@ -54,15 +54,27 @@ export const usePreferencesStore = defineStore('preferences', () => {
     persist()
   }
 
+  function setSchedule(schedule: Record<string, string | null>) {
+    preferences.value.schedule = { ...schedule }
+    persist()
+  }
+
   function setToggles(soundEnabled: boolean, vibrationEnabled: boolean) {
     preferences.value.soundEnabled = soundEnabled
     preferences.value.vibrationEnabled = vibrationEnabled
     persist()
   }
 
-  function completeOnboarding(level: UserLevel, equipment: Equipment[]) {
+  function completeOnboarding(
+    level: UserLevel,
+    equipment: Equipment[],
+    schedule?: Record<string, string | null>
+  ) {
     preferences.value.level = level
     preferences.value.equipment = equipment
+    if (schedule) {
+      preferences.value.schedule = { ...schedule }
+    }
     preferences.value.onboardingDone = true
     persist()
   }
@@ -97,6 +109,7 @@ export const usePreferencesStore = defineStore('preferences', () => {
     setLevel,
     setEquipment,
     setDayWorkout,
+    setSchedule,
     setToggles,
     completeOnboarding,
     completeFirstSessionTour,
