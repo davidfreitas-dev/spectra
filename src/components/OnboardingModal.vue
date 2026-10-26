@@ -3,7 +3,7 @@ import { ref, computed, toRef } from 'vue'
 import { AppButton, AppCheckbox } from '@/components'
 import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import { DAYS_OF_WEEK } from '@/constants/domain'
-import { PRESET_WORKOUTS } from '@/data/presetWorkouts'
+import { getRecommendedPreset, getWorkoutRequiredEquipment, formatEquipmentLabel } from '@/utils/workoutMetrics'
 import AppIcon from './AppIcon.vue'
 import type { AppIconName } from './icons'
 import type { UserLevel, Equipment } from '@/types/domain'
@@ -55,15 +55,9 @@ const equipmentOptions: { value: Equipment; label: string; icon: AppIconName }[]
   { value: 'rope', label: 'Corda de Pular', icon: 'flame' },
 ]
 
-// Treino recomendado baseado no nível
+// Treino recomendado baseado no nível E equipamentos
 const recommendedPreset = computed(() => {
-  if (selectedLevel.value === 'beginner') {
-    return PRESET_WORKOUTS[0] || null // Full Body Iniciante
-  } else if (selectedLevel.value === 'intermediate') {
-    return PRESET_WORKOUTS[1] || PRESET_WORKOUTS[0] // Empurrada Intermediária
-  } else {
-    return PRESET_WORKOUTS[2] || PRESET_WORKOUTS[0] // Puxada & Core
-  }
+  return getRecommendedPreset(selectedLevel.value, selectedEquipment.value)
 })
 
 function toggleEquipment(eq: Equipment) {
@@ -270,11 +264,23 @@ function handleFinish(startChoice: 'recommended' | 'presets' | 'custom') {
                     Recomendado
                   </div>
                   <h3 class="font-display font-bold text-sm sm:text-base text-ink">
-                    {{ recommendedPreset?.name || 'Iniciante — Corpo Todo' }}
+                    {{ recommendedPreset?.name || 'Iniciante — 100% Peso Corporal' }}
                   </h3>
                   <p class="text-xs text-ink-muted mt-0.5">
                     {{ recommendedPreset?.items.length || 4 }} exercícios estruturados para o seu nível e equipamentos.
                   </p>
+                  <div
+                    v-if="recommendedPreset"
+                    class="flex items-center gap-1.5 mt-2 flex-wrap"
+                  >
+                    <span
+                      v-for="eq in getWorkoutRequiredEquipment(recommendedPreset)"
+                      :key="eq"
+                      class="text-[10px] font-bold px-2 py-0.5 rounded bg-surface border border-border-grid text-ink font-eyebrow uppercase"
+                    >
+                      {{ formatEquipmentLabel(eq) }}
+                    </span>
+                  </div>
                 </div>
               </div>
 

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { AppCard, AppStatusBadge } from '@/components'
+import { formatEquipmentLabel } from '@/utils/workoutMetrics'
 import type { ExerciseCatalogItem } from '@/types/domain'
 
 interface Props {
@@ -47,8 +48,15 @@ const personalRecordUnit = computed(() => {
     >
       <div class="flex-1 flex flex-col justify-between space-y-3">
         <div class="space-y-3">
-          <!-- Muscle Tags -->
+          <!-- Muscle Tags & Equipment Badge -->
           <div class="flex flex-wrap items-center gap-1.5 min-h-6">
+            <span
+              v-for="eq in exercise.equipment"
+              :key="eq"
+              class="px-2 py-0.5 rounded bg-primary-container/10 border border-border-primary/40 font-eyebrow text-[10px] font-bold text-primary-container uppercase"
+            >
+              {{ formatEquipmentLabel(eq) }}
+            </span>
             <span
               v-for="muscle in exercise.muscleGroups"
               :key="muscle"

@@ -8,6 +8,7 @@ import { DAYS_OF_WEEK } from '@/constants/domain'
 import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import {
   AppButton,
+  AppChip,
   AppEmptyState,
   AppIcon,
   AppPageHeader,
@@ -17,6 +18,7 @@ import {
   WorkoutPreSummaryModal,
   WorkoutScheduleModal,
 } from '@/components'
+import { canUserPerformWorkout, getWorkoutRequiredEquipment } from '@/utils/workoutMetrics'
 import type { Workout, WorkoutItem } from '@/types/domain'
 import type { SegmentedOption } from '@/types'
 
@@ -32,6 +34,28 @@ const tabOptions = computed<SegmentedOption[]>(() => [
   { value: 'user', label: `Meus Treinos (${workoutsStore.workouts.length})` },
   { value: 'presets', label: `Modelos Prontos (${workoutsStore.presets.length})` },
 ])
+
+const selectedPresetFilter = ref<string>('all')
+
+const presetFilters = computed(() => [
+  { id: 'all', label: `Todos (${workoutsStore.presets.length})` },
+  { id: 'compatible', label: 'Compatíveis Comigo' },
+  { id: 'none', label: 'Peso Corporal' },
+  { id: 'bar', label: 'Barra' },
+  { id: 'rope', label: 'Corda' },
+  { id: 'band', label: 'Elástico' },
+])
+
+const filteredPresets = computed(() => {
+  return workoutsStore.presets.filter((preset) => {
+    if (selectedPresetFilter.value === 'all') return true
+    if (selectedPresetFilter.value === 'compatible') {
+      return canUserPerformWorkout(preset, preferencesStore.preferences.equipment)
+    }
+    const required = getWorkoutRequiredEquipment(preset)
+    return required.includes(selectedPresetFilter.value as any)
+  })
+})
 
 // Modais
 const showEditorModal = ref(false)
@@ -308,8 +332,28 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
         </div>
       </div>
 
+      <!-- Filter chips for presets -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+        <AppChip
+          v-for="filter in presetFilters"
+          :key="filter.id"
+          :label="filter.label"
+          :selected="selectedPresetFilter === filter.id"
+          class="shrink-0"
+          @click="selectedPresetFilter = filter.id"
+        />
+      </div>
+
+      <AppEmptyState
+        v-if="filteredPresets.length === 0"
+        variant="dashed"
+        title="Nenhum modelo encontrado"
+        description="Tente selecionar outro filtro de equipamento."
+        icon="search"
+      />
+
       <div
-        v-for="preset in workoutsStore.presets"
+        v-for="preset in filteredPresets"
         :key="preset.id"
       >
         <WorkoutCard

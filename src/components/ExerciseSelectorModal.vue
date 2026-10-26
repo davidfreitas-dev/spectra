@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { AppButton, AppInput, AppChip, AppCheckbox, AppModal, AppEmptyState } from '@/components'
+import { canPerformExercise, formatEquipmentLabel } from '@/utils/workoutMetrics'
 import AppIcon from './AppIcon.vue'
 import type { ExerciseCatalogItem, Equipment } from '@/types/domain'
 
@@ -78,9 +79,10 @@ const filteredExercises = computed(() => {
         return false
       }
     } else if (!showAllExercises.value && props.userEquipment && props.userEquipment.length > 0) {
-      // Quando em 'Todos', restringe aos equipamentos cadastrados no perfil a menos que 'showAllExercises' esteja marcado
-      const hasEquipment = ex.equipment.every((eq) => props.userEquipment?.includes(eq))
-      if (!hasEquipment) return false
+      // Quando em 'Todos', restringe aos exercícios viáveis com os equipamentos do perfil (peso corporal 'none' é sempre disponível)
+      if (!canPerformExercise(ex.equipment, props.userEquipment)) {
+        return false
+      }
     }
 
     return true
@@ -164,7 +166,7 @@ function handleSelect(exercise: ExerciseCatalogItem) {
         v-if="filteredExercises.length === 0"
         variant="dashed"
         title="Nenhum exercício encontrado"
-        description="Tente buscar por outro termo ou desmarque o filtro de equipamento."
+        description="Tente buscar por outro termo ou marque para exibir todos os equipamentos."
         icon="search"
       />
 
@@ -179,10 +181,20 @@ function handleSelect(exercise: ExerciseCatalogItem) {
           <div class="font-bold text-sm text-ink group-hover:text-primary-container transition-colors">
             {{ exercise.name }}
           </div>
-          <div class="flex items-center gap-2 mt-1 text-xs text-ink-muted">
-            <span>{{ exercise.muscleGroups.join(', ') }}</span>
-            <span>•</span>
-            <span class="font-medium text-ink">
+          <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+            <span
+              v-for="eq in exercise.equipment"
+              :key="eq"
+              class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-bg-alternate border border-border-grid text-ink font-eyebrow uppercase"
+            >
+              {{ formatEquipmentLabel(eq) }}
+            </span>
+            <span class="text-border-primary">•</span>
+            <span class="text-[11px] text-ink-muted">
+              {{ exercise.muscleGroups.join(', ') }}
+            </span>
+            <span class="text-border-primary">•</span>
+            <span class="text-[11px] font-medium text-ink">
               {{ exercise.measurementType === 'reps' ? 'Repetições' : 'Duração' }}
             </span>
           </div>

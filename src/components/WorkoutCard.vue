@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { AppCard, AppIcon } from '@/components'
-import { calculateWorkoutEstimatedMinutes, getExerciseDetails } from '@/utils/workoutMetrics'
+import {
+  calculateWorkoutEstimatedMinutes,
+  getExerciseDetails,
+  getWorkoutRequiredEquipment,
+  formatEquipmentLabel,
+} from '@/utils/workoutMetrics'
 import type { Workout } from '@/types/domain'
 
 interface Props {
@@ -18,6 +23,10 @@ const props = withDefaults(defineProps<Props>(), {
 const estimatedMinutes = computed(() => {
   return calculateWorkoutEstimatedMinutes(props.workout)
 })
+
+const requiredEquipment = computed(() => {
+  return getWorkoutRequiredEquipment(props.workout)
+})
 </script>
 
 <template>
@@ -26,17 +35,26 @@ const estimatedMinutes = computed(() => {
     :eyebrow="eyebrow"
     :dot-color="dotColor"
   >
-    <div class="space-y-4">
-      <!-- Informações de quantidade de exercícios e tempo estimado (apenas mobile) -->
-      <div class="sm:hidden flex items-center justify-between px-3 py-2 rounded-xl bg-bg-alternate border border-border-grid text-xs text-ink-muted">
-        <div class="flex items-center gap-1.5 font-medium">
-          <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
-          <span><strong class="text-ink font-bold">{{ workout.items.length }}</strong> exercícios</span>
+    <div class="space-y-3.5">
+      <!-- Equipamentos Exigidos & Quantidade de Exercícios -->
+      <div class="flex items-center justify-between gap-2 flex-wrap text-xs">
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[10px] font-eyebrow font-bold uppercase text-ink-muted">
+            Equipamentos:
+          </span>
+          <span
+            v-for="eq in requiredEquipment"
+            :key="eq"
+            class="px-2 py-0.5 rounded text-[10px] font-bold font-eyebrow uppercase bg-bg-alternate border border-border-grid text-ink"
+          >
+            {{ formatEquipmentLabel(eq) }}
+          </span>
         </div>
-        <div class="h-3.5 w-px bg-border-grid" />
-        <div class="flex items-center gap-1.5 font-medium">
-          <AppIcon name="clock" :size="14" class="text-primary-container" />
-          <span>Estimado: <strong class="text-ink font-bold">~{{ estimatedMinutes }} min</strong></span>
+
+        <div class="sm:hidden flex items-center gap-2 text-ink-muted font-medium text-xs">
+          <span>{{ workout.items.length }} exercícios</span>
+          <span>•</span>
+          <span>~{{ estimatedMinutes }} min</span>
         </div>
       </div>
 

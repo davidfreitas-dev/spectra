@@ -7,7 +7,7 @@ import { useSessionsStore, type ProgressionSuggestion } from '@/stores/sessionsS
 import { useTourStore } from '@/stores/tourStore'
 import { DAYS_OF_WEEK } from '@/constants/domain'
 import { EXERCISE_CATALOG } from '@/data/exercises'
-import { getExerciseDetails } from '@/utils/workoutMetrics'
+import { getExerciseDetails, getRecommendedPreset } from '@/utils/workoutMetrics'
 import {
   AppButton,
   AppCard,
@@ -156,12 +156,11 @@ function handleOnboardingComplete(data: OnboardingCompleteEvent) {
   let targetWorkoutId: string | null = null
 
   if (data.startChoice === 'recommended') {
-    let presetId = 'preset-fullbody-beginner'
-    if (data.level === 'intermediate') presetId = 'preset-push-intermediate'
-    else if (data.level === 'advanced') presetId = 'preset-pull-core'
+    const recommended = getRecommendedPreset(data.level, data.equipment)
+    const presetId = recommended.id
 
     // Procura se já tem nos treinos salvos ou copia
-    const existing = workoutsStore.workouts.find((w) => w.id === presetId || w.name.includes('Iniciante') || w.name.includes('Empurrada') || w.name.includes('Puxada'))
+    const existing = workoutsStore.workouts.find((w) => w.id === presetId || w.name.startsWith(recommended.name))
     if (existing) {
       targetWorkoutId = existing.id
     } else {

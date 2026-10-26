@@ -2,8 +2,44 @@ import type { Workout } from '@/types/domain'
 
 export const PRESET_WORKOUTS: Workout[] = [
   {
+    id: 'preset-beginner-zero-equipment',
+    name: 'Iniciante — 100% Peso Corporal (Sem Equipamento)',
+    items: [
+      {
+        id: 'item-bze-1',
+        exerciseId: 'pushup-incline',
+        sets: 3,
+        target: 10,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-bze-2',
+        exerciseId: 'squat-air',
+        sets: 3,
+        target: 12,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-bze-3',
+        exerciseId: 'glute-bridge',
+        sets: 3,
+        target: 12,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-bze-4',
+        exerciseId: 'plank-standard',
+        sets: 3,
+        target: 25,
+        restSeconds: 60,
+      },
+    ],
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
     id: 'preset-fullbody-beginner',
-    name: 'Iniciante — Corpo Todo (Full Body)',
+    name: 'Iniciante — Corpo Todo com Barra',
     items: [
       {
         id: 'item-1',
@@ -31,6 +67,78 @@ export const PRESET_WORKOUTS: Workout[] = [
         exerciseId: 'plank-standard',
         sets: 3,
         target: 30,
+        restSeconds: 60,
+      },
+    ],
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'preset-cardio-rope',
+    name: 'Cardio & Queima com Corda',
+    items: [
+      {
+        id: 'item-rope-1',
+        exerciseId: 'rope-basic-jump',
+        sets: 4,
+        target: 45,
+        restSeconds: 45,
+      },
+      {
+        id: 'item-rope-2',
+        exerciseId: 'jumping-jacks',
+        sets: 3,
+        target: 35,
+        restSeconds: 30,
+      },
+      {
+        id: 'item-rope-3',
+        exerciseId: 'mountain-climbers',
+        sets: 3,
+        target: 30,
+        restSeconds: 45,
+      },
+      {
+        id: 'item-rope-4',
+        exerciseId: 'rope-high-knees',
+        sets: 3,
+        target: 30,
+        restSeconds: 60,
+      },
+    ],
+    createdAt: '2026-01-01T00:00:00.000Z',
+    updatedAt: '2026-01-01T00:00:00.000Z',
+  },
+  {
+    id: 'preset-band-functional',
+    name: 'Força Funcional com Elásticos',
+    items: [
+      {
+        id: 'item-band-1',
+        exerciseId: 'band-row',
+        sets: 3,
+        target: 12,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-band-2',
+        exerciseId: 'band-pushup-resisted',
+        sets: 3,
+        target: 8,
+        restSeconds: 75,
+      },
+      {
+        id: 'item-band-3',
+        exerciseId: 'band-squat',
+        sets: 3,
+        target: 12,
+        restSeconds: 60,
+      },
+      {
+        id: 'item-band-4',
+        exerciseId: 'band-face-pull',
+        sets: 3,
+        target: 15,
         restSeconds: 60,
       },
     ],

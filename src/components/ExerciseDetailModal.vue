@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { EXERCISE_CATALOG } from '@/data/exercises'
-import { AppButton, AppModal } from '@/components'
+import { AppButton, AppModal, AppStatusBadge } from '@/components'
+import { formatEquipmentLabel } from '@/utils/workoutMetrics'
 import AppIcon from './AppIcon.vue'
 import type { ExerciseCatalogItem } from '@/types/domain'
 
@@ -37,14 +38,27 @@ const harderExercise = computed(() => {
   >
     <!-- Content -->
     <div v-if="exercise" class="p-4 sm:p-6 space-y-4">
-      <!-- Tags & PR Card -->
-      <div class="flex items-center justify-between gap-3 p-3 rounded-xl border border-border-grid bg-bg-alternate">
+      <!-- Tags, Equipment & PR Card -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3.5 rounded-xl border border-border-grid bg-bg-alternate">
         <div class="space-y-1">
           <span class="font-eyebrow text-[10px] uppercase text-ink-muted block">Grupo Principal</span>
-          <span class="font-bold text-sm text-ink">{{ exercise.muscleGroups.join(', ') }}</span>
+          <span class="font-bold text-xs sm:text-sm text-ink">{{ exercise.muscleGroups.join(', ') }}</span>
         </div>
 
-        <div class="text-right">
+        <div class="space-y-1">
+          <span class="font-eyebrow text-[10px] uppercase text-ink-muted block">Equipamento</span>
+          <div class="flex flex-wrap gap-1">
+            <span
+              v-for="eq in exercise.equipment"
+              :key="eq"
+              class="font-bold text-xs px-2 py-0.5 rounded bg-surface border border-border-grid text-ink inline-block"
+            >
+              {{ formatEquipmentLabel(eq) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="space-y-1 sm:text-right">
           <span class="font-eyebrow text-[10px] uppercase text-ink-muted block">Recorde Pessoal (PR)</span>
           <span
             v-if="personalRecord !== undefined && personalRecord !== null"
@@ -52,7 +66,7 @@ const harderExercise = computed(() => {
           >
             {{ personalRecord }} {{ exercise.measurementType === 'reps' ? 'reps' : 's' }}
           </span>
-          <span v-else class="text-xs text-ink-muted font-bold">
+          <span v-else class="text-xs text-ink-muted font-bold block pt-0.5">
             Sem registro
           </span>
         </div>
@@ -60,9 +74,12 @@ const harderExercise = computed(() => {
 
       <!-- Instructions -->
       <div>
-        <h3 class="font-bold text-xs uppercase text-ink-muted tracking-wider mb-2">
-          Como Executar
-        </h3>
+        <div class="flex items-center justify-between mb-2">
+          <h3 class="font-bold text-xs uppercase text-ink-muted tracking-wider">
+            Como Executar
+          </h3>
+          <AppStatusBadge :type="exercise.level" />
+        </div>
         <ol class="space-y-2 list-decimal list-inside text-sm text-ink">
           <li
             v-for="(instruction, idx) in exercise.instructions"
@@ -89,28 +106,40 @@ const harderExercise = computed(() => {
       <!-- Variations (Easier / Harder) -->
       <div v-if="easierExercise || harderExercise" class="space-y-2 pt-4 border-t border-border-grid">
         <h3 class="font-bold text-xs uppercase text-ink-muted tracking-wider">
-          Variações do Movimento
+          Progressões &amp; Variações
         </h3>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <!-- Easier -->
           <button
             v-if="easierExercise"
             type="button"
-            class="text-left p-3 rounded-xl border border-border-grid bg-surface hover:bg-bg-alternate transition-colors cursor-pointer"
+            class="p-3 rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate hover:border-border-primary transition-all text-left group cursor-pointer"
             @click="emit('select-variation', easierExercise)"
           >
-            <span class="font-eyebrow text-[9px] uppercase text-ink-muted font-bold block">Mais fácil</span>
-            <span class="font-bold text-sm text-ink block mt-0.5">{{ easierExercise.name }}</span>
+            <div class="flex items-center gap-1.5 text-[11px] font-bold text-success-container font-eyebrow uppercase mb-1">
+              <AppIcon name="arrow_down" :size="14" />
+              <span>Variação Mais Fácil</span>
+            </div>
+            <div class="font-bold text-xs text-ink group-hover:text-primary-container transition-colors">
+              {{ easierExercise.name }}
+            </div>
           </button>
 
+          <!-- Harder -->
           <button
             v-if="harderExercise"
             type="button"
-            class="text-left p-3 rounded-xl border border-border-grid bg-surface hover:bg-bg-alternate transition-colors cursor-pointer"
+            class="p-3 rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate hover:border-border-primary transition-all text-left group cursor-pointer"
             @click="emit('select-variation', harderExercise)"
           >
-            <span class="font-eyebrow text-[9px] uppercase text-ink-muted font-bold block">Mais desafiador</span>
-            <span class="font-bold text-sm text-ink block mt-0.5">{{ harderExercise.name }}</span>
+            <div class="flex items-center gap-1.5 text-[11px] font-bold text-primary-container font-eyebrow uppercase mb-1">
+              <AppIcon name="arrow_up" :size="14" />
+              <span>Próximo Nível (Mais Difícil)</span>
+            </div>
+            <div class="font-bold text-xs text-ink group-hover:text-primary-container transition-colors">
+              {{ harderExercise.name }}
+            </div>
           </button>
         </div>
       </div>

@@ -1,7 +1,39 @@
 import type { ExerciseCatalogItem } from '@/types/domain'
 
 export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
-  // Empurrada / Peito & Tríceps & Ombros
+  // ==========================================
+  // Empurrada / Peito, Tríceps & Ombros
+  // ==========================================
+  {
+    id: 'pushup-incline',
+    name: 'Flexão Inclinada (Apoio Alto)',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Peito', 'Tríceps', 'Ombros'],
+    equipment: ['none'],
+    instructions: [
+      'Apoie as mãos em uma superfície elevada estável (mesa, banco ou parede).',
+      'Mantenha o corpo reto da cabeça aos pés.',
+      'Desça o peito até tocar o apoio e empurre de volta estendendo os braços.',
+    ],
+    safetyNote: 'Certifique-se de que o apoio não deslizará durante o movimento.',
+    harderId: 'pushup-kneeling',
+  },
+  {
+    id: 'pushup-kneeling',
+    name: 'Flexão de Joelhos',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Peito', 'Tríceps', 'Ombros'],
+    equipment: ['none'],
+    instructions: [
+      'Apoie os joelhos no chão e cruze os pés.',
+      'Mantenha o tronco alinhado e desça até quase tocar o peito no chão.',
+      'Empurre firmemente até estender os cotovelos.',
+    ],
+    easierId: 'pushup-incline',
+    harderId: 'pushup-standard',
+  },
   {
     id: 'pushup-standard',
     name: 'Flexão Tradicional',
@@ -20,19 +52,6 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
     harderId: 'pushup-diamond',
   },
   {
-    id: 'pushup-kneeling',
-    name: 'Flexão de Joelhos',
-    measurementType: 'reps',
-    level: 'beginner',
-    muscleGroups: ['Peito', 'Tríceps', 'Ombros'],
-    equipment: ['none'],
-    instructions: [
-      'Apoie os joelhos no chão e cruze os pés.',
-      'Mantenha o tronco alinhado e desça até quase tocar o peito no chão.',
-    ],
-    harderId: 'pushup-standard',
-  },
-  {
     id: 'pushup-diamond',
     name: 'Flexão Diamante',
     measurementType: 'reps',
@@ -42,9 +61,25 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
     instructions: [
       'Junte os polegares e indicadores formando um triângulo/diamante sob o peito.',
       'Desça controladamente mantendo os cotovelos próximos às costelas.',
+      'Empurre de volta focando a força no tríceps.',
     ],
     easierId: 'pushup-standard',
     harderId: 'pushup-archer',
+  },
+  {
+    id: 'pushup-decline',
+    name: 'Flexão Declinada (Pés Elevados)',
+    measurementType: 'reps',
+    level: 'intermediate',
+    muscleGroups: ['Peito', 'Ombros', 'Tríceps', 'Core'],
+    equipment: ['none'],
+    instructions: [
+      'Apoie os pés em uma cadeira, banco ou sofá e as mãos no chão.',
+      'Mantenha o core rígido e desça a cabeça em direção ao solo.',
+      'Empurre o chão enfatizando a porção superior do peitoral e ombros.',
+    ],
+    easierId: 'pushup-standard',
+    harderId: 'pike-pushup',
   },
   {
     id: 'pushup-archer',
@@ -54,8 +89,9 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
     muscleGroups: ['Peito', 'Tríceps', 'Ombros', 'Core'],
     equipment: ['none'],
     instructions: [
-      'Afaste bastante as mãos.',
+      'Afaste bastante as mãos em relação à largura dos ombros.',
       'Desça em direção a um dos braços estendendo totalmente o outro na lateral.',
+      'Alterne os lados a cada repetição ou faça todas em um braço antes de trocar.',
     ],
     easierId: 'pushup-diamond',
   },
@@ -67,9 +103,11 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
     muscleGroups: ['Tríceps', 'Peito', 'Ombros'],
     equipment: ['none'],
     instructions: [
-      'Apoie as mãos na borda de um banco ou apoio firme atrás de você.',
-      'Flexione os cotovelos até 90 graus e empurre para cima.',
+      'Apoie as mãos na borda de um banco, sofá ou cadeira firme atrás de você.',
+      'Com pernas flexionadas (mais fácil) ou esticadas (mais desafiador), desça até 90° nos cotovelos.',
+      'Empurre o apoio com as palmas até estender totalmente os braços.',
     ],
+    safetyNote: 'Mantenha as costas e quadril próximos à borda do apoio para não sobrecarregar os ombros.',
     harderId: 'dips-parallel',
   },
   {
@@ -113,7 +151,8 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
       'Desça a cabeça diagonalmente à frente das mãos formando um tripé.',
       'Empurre de volta empurrando o chão para longe.',
     ],
-    harderId: 'handstand-pushup',
+    easierId: 'pushup-decline',
+    harderId: 'handstand-hold',
   },
   {
     id: 'handstand-hold',
@@ -126,9 +165,69 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
       'Suba na parada de mão com a barriga ou costas voltadas para a parede.',
       'Empurre ativamente o chão com as mãos, trave o abdômen e glúteos.',
     ],
+    easierId: 'pike-pushup',
   },
 
+  // ==========================================
   // Puxada / Costas & Bíceps
+  // ==========================================
+  {
+    id: 'dead-hang',
+    name: 'Suspensão Passiva na Barra (Dead Hang)',
+    measurementType: 'duration',
+    level: 'beginner',
+    muscleGroups: ['Antebraço', 'Ombros', 'Costas'],
+    equipment: ['bar'],
+    instructions: [
+      'Segure na barra fixa e solte o peso do corpo relaxando ombros e escápulas.',
+      'Respire fundo e desenvolva força de preensão manual e descompressão vertebral.',
+    ],
+  },
+  {
+    id: 'australian-pullup',
+    name: 'Remada Australiana (Inverted Row)',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Costas', 'Bíceps', 'Trapézio', 'Core'],
+    equipment: ['bar'],
+    instructions: [
+      'Sob uma barra baixa ou paralelas, posicione o corpo inclinado com calcanhares no chão.',
+      'Puxe o peito até a barra mantendo o corpo rígido como uma prancha.',
+      'Desça controladamente sem relaxar a postura.',
+    ],
+    harderId: 'chinup-standard',
+  },
+  {
+    id: 'chinup-standard',
+    name: 'Barra Fixa Supinada (Chin-up)',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Bíceps', 'Costas', 'Antebraço'],
+    equipment: ['bar'],
+    instructions: [
+      'Pegada na largura dos ombros com as palmas voltadas para você.',
+      'Puxe o peito em direção à barra mantendo o core ativado até o queixo passar da barra.',
+      'Desça de forma totalmente controlada até estender os braços.',
+    ],
+    easierId: 'australian-pullup',
+    harderId: 'pullup-standard',
+  },
+  {
+    id: 'band-pullup-assisted',
+    name: 'Barra Fixa Assistida com Elástico',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Costas', 'Bíceps', 'Antebraço'],
+    equipment: ['bar', 'band'],
+    instructions: [
+      'Prenda o elástico no meio da barra e apoie um dos pés ou joelhos no laço.',
+      'Com pegada pronada na largura dos ombros, puxe o queixo acima da barra com ajuda da tensão do elástico.',
+      'Controle a descida até os braços estenderem.',
+    ],
+    safetyNote: 'Cuidado ao posicionar e retirar o pé do elástico para não soltá-lo bruscamente.',
+    easierId: 'australian-pullup',
+    harderId: 'pullup-standard',
+  },
   {
     id: 'pullup-standard',
     name: 'Barra Fixa Pronada (Pull-up)',
@@ -142,46 +241,8 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
       'Puxe até que o queixo passe por cima da barra.',
       'Desça de forma totalmente controlada até os braços quase estenderem.',
     ],
-    easierId: 'australian-pullup',
-    harderId: 'pullup-wide',
-  },
-  {
-    id: 'chinup-standard',
-    name: 'Barra Fixa Supinada (Chin-up)',
-    measurementType: 'reps',
-    level: 'beginner',
-    muscleGroups: ['Bíceps', 'Costas', 'Antebraço'],
-    equipment: ['bar'],
-    instructions: [
-      'Pegada na largura dos ombros com as palmas voltadas para você.',
-      'Puxe o peito em direção à barra mantendo o core ativado.',
-    ],
-    harderId: 'pullup-standard',
-  },
-  {
-    id: 'australian-pullup',
-    name: 'Remada Australiana (Inverted Row)',
-    measurementType: 'reps',
-    level: 'beginner',
-    muscleGroups: ['Costas', 'Bíceps', 'Trapézio', 'Core'],
-    equipment: ['bar'],
-    instructions: [
-      'Sob uma barra baixa ou paralelas, posicione o corpo inclinado com calcanhares no chão.',
-      'Puxe o peito até a barra mantendo o corpo rígido como uma prancha.',
-    ],
-    harderId: 'pullup-standard',
-  },
-  {
-    id: 'dead-hang',
-    name: 'Suspensão Passiva na Barra (Dead Hang)',
-    measurementType: 'duration',
-    level: 'beginner',
-    muscleGroups: ['Antebraço', 'Ombros', 'Costas'],
-    equipment: ['bar'],
-    instructions: [
-      'Segure na barra fixa e solte o peso do corpo relaxando ombros e escápulas.',
-      'Respire fundo e desenvolva força de preensão manual.',
-    ],
+    easierId: 'band-pullup-assisted',
+    harderId: 'muscle-up',
   },
   {
     id: 'muscle-up',
@@ -197,7 +258,9 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
     easierId: 'pullup-standard',
   },
 
+  // ==========================================
   // Pernas / Membros Inferiores
+  // ==========================================
   {
     id: 'squat-air',
     name: 'Agachamento Livre (Air Squat)',
@@ -210,20 +273,7 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
       'Desça o quadril abaixo da linha dos joelhos mantendo a coluna neutra.',
       'Suba empurrando o chão com toda a planta dos pés.',
     ],
-    harderId: 'pistol-squat',
-  },
-  {
-    id: 'pistol-squat',
-    name: 'Pistol Squat (Agachamento Unilateral)',
-    measurementType: 'reps',
-    level: 'advanced',
-    muscleGroups: ['Quadríceps', 'Glúteos', 'Equilíbrio'],
-    equipment: ['none'],
-    instructions: [
-      'Equilibre-se em uma perna com a outra estendida à frente.',
-      'Desça até a flexão profunda da perna de apoio e retorne sem apoiar a outra.',
-    ],
-    easierId: 'squat-air',
+    harderId: 'bulgarian-split-squat',
   },
   {
     id: 'lunges',
@@ -234,7 +284,37 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
     equipment: ['none'],
     instructions: [
       'Dê um passo à frente flexionando ambos os joelhos até 90°.',
-      'O joelho de trás quase encosta no chão.',
+      'O joelho de trás quase encosta no chão sem bater no solo.',
+      'Retorne à posição inicial e alterne a perna.',
+    ],
+    harderId: 'bulgarian-split-squat',
+  },
+  {
+    id: 'bulgarian-split-squat',
+    name: 'Agachamento Búlgaro',
+    measurementType: 'reps',
+    level: 'intermediate',
+    muscleGroups: ['Quadríceps', 'Glúteos'],
+    equipment: ['none'],
+    instructions: [
+      'Apoie o peito do pé de trás em um banco ou cadeira firme.',
+      'Flexione o joelho da perna da frente descendo o quadril verticalmente.',
+      'Empurre o chão com o calcanhar da frente até retornar ao topo.',
+    ],
+    easierId: 'lunges',
+    harderId: 'pistol-squat',
+  },
+  {
+    id: 'glute-bridge',
+    name: 'Elevação Pélvica / Ponte de Glúteos',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Glúteos', 'Posteriores', 'Lombar'],
+    equipment: ['none'],
+    instructions: [
+      'Deite-se de costas com joelhos dobrados e pés firmes no chão.',
+      'Eleve o quadril contraindo fortemente os glúteos até formar uma linha reta dos joelhos aos ombros.',
+      'Segure 1 segundo no topo e desça controladamente.',
     ],
   },
   {
@@ -261,8 +341,23 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
       'Mantenha a posição sustentando a contração isométrica.',
     ],
   },
+  {
+    id: 'pistol-squat',
+    name: 'Pistol Squat (Agachamento Unilateral)',
+    measurementType: 'reps',
+    level: 'advanced',
+    muscleGroups: ['Quadríceps', 'Glúteos', 'Equilíbrio'],
+    equipment: ['none'],
+    instructions: [
+      'Equilibre-se em uma perna com a outra estendida à frente.',
+      'Desça até a flexão profunda da perna de apoio e retorne sem apoiar a outra no solo.',
+    ],
+    easierId: 'bulgarian-split-squat',
+  },
 
+  // ==========================================
   // Core & Abdômen
+  // ==========================================
   {
     id: 'plank-standard',
     name: 'Prancha Frontal Isométrica',
@@ -274,6 +369,33 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
       'Apoie os antebraços e as pontas dos pés no chão.',
       'Mantenha glúteos e abdômen contraídos em linha reta.',
     ],
+    harderId: 'hollow-body-hold',
+  },
+  {
+    id: 'plank-side',
+    name: 'Prancha Lateral Isométrica',
+    measurementType: 'duration',
+    level: 'beginner',
+    muscleGroups: ['Core', 'Oblíquos', 'Ombros'],
+    equipment: ['none'],
+    instructions: [
+      'Deite-se de lado apoiando um antebraço no solo e pés alinhados.',
+      'Eleve o quadril alinhando o corpo da cabeça aos pés.',
+      'Sustente a contração ativando os oblíquos.',
+    ],
+  },
+  {
+    id: 'superman',
+    name: 'Superman Isométrico (Hiperextensão)',
+    measurementType: 'duration',
+    level: 'beginner',
+    muscleGroups: ['Lombar', 'Glúteos', 'Costas'],
+    equipment: ['none'],
+    instructions: [
+      'Deite-se de bruços com braços esticados à frente e pernas estendidas.',
+      'Eleve simultaneamente o peito e as coxas do chão contraindo glúteos e lombar.',
+      'Sustente a posição respirando de forma cadenciada.',
+    ],
   },
   {
     id: 'hollow-body-hold',
@@ -283,9 +405,11 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
     muscleGroups: ['Core', 'Abdômen'],
     equipment: ['none'],
     instructions: [
-      'Deite-se de costas, pressione a lombar contra o chão.',
+      'Deite-se de costas, pressione a lombar firmemente contra o chão.',
       'Eleve os ombros e as pernas estendidas formando uma curvatura em formato de concha.',
     ],
+    easierId: 'plank-standard',
+    harderId: 'l-sit',
   },
   {
     id: 'hanging-leg-raise',
@@ -299,6 +423,7 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
       'Controle a descida sem balançar o corpo com impulso.',
     ],
     easierId: 'plank-standard',
+    harderId: 'l-sit',
   },
   {
     id: 'l-sit',
@@ -310,6 +435,191 @@ export const EXERCISE_CATALOG: ExerciseCatalogItem[] = [
     instructions: [
       'Com as mãos ao lado do quadril, empurre o chão para elevar o quadril e mantenha as pernas retas a 90°.',
     ],
-    easierId: 'hanging-leg-raise',
+    easierId: 'hollow-body-hold',
+  },
+
+  // ==========================================
+  // Corda de Pular (`rope`) & Cardio Funcional
+  // ==========================================
+  {
+    id: 'rope-basic-jump',
+    name: 'Pular Corda (Salto Básico)',
+    measurementType: 'duration',
+    level: 'beginner',
+    muscleGroups: ['Cardio', 'Panturrilhas', 'Coordenação'],
+    equipment: ['rope'],
+    instructions: [
+      'Segure as manoplas na altura do quadril com os cotovelos próximos às costelas.',
+      'Salte com os dois pés juntos a apenas alguns centímetros do chão.',
+      'Gire a corda utilizando apenas o movimento dos punhos, sem abrir os braços.',
+    ],
+    safetyNote: 'Pouse suavemente sobre as pontas dos pés para proteger os joelhos.',
+    harderId: 'rope-boxer-step',
+  },
+  {
+    id: 'rope-boxer-step',
+    name: 'Pular Corda (Passo do Boxeador)',
+    measurementType: 'duration',
+    level: 'intermediate',
+    muscleGroups: ['Cardio', 'Panturrilhas', 'Coordenação'],
+    equipment: ['rope'],
+    instructions: [
+      'Transfira o peso do corpo ritmicamente de um pé para o outro a cada giro da corda.',
+      'Toque levemente o pé livre no chão como descanso ativo.',
+      'Mantenha os giros firmes nos punhos com ritmo constante.',
+    ],
+    easierId: 'rope-basic-jump',
+    harderId: 'rope-high-knees',
+  },
+  {
+    id: 'rope-high-knees',
+    name: 'Pular Corda com Joelhos Altos',
+    measurementType: 'duration',
+    level: 'intermediate',
+    muscleGroups: ['Cardio', 'Panturrilhas', 'Core', 'Quadríceps'],
+    equipment: ['rope'],
+    instructions: [
+      'Eleve alternadamente os joelhos em direção ao peito a cada giro da corda como em uma corrida estacionária.',
+      'Aumente a cadência e mantenha o core engajado.',
+    ],
+    easierId: 'rope-boxer-step',
+    harderId: 'rope-double-under',
+  },
+  {
+    id: 'rope-double-under',
+    name: 'Pular Corda (Salto Duplo / Double Under)',
+    measurementType: 'reps',
+    level: 'advanced',
+    muscleGroups: ['Cardio', 'Panturrilhas', 'Ombros', 'Potência'],
+    equipment: ['rope'],
+    instructions: [
+      'Salte um pouco mais alto mantendo o corpo vertical.',
+      'Gire os punhos com o dobro da velocidade para a corda passar duas vezes sob os pés no mesmo salto.',
+    ],
+    easierId: 'rope-high-knees',
+  },
+  {
+    id: 'jumping-jacks',
+    name: 'Polichinelos (Jumping Jacks)',
+    measurementType: 'duration',
+    level: 'beginner',
+    muscleGroups: ['Cardio', 'Ombros', 'Pernas'],
+    equipment: ['none'],
+    instructions: [
+      'Inicie com pés juntos e braços ao lado do corpo.',
+      'Salte afastando os pés enquanto eleva as mãos acima da cabeça.',
+      'Retorne imediatamente e repita em ritmo contínuo.',
+    ],
+  },
+  {
+    id: 'mountain-climbers',
+    name: 'Escaladores (Mountain Climbers)',
+    measurementType: 'duration',
+    level: 'beginner',
+    muscleGroups: ['Cardio', 'Core', 'Ombros'],
+    equipment: ['none'],
+    instructions: [
+      'Em posição de prancha alta com mãos sob os ombros.',
+      'Traga um joelho em direção ao peito e alterne rapidamente em movimento de corrida.',
+      'Mantenha o quadril estável sem quicar para cima.',
+    ],
+  },
+  {
+    id: 'burpees',
+    name: 'Burpees Calistênicos',
+    measurementType: 'reps',
+    level: 'intermediate',
+    muscleGroups: ['Cardio', 'Peito', 'Pernas', 'Core'],
+    equipment: ['none'],
+    instructions: [
+      'Do pé, agache, apoie as mãos no chão e salte os pés para trás em prancha.',
+      'Realize uma flexão completa tocando o peito no solo.',
+      'Salte os pés de volta para as mãos e finalize com um salto vertical batendo palmas.',
+    ],
+    easierId: 'mountain-climbers',
+  },
+
+  // ==========================================
+  // Elástico de Resistência (`band`)
+  // ==========================================
+  {
+    id: 'band-row',
+    name: 'Remada Sentada ou em Pé com Elástico',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Costas', 'Bíceps', 'Trapézio'],
+    equipment: ['band'],
+    instructions: [
+      'Passe o elástico sob as solas dos pés (sentado) ou em um ponto de ancoragem firme à frente.',
+      'Segure as pontas do elástico com os braços esticados.',
+      'Puxe os cotovelos para trás aproximando as escápulas.',
+      'Retorne com controle resistindo à tensão.',
+    ],
+    harderId: 'band-pullup-assisted',
+  },
+  {
+    id: 'band-face-pull',
+    name: 'Face Pull com Elástico',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Ombros', 'Trapézio', 'Costas'],
+    equipment: ['band'],
+    instructions: [
+      'Prenda o elástico na altura dos olhos.',
+      'Segure com as palmas voltadas para baixo e puxe em direção ao rosto, abrindo os cotovelos.',
+      'Contraia os deltoides posteriores e o trapézio por 1 segundo antes de estender.',
+    ],
+  },
+  {
+    id: 'band-pushup-resisted',
+    name: 'Flexão com Resistência do Elástico',
+    measurementType: 'reps',
+    level: 'intermediate',
+    muscleGroups: ['Peito', 'Tríceps', 'Ombros'],
+    equipment: ['band'],
+    instructions: [
+      'Passe o elástico por trás das costas sob as axilas e prenda as pontas sob as palmas das mãos no solo.',
+      'Execute a flexão tradicional sentindo a resistência progressiva na subida.',
+    ],
+    easierId: 'pushup-standard',
+  },
+  {
+    id: 'band-squat',
+    name: 'Agachamento com Resistência do Elástico',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Quadríceps', 'Glúteos'],
+    equipment: ['band'],
+    instructions: [
+      'Pise no meio do elástico e puxe a outra extremidade até apoiar sobre os ombros.',
+      'Agache normalmente mantendo a postura ereta e suba contra a resistência.',
+    ],
+    easierId: 'squat-air',
+  },
+  {
+    id: 'band-bicep-curl',
+    name: 'Rosca Bíceps com Elástico',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Bíceps', 'Antebraço'],
+    equipment: ['band'],
+    instructions: [
+      'Pise no elástico com ambos os pés e segure as extremidades com as palmas para a frente.',
+      'Flexione os cotovelos elevando as mãos em direção aos ombros sem afastar os cotovelos do tronco.',
+      'Desça de forma controlada.',
+    ],
+  },
+  {
+    id: 'band-triceps-pushdown',
+    name: 'Tríceps no Elástico (Pushdown)',
+    measurementType: 'reps',
+    level: 'beginner',
+    muscleGroups: ['Tríceps'],
+    equipment: ['band'],
+    instructions: [
+      'Ancore o elástico no alto (ou em uma barra fixa).',
+      'Segure as alças com os cotovelos colados ao tronco e empurre as mãos para baixo até a extensão total.',
+      'Retorne controladamente sentindo a tensão do tríceps.',
+    ],
   },
 ]
