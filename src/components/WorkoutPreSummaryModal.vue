@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { EXERCISE_CATALOG } from '@/data/exercises'
-import { AppButton, AppModal } from '@/components'
+import { AppButton, AppModal, ProgressionSuggestionCard } from '@/components'
+import { calculateWorkoutEstimatedMinutes, getExerciseDetails } from '@/utils/workoutMetrics'
 import AppIcon from './AppIcon.vue'
-import type { Workout, WorkoutItem } from '@/types/domain'
+import type { Workout } from '@/types/domain'
 import type { ProgressionSuggestion } from '@/stores/sessionsStore'
 
 const props = defineProps<{
@@ -19,26 +19,10 @@ const emit = defineEmits<{
   (e: 'dismiss-suggestion', suggestion: ProgressionSuggestion): void
 }>()
 
-function getExerciseDetails(item: WorkoutItem) {
-  const catalog = EXERCISE_CATALOG.find((e) => e.id === item.exerciseId)
-  return {
-    name: catalog?.name || 'Exercício',
-    measurementType: catalog?.measurementType || 'reps',
-  }
-}
-
 // Cálculo de estimativa aproximada de tempo (~X min)
 const estimatedDurationMinutes = computed(() => {
   if (!props.workout) return 0
-  let totalSeconds = 0
-  for (const item of props.workout.items) {
-    const isDuration = getExerciseDetails(item).measurementType === 'duration'
-    // Tempo estimado da série de execução: se reps ~ 3s por rep, se duração = target
-    const setExecSeconds = isDuration ? item.target : item.target * 3
-    const totalSetTime = (setExecSeconds + item.restSeconds) * item.sets
-    totalSeconds += totalSetTime
-  }
-  return Math.max(5, Math.round(totalSeconds / 60))
+  return calculateWorkoutEstimatedMinutes(props.workout)
 })
 </script>
 
@@ -69,55 +53,12 @@ const estimatedDurationMinutes = computed(() => {
       </div>
 
       <!-- Progression Suggestions Card (if any) -->
-      <div
+      <ProgressionSuggestionCard
         v-if="suggestions && suggestions.length > 0"
-        class="p-4 rounded-xl border-2 border-primary-container bg-primary-container/10 space-y-3"
-      >
-        <div class="flex items-center gap-2">
-          <AppIcon name="trending_up" :size="18" class="text-primary-container" />
-          <span class="font-bold text-xs uppercase text-primary-container tracking-wider">
-            Sugestão de Progressão Disponível
-          </span>
-        </div>
-
-        <div
-          v-for="sug in suggestions"
-          :key="sug.exerciseId"
-          class="p-3 rounded-lg bg-surface border border-border-grid space-y-2"
-        >
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-sm text-ink">{{ sug.exerciseName }}</span>
-            <div class="flex items-center gap-1.5 font-metric-number text-xs font-bold text-ink">
-              <span class="text-ink-muted line-through">{{ sug.currentTarget }}</span>
-              <AppIcon name="arrow_right" :size="12" class="text-primary-container" />
-              <span class="text-primary-container bg-primary-container/15 px-1.5 py-0.5 rounded">
-                {{ sug.suggestedTarget }} {{ sug.measurementType === 'reps' ? 'reps' : 's' }}
-              </span>
-            </div>
-          </div>
-
-          <p class="text-xs text-ink-muted">
-            {{ sug.reason }}
-          </p>
-
-          <div class="flex items-center gap-2 pt-1">
-            <AppButton
-              variant="fill"
-              size="sm"
-              @click="emit('accept-suggestion', sug)"
-            >
-              Aceitar
-            </AppButton>
-            <AppButton
-              variant="ghost"
-              size="sm"
-              @click="emit('dismiss-suggestion', sug)"
-            >
-              Ignorar
-            </AppButton>
-          </div>
-        </div>
-      </div>
+        :suggestions="suggestions"
+        @accept="(sug) => emit('accept-suggestion', sug)"
+        @dismiss="(sug) => emit('dismiss-suggestion', sug)"
+      />
 
       <!-- Exercise preview list -->
       <div class="space-y-2">

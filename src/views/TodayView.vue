@@ -7,11 +7,13 @@ import { useSessionsStore, type ProgressionSuggestion } from '@/stores/sessionsS
 import { useTourStore } from '@/stores/tourStore'
 import { DAYS_OF_WEEK } from '@/constants/domain'
 import { EXERCISE_CATALOG } from '@/data/exercises'
+import { getExerciseDetails } from '@/utils/workoutMetrics'
 import {
   AppButton,
   AppCard,
   AppPageHeader,
-  AppProgressBar,
+  WeeklyGoalCard,
+  ProgressionSuggestionCard,
   AppStatusBadge,
   AppIcon,
   ScheduleDayModal,
@@ -21,8 +23,6 @@ import {
 } from '@/components'
 import type { OnboardingCompleteEvent } from '@/components/OnboardingModal.vue'
 import type { Workout, WorkoutItem } from '@/types/domain'
-import { useConfetti } from '@/composables/useConfetti'
-import { useSound } from '@/composables/useSound'
 
 const route = useRoute()
 const router = useRouter()
@@ -30,15 +30,6 @@ const preferencesStore = usePreferencesStore()
 const workoutsStore = useWorkoutsStore()
 const sessionsStore = useSessionsStore()
 const tourStore = useTourStore()
-const { fireCelebrationBurst } = useConfetti()
-const { playCelebration } = useSound()
-
-function handleCelebrateWeeklyGoal() {
-  fireCelebrationBurst()
-  if (preferencesStore.preferences.soundEnabled) {
-    playCelebration()
-  }
-}
 
 // Modais
 const showScheduleModal = ref(false)
@@ -392,57 +383,12 @@ function formatSessionDate(isoString: string): string {
     </AppCard>
 
     <!-- Weekly Target & Progress Card -->
-    <AppCard
-      title="Meta Semanal"
-      eyebrow="Derivada dos dias agendados"
+    <WeeklyGoalCard
+      :completed-count="completedCount"
+      :weekly-goal="weeklyGoal"
+      :sound-enabled="preferencesStore.preferences.soundEnabled"
       data-tour="today-weekly-goal"
-    >
-      <div v-if="weeklyGoal > 0" class="space-y-4">
-        <AppProgressBar
-          :value="completedCount"
-          :max="weeklyGoal"
-          :label="`Meta da Semana: ${completedCount} de ${weeklyGoal} treinos`"
-          :status-text="`${Math.min(100, Math.round((completedCount / weeklyGoal) * 100))}% concluído`"
-          variant="success"
-        />
-
-        <!-- Banner comemorativo de meta batida -->
-        <div
-          v-if="completedCount >= weeklyGoal"
-          class="p-3.5 rounded-xl border-2 border-border-primary bg-primary-container/10 flex items-center justify-between gap-3 shadow-[0_2px_0_0_#111111]"
-        >
-          <div class="flex items-center gap-2.5">
-            <span class="text-xl">🏆</span>
-            <div>
-              <span class="font-bold text-xs text-ink block">
-                Meta Semanal Conquistada!
-              </span>
-              <span class="text-[11px] text-ink-muted font-medium block">
-                Você cumpriu todos os treinos desta semana.
-              </span>
-            </div>
-          </div>
-          <AppButton
-            variant="outline"
-            size="sm"
-            class="shrink-0"
-            @click="handleCelebrateWeeklyGoal"
-          >
-            Comemorar 🎉
-          </AppButton>
-        </div>
-
-        <p class="font-body text-xs text-ink-muted leading-relaxed">
-          Sua meta é calculada automaticamente a partir da sua agenda. Sessões concluídas contam para a semana atual (segunda a domingo).
-        </p>
-      </div>
-
-      <div v-else class="text-center py-4 space-y-2">
-        <p class="text-xs text-ink-muted">
-          Nenhum treino agendado para esta semana. Toque em qualquer dia acima para definir sua rotina semanal.
-        </p>
-      </div>
-    </AppCard>
+    />
 
     <!-- Today's Prescribed Workout Card -->
     <AppCard
@@ -452,55 +398,11 @@ function formatSessionDate(isoString: string): string {
     >
       <div class="space-y-4">
         <!-- Progression Suggestions Card (if any) -->
-        <div
-          v-if="todaySuggestions.length > 0"
-          class="p-4 rounded-xl border-2 border-primary-container bg-primary-container/10 space-y-3"
-        >
-          <div class="flex items-center gap-2">
-            <AppIcon name="trending_up" :size="18" class="text-primary-container" />
-            <span class="font-bold text-xs uppercase text-primary-container tracking-wider">
-              Sugestão de Progressão Disponível
-            </span>
-          </div>
-
-          <div
-            v-for="sug in todaySuggestions"
-            :key="sug.exerciseId"
-            class="p-3 rounded-lg bg-surface border border-border-grid space-y-2"
-          >
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-sm text-ink">{{ sug.exerciseName }}</span>
-              <div class="flex items-center gap-1.5 font-metric-number text-xs font-bold text-ink">
-                <span class="text-ink-muted line-through">{{ sug.currentTarget }}</span>
-                <AppIcon name="arrow_right" :size="12" class="text-primary-container" />
-                <span class="text-primary-container bg-primary-container/15 px-1.5 py-0.5 rounded">
-                  {{ sug.suggestedTarget }} {{ sug.measurementType === 'reps' ? 'reps' : 's' }}
-                </span>
-              </div>
-            </div>
-
-            <p class="text-xs text-ink-muted">
-              {{ sug.reason }}
-            </p>
-
-            <div class="flex items-center gap-2 pt-1">
-              <AppButton
-                variant="fill"
-                size="sm"
-                @click="handleAcceptSuggestion(sug)"
-              >
-                Aceitar
-              </AppButton>
-              <AppButton
-                variant="ghost"
-                size="sm"
-                @click="handleDismissSuggestion(sug)"
-              >
-                Ignorar
-              </AppButton>
-            </div>
-          </div>
-        </div>
+        <ProgressionSuggestionCard
+          :suggestions="todaySuggestions"
+          @accept="handleAcceptSuggestion"
+          @dismiss="handleDismissSuggestion"
+        />
 
         <!-- Dica de Personalização -->
         <div class="px-3 py-2 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-between gap-2 text-xs text-ink-muted">
@@ -532,7 +434,7 @@ function formatSessionDate(isoString: string): string {
                   {{ getExerciseName(item.exerciseId) }}
                 </div>
                 <div class="text-xs text-ink-muted mt-0.5">
-                  {{ item.sets }} séries × {{ item.target }} {{ getExerciseName(item.exerciseId).includes('Prancha') ? 's' : 'reps' }} · {{ item.restSeconds }}s descanso
+                  {{ item.sets }} séries × {{ item.target }} {{ getExerciseDetails(item.exerciseId).unit }} · {{ item.restSeconds }}s descanso
                 </div>
               </div>
             </div>

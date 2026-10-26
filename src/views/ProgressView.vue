@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import {
   AppCard,
   AppPageHeader,
-  AppProgressBar,
+  WeeklyGoalCard,
   AppStatusBadge,
   AppButton,
   AppIcon,
@@ -12,23 +12,12 @@ import {
 } from '@/components'
 import { useSessionsStore } from '@/stores/sessionsStore'
 import { usePreferencesStore } from '@/stores/preferencesStore'
-import { useConfetti } from '@/composables/useConfetti'
-import { useSound } from '@/composables/useSound'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import type { Session, ExerciseCatalogItem } from '@/types/domain'
 
 const router = useRouter()
 const sessionsStore = useSessionsStore()
 const preferencesStore = usePreferencesStore()
-const { fireCelebrationBurst } = useConfetti()
-const { playCelebration } = useSound()
-
-function handleCelebrateWeeklyGoal() {
-  fireCelebrationBurst()
-  if (preferencesStore.preferences.soundEnabled) {
-    playCelebration()
-  }
-}
 
 // Modal de detalhe da sessão
 const selectedSession = ref<Session | null>(null)
@@ -182,47 +171,12 @@ function calculateSessionDuration(session: Session): string {
     <!-- Main Content when sessions exist -->
     <template v-else>
       <!-- BLOCO 1: Meta da Semana -->
-      <AppCard title="Meta Semanal de Treinos" eyebrow="Frequência Baseada na Agenda">
-        <div class="space-y-4">
-          <AppProgressBar
-            v-if="weeklyGoal > 0"
-            :value="completedThisWeek"
-            :max="weeklyGoal"
-            :label="`Meta da Semana: ${completedThisWeek} de ${weeklyGoal} treinos concluídos`"
-            :status-text="`${Math.min(100, Math.round((completedThisWeek / weeklyGoal) * 100))}% atingido`"
-            variant="success"
-          />
-
-          <!-- Banner comemorativo de meta semanal batida -->
-          <div
-            v-if="weeklyGoal > 0 && completedThisWeek >= weeklyGoal"
-            class="p-3.5 rounded-xl border-2 border-border-primary bg-primary-container/10 flex items-center justify-between gap-3 shadow-[0_2px_0_0_#111111]"
-          >
-            <div class="flex items-center gap-2.5">
-              <span class="text-xl">🏆</span>
-              <div>
-                <span class="font-bold text-xs text-ink block">
-                  Meta Semanal Conquistada!
-                </span>
-                <span class="text-[11px] text-ink-muted font-medium block">
-                  Você completou todos os treinos desta semana.
-                </span>
-              </div>
-            </div>
-            <AppButton
-              variant="outline"
-              size="sm"
-              class="shrink-0"
-              @click="handleCelebrateWeeklyGoal"
-            >
-              Comemorar 🎉
-            </AppButton>
-          </div>
-          <div v-else class="text-xs text-ink-muted">
-            Sem meta definida. Defina os dias de treino na sua agenda na aba Hoje para ativar a meta semanal.
-          </div>
-        </div>
-      </AppCard>
+      <WeeklyGoalCard
+        :completed-count="completedThisWeek"
+        :weekly-goal="weeklyGoal"
+        :sound-enabled="preferencesStore.preferences.soundEnabled"
+        title="Meta Semanal de Treinos"
+      />
 
       <!-- BLOCO 2: Frequência nas últimas 8 semanas -->
       <AppCard title="Frequência de Treinos" eyebrow="Últimas 8 Semanas">

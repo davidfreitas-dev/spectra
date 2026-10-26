@@ -8,9 +8,12 @@ import {
   AppToggle,
   AppSegmentedControl,
   AppProgressBar,
+  WeeklyGoalCard,
   AppChip,
   AppStatusBadge,
   AppCard,
+  WorkoutCard,
+  ProgressionSuggestionCard,
   AppPageHeader,
   AppModal,
   AppSpinner,
@@ -23,6 +26,30 @@ import type { SegmentedOption, SelectOption } from '@/types'
 
 // Modais showcase
 const showDemoModal = ref(false)
+
+const sampleWorkout = {
+  id: 'sample-push',
+  name: 'Treino A · Empurrada Calistênica',
+  createdAt: '2026-10-01T10:00:00.000Z',
+  updatedAt: '2026-10-01T10:00:00.000Z',
+  items: [
+    { id: '1', exerciseId: 'pushup-standard', sets: 4, target: 12, restSeconds: 60 },
+    { id: '2', exerciseId: 'dips-bench', sets: 3, target: 10, restSeconds: 75 },
+    { id: '3', exerciseId: 'pike-pushup', sets: 3, target: 8, restSeconds: 90 },
+    { id: '4', exerciseId: 'plank-standard', sets: 3, target: 45, restSeconds: 60 },
+  ],
+}
+
+const sampleSuggestions = [
+  {
+    exerciseId: 'pushup-standard',
+    exerciseName: 'Flexão de Braços',
+    currentTarget: 12,
+    suggestedTarget: 13,
+    measurementType: 'reps' as const,
+    reason: 'Você completou todas as repetições planejadas nas últimas 2 sessões consecutivas (+1 rep sugerida).',
+  },
+]
 
 // Form & workout state
 const workoutName = ref('')
@@ -836,6 +863,19 @@ const swatches = [
           </AppCard>
         </div>
 
+        <!-- WeeklyGoalCard Showcase -->
+        <div class="mt-8">
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-2">
+            Card Integrado de Meta Semanal &amp; Celebração (WeeklyGoalCard)
+          </span>
+          <WeeklyGoalCard
+            :completed-count="4"
+            :weekly-goal="4"
+            :sound-enabled="true"
+            title="Meta Semanal de Treinos (Exemplo: 100% Concluída)"
+          />
+        </div>
+
         <!-- Mobile Navigation Tab Bar Showcase -->
         <AppCard title="Navegação Inferior Mobile (AppTabBar)" dot-color="primary" badge="Acesso com Uma Só Mão" class="mt-8">
           <p class="font-body text-xs text-ink-muted mb-4 leading-relaxed">
@@ -1260,6 +1300,41 @@ const swatches = [
             </div>
           </div>
         </AppCard>
+
+        <!-- Showcase WorkoutCard -->
+        <div class="mt-8">
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-2">
+            Card Padronizado de Treino (WorkoutCard)
+          </span>
+          <WorkoutCard
+            :workout="sampleWorkout"
+            eyebrow="Agendado: Seg, Qua, Sex"
+            dot-color="primary"
+          >
+            <template #actions>
+              <div class="flex items-center justify-end gap-2">
+                <AppButton variant="outline" size="sm">
+                  <AppIcon name="edit" :size="16" />
+                  <span>Editar</span>
+                </AppButton>
+                <AppButton variant="fill" size="sm">
+                  <AppIcon name="play" :size="16" />
+                  <span>Iniciar</span>
+                </AppButton>
+              </div>
+            </template>
+          </WorkoutCard>
+        </div>
+
+        <!-- Showcase ProgressionSuggestionCard -->
+        <div class="mt-8">
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-2">
+            Card de Sugestões de Progressão (ProgressionSuggestionCard)
+          </span>
+          <ProgressionSuggestionCard
+            :suggestions="sampleSuggestions"
+          />
+        </div>
 
         <!-- Showcase AppModal -->
         <AppCard title="Modal Base &amp; Bottom Sheet (AppModal)" dot-color="primary" badge="Controle de Foco &amp; Scroll Lock" class="mt-8">

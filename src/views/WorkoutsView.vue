@@ -4,15 +4,14 @@ import { useRouter, useRoute } from 'vue-router'
 import { useWorkoutsStore } from '@/stores/workoutsStore'
 import { usePreferencesStore } from '@/stores/preferencesStore'
 import { useSessionsStore, type ProgressionSuggestion } from '@/stores/sessionsStore'
-import { EXERCISE_CATALOG } from '@/data/exercises'
 import { DAYS_OF_WEEK } from '@/constants/domain'
 import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import {
   AppButton,
-  AppCard,
   AppIcon,
   AppPageHeader,
   AppSegmentedControl,
+  WorkoutCard,
   WorkoutEditorModal,
   WorkoutPreSummaryModal,
   WorkoutScheduleModal,
@@ -74,24 +73,6 @@ watch(
     }
   }
 )
-
-function getExerciseDetails(item: WorkoutItem) {
-  const catalog = EXERCISE_CATALOG.find((e) => e.id === item.exerciseId)
-  return {
-    name: catalog?.name || 'Exercício',
-    measurementType: catalog?.measurementType || 'reps',
-  }
-}
-
-function calculateEstimatedMinutes(workout: Workout): number {
-  let totalSeconds = 0
-  for (const item of workout.items) {
-    const isDuration = getExerciseDetails(item).measurementType === 'duration'
-    const execSeconds = isDuration ? item.target : item.target * 3
-    totalSeconds += (execSeconds + item.restSeconds) * item.sets
-  }
-  return Math.max(5, Math.round(totalSeconds / 60))
-}
 
 function getScheduledDays(workoutId: string): string[] {
   const schedule = preferencesStore.preferences.schedule || {}
@@ -246,118 +227,66 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
         v-for="workout in workoutsStore.workouts"
         :key="workout.id"
       >
-        <AppCard
-          :title="workout.name"
+        <WorkoutCard
+          :workout="workout"
           :eyebrow="getScheduledDays(workout.id).length > 0 ? `Agendado: ${getScheduledDays(workout.id).join(', ')}` : 'Não agendado'"
           dot-color="primary"
         >
-          <div class="space-y-4">
-            <!-- Informações de quantidade de exercícios e tempo estimado (apenas mobile) -->
-            <div class="sm:hidden flex items-center justify-between px-3 py-2 rounded-xl bg-bg-alternate border border-border-grid text-xs text-ink-muted">
-              <div class="flex items-center gap-1.5 font-medium">
-                <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
-                <span><strong class="text-ink font-bold">{{ workout.items.length }}</strong> exercícios</span>
-              </div>
-              <div class="h-3.5 w-px bg-border-grid" />
-              <div class="flex items-center gap-1.5 font-medium">
-                <AppIcon name="clock" :size="14" class="text-primary-container" />
-                <span>Estimado: <strong class="text-ink font-bold">~{{ calculateEstimatedMinutes(workout) }} min</strong></span>
-              </div>
-            </div>
-
-            <!-- Exercícios do treino em grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div
-                v-for="item in workout.items"
-                :key="item.id"
-                class="py-2.5 px-3 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-between"
+          <template #actions>
+            <div class="flex items-center justify-end gap-1.5 flex-wrap ml-auto">
+              <AppButton
+                variant="outline"
+                size="sm"
+                :icon-only="true"
+                title="Agendar na semana"
+                @click="openSchedulePicker(workout)"
               >
-                <div>
-                  <div class="font-bold text-xs text-ink">
-                    {{ getExerciseDetails(item).name }}
-                  </div>
-                  <div class="text-[11px] text-ink-muted">
-                    {{ item.sets }} séries × {{ item.target }} {{ getExerciseDetails(item).measurementType === 'reps' ? 'reps' : 's' }}
-                  </div>
-                </div>
-                <span class="font-metric-number text-[10px] text-primary-container font-bold">
-                  {{ item.restSeconds }}s desc.
-                </span>
-              </div>
-            </div>
-          </div>
+                <AppIcon name="calendar" :size="16" />
+              </AppButton>
 
-          <template #footer>
-            <div class="flex items-center justify-between gap-3 w-full">
-              <!-- Info de exercícios e tempo com ícones (tablet e desktop) -->
-              <div class="hidden sm:inline-flex sm:items-center gap-2 font-eyebrow text-xs text-ink-muted">
-                <span class="inline-flex items-center gap-1.5">
-                  <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
-                  <span>{{ workout.items.length }} exercícios</span>
-                </span>
-                <span class="text-border-primary">•</span>
-                <span class="inline-flex items-center gap-1.5">
-                  <AppIcon name="clock" :size="14" class="text-primary-container" />
-                  <span>~{{ calculateEstimatedMinutes(workout) }} min</span>
-                </span>
-              </div>
+              <AppButton
+                variant="outline"
+                size="sm"
+                :icon-only="true"
+                title="Duplicar treino"
+                @click="handleDuplicateWorkout(workout.id)"
+              >
+                <AppIcon name="copy" :size="16" />
+              </AppButton>
 
-              <!-- Botões de ação sempre alinhados à direita -->
-              <div class="flex items-center justify-end gap-1.5 flex-wrap ml-auto">
-                <AppButton
-                  variant="outline"
-                  size="sm"
-                  :icon-only="true"
-                  title="Agendar na semana"
-                  @click="openSchedulePicker(workout)"
-                >
-                  <AppIcon name="calendar" :size="16" />
-                </AppButton>
+              <AppButton
+                variant="outline"
+                size="sm"
+                :icon-only="true"
+                title="Editar treino"
+                @click="handleEditWorkout(workout)"
+              >
+                <AppIcon name="edit" :size="16" />
+              </AppButton>
 
-                <AppButton
-                  variant="outline"
-                  size="sm"
-                  :icon-only="true"
-                  title="Duplicar treino"
-                  @click="handleDuplicateWorkout(workout.id)"
-                >
-                  <AppIcon name="copy" :size="16" />
-                </AppButton>
+              <AppButton
+                variant="danger"
+                size="sm"
+                :icon-only="true"
+                title="Excluir treino"
+                @click="confirmDeleteWorkout(workout)"
+              >
+                <AppIcon name="trash" :size="16" />
+              </AppButton>
 
-                <AppButton
-                  variant="outline"
-                  size="sm"
-                  :icon-only="true"
-                  title="Editar treino"
-                  @click="handleEditWorkout(workout)"
-                >
-                  <AppIcon name="edit" :size="16" />
-                </AppButton>
-
-                <AppButton
-                  variant="danger"
-                  size="sm"
-                  :icon-only="true"
-                  title="Excluir treino"
-                  @click="confirmDeleteWorkout(workout)"
-                >
-                  <AppIcon name="trash" :size="16" />
-                </AppButton>
-
-                <AppButton
-                  variant="fill"
-                  size="sm"
-                  class="ml-1"
-                  title="Iniciar Treino"
-                  @click="handleStartWorkout(workout)"
-                >
-                  <AppIcon name="play" :size="16" />
-                  Iniciar
-                </AppButton>
-              </div>
+              <AppButton
+                variant="fill"
+                size="sm"
+                class="ml-1"
+                title="Iniciar Treino"
+                @click="handleStartWorkout(workout)"
+              >
+                <AppIcon name="play" :size="16" />
+                Iniciar
+              </AppButton>
             </div>
           </template>
-        </AppCard>
+        </WorkoutCard>
       </div>
     </div>
 
@@ -375,90 +304,38 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
         v-for="preset in workoutsStore.presets"
         :key="preset.id"
       >
-        <AppCard
-          :title="preset.name"
+        <WorkoutCard
+          :workout="preset"
           eyebrow="Modelo Pronto"
           dot-color="ink"
         >
-          <div class="space-y-4">
-            <!-- Informações de quantidade de exercícios e tempo estimado (apenas mobile) -->
-            <div class="sm:hidden flex items-center justify-between px-3 py-2 rounded-xl bg-bg-alternate border border-border-grid text-xs text-ink-muted">
-              <div class="flex items-center gap-1.5 font-medium">
-                <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
-                <span><strong class="text-ink font-bold">{{ preset.items.length }}</strong> exercícios</span>
-              </div>
-              <div class="h-3.5 w-px bg-border-grid" />
-              <div class="flex items-center gap-1.5 font-medium">
-                <AppIcon name="clock" :size="14" class="text-primary-container" />
-                <span>Estimado: <strong class="text-ink font-bold">~{{ calculateEstimatedMinutes(preset) }} min</strong></span>
-              </div>
-            </div>
-
-            <!-- Exercícios do treino em grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-              <div
-                v-for="item in preset.items"
-                :key="item.id"
-                class="py-2.5 px-3 rounded-lg bg-bg-alternate border border-border-grid flex items-center justify-between"
+          <template #actions>
+            <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
+              <AppButton
+                variant="outline"
+                size="sm"
+                class="w-full sm:w-auto"
+                title="Copiar para Meus Treinos"
+                @click="handleCopyPreset(preset.id)"
               >
-                <div>
-                  <div class="font-bold text-xs text-ink">
-                    {{ getExerciseDetails(item).name }}
-                  </div>
-                  <div class="text-[11px] text-ink-muted">
-                    {{ item.sets }} séries × {{ item.target }} {{ getExerciseDetails(item).measurementType === 'reps' ? 'reps' : 's' }}
-                  </div>
-                </div>
-                <span class="font-metric-number text-[10px] text-ink-muted font-bold">
-                  {{ item.restSeconds }}s desc.
-                </span>
-              </div>
-            </div>
-          </div>
+                <AppIcon name="copy" :size="16" />
+                <span class="sm:hidden truncate">Copiar Treino</span>
+                <span class="hidden sm:inline">Copiar para Meus Treinos</span>
+              </AppButton>
 
-          <template #footer>
-            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 w-full">
-              <!-- Info de exercícios e tempo com ícones (tablet e desktop) -->
-              <div class="hidden sm:inline-flex sm:items-center gap-2 font-eyebrow text-xs text-ink-muted">
-                <span class="inline-flex items-center gap-1.5">
-                  <AppIcon name="dumbbell" :size="14" class="text-primary-container" />
-                  <span>{{ preset.items.length }} exercícios</span>
-                </span>
-                <span class="text-border-primary">•</span>
-                <span class="inline-flex items-center gap-1.5">
-                  <AppIcon name="clock" :size="14" class="text-primary-container" />
-                  <span>~{{ calculateEstimatedMinutes(preset) }} min</span>
-                </span>
-              </div>
-
-              <!-- Botões de ação: 100% largura lado a lado no mobile, alinhados à direita no tablet/desktop -->
-              <div class="grid grid-cols-2 sm:flex sm:items-center gap-2 w-full sm:w-auto">
-                <AppButton
-                  variant="outline"
-                  size="sm"
-                  class="w-full sm:w-auto"
-                  title="Copiar para Meus Treinos"
-                  @click="handleCopyPreset(preset.id)"
-                >
-                  <AppIcon name="copy" :size="16" />
-                  <span class="sm:hidden truncate">Copiar Treino</span>
-                  <span class="hidden sm:inline">Copiar para Meus Treinos</span>
-                </AppButton>
-
-                <AppButton
-                  variant="fill"
-                  size="sm"
-                  class="w-full sm:w-auto"
-                  title="Iniciar Treino"
-                  @click="handleStartWorkout(preset)"
-                >
-                  <AppIcon name="play" :size="16" />
-                  <span>Iniciar</span>
-                </AppButton>
-              </div>
+              <AppButton
+                variant="fill"
+                size="sm"
+                class="w-full sm:w-auto"
+                title="Iniciar Treino"
+                @click="handleStartWorkout(preset)"
+              >
+                <AppIcon name="play" :size="16" />
+                <span>Iniciar</span>
+              </AppButton>
             </div>
           </template>
-        </AppCard>
+        </WorkoutCard>
       </div>
     </div>
 
