@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, toRef } from 'vue'
-import { AppButton, AppCheckbox } from '@/components'
-import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
-import AppIcon from './AppIcon.vue'
+import { ref, watch } from 'vue'
+import { AppButton, AppCheckbox, AppModal } from '@/components'
 import { DAYS_OF_WEEK } from '@/constants/domain'
 import type { Workout } from '@/types/domain'
 
@@ -22,8 +20,6 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'save', selectedDayKeys: string[]): void
 }>()
-
-useBodyScrollLock(toRef(props, 'isOpen'))
 
 const selectedDayKeys = ref<string[]>([])
 
@@ -68,97 +64,76 @@ function handleSave() {
 </script>
 
 <template>
-  <Transition name="modal-sheet">
-    <div
-      v-if="isOpen && workout"
-      class="modal-backdrop fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-ink/50 backdrop-blur-xs select-none"
-      @click.self="emit('close')"
-      @touchmove.self.prevent
-    >
+  <AppModal
+    :is-open="isOpen && !!workout"
+    eyebrow="Agenda Semanal"
+    :title="workout?.name"
+    max-width="md"
+    @close="emit('close')"
+  >
+    <!-- Subtitle description -->
+    <div class="px-5 pt-4 pb-2 text-xs text-ink-muted leading-relaxed">
+      Selecione os dias da semana em que você deseja realizar este treino:
+    </div>
+
+    <!-- Days of week list -->
+    <div class="p-4 sm:p-5 pt-0 space-y-2">
       <div
-        class="modal-card bg-surface border-t-2 sm:border-2 border-border-primary rounded-t-3xl sm:rounded-2xl w-full max-w-md max-h-[88vh] sm:max-h-[85vh] flex flex-col shadow-[0_8px_0_0_#111111] overflow-hidden"
+        v-for="day in DAYS_OF_WEEK"
+        :key="day.key"
+        class="w-full p-3 rounded-xl border transition-all flex items-center justify-between cursor-pointer"
+        :class="selectedDayKeys.includes(day.key)
+          ? 'border-border-primary bg-primary-container/10 font-bold shadow-[0_2px_0_0_#111111]'
+          : 'border-border-grid bg-surface hover:bg-bg-alternate'"
+        @click="toggleDay(day.key)"
       >
-      <!-- Header -->
-      <div class="p-4 sm:p-5 border-b border-border-grid flex items-center justify-between bg-bg-alternate">
-        <div>
-          <span class="font-eyebrow text-[10px] text-primary-container font-bold uppercase tracking-wider block">
-            Agenda Semanal
+        <div class="flex items-center gap-3">
+          <span
+            class="w-8 h-8 rounded-lg border flex items-center justify-center font-eyebrow text-xs font-bold shrink-0"
+            :class="selectedDayKeys.includes(day.key)
+              ? 'bg-primary-container text-on-primary border-border-primary'
+              : 'bg-bg-alternate text-ink border-border-grid'"
+          >
+            {{ day.shortLabel }}
           </span>
-          <h2 class="font-display text-lg sm:text-xl font-bold text-ink truncate max-w-70">
-            {{ workout.name }}
-          </h2>
-        </div>
-        <button
-          type="button"
-          class="w-9 h-9 flex items-center justify-center rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate text-ink font-bold cursor-pointer transition-colors"
-          @click="emit('close')"
-        >
-          <AppIcon name="close" :size="18" />
-        </button>
-      </div>
-
-      <!-- Subtitle description -->
-      <div class="px-5 pt-4 pb-2 text-xs text-ink-muted leading-relaxed">
-        Selecione os dias da semana em que você deseja realizar este treino:
-      </div>
-
-      <!-- Days of week list -->
-      <div class="p-4 sm:p-5 space-y-2 flex-1 overflow-y-auto">
-        <div
-          v-for="day in DAYS_OF_WEEK"
-          :key="day.key"
-          class="w-full p-3 rounded-xl border transition-all flex items-center justify-between cursor-pointer"
-          :class="selectedDayKeys.includes(day.key)
-            ? 'border-border-primary bg-primary-container/10 font-bold shadow-[0_2px_0_0_#111111]'
-            : 'border-border-grid bg-surface hover:bg-bg-alternate'"
-          @click="toggleDay(day.key)"
-        >
-          <div class="flex items-center gap-3">
-            <span
-              class="w-8 h-8 rounded-lg border flex items-center justify-center font-eyebrow text-xs font-bold shrink-0"
-              :class="selectedDayKeys.includes(day.key)
-                ? 'bg-primary-container text-on-primary border-border-primary'
-                : 'bg-bg-alternate text-ink border-border-grid'"
-            >
-              {{ day.shortLabel }}
+          <div>
+            <span class="font-bold text-sm text-ink block leading-tight">
+              {{ day.label }}
             </span>
-            <div>
-              <span class="font-bold text-sm text-ink block leading-tight">
-                {{ day.label }}
-              </span>
-              <span
-                v-if="selectedDayKeys.includes(day.key)"
-                class="text-[11px] text-primary-container font-semibold"
-              >
-                Agendado
-              </span>
-              <span
-                v-else-if="getOtherWorkoutName(day.key)"
-                class="text-[11px] text-warning font-medium"
-              >
-                Atualmente: {{ getOtherWorkoutName(day.key) }}
-              </span>
-              <span
-                v-else
-                class="text-[11px] text-ink-muted"
-              >
-                Descanso
-              </span>
-            </div>
+            <span
+              v-if="selectedDayKeys.includes(day.key)"
+              class="text-[11px] text-primary-container font-semibold"
+            >
+              Agendado
+            </span>
+            <span
+              v-else-if="getOtherWorkoutName(day.key)"
+              class="text-[11px] text-warning font-medium"
+            >
+              Atualmente: {{ getOtherWorkoutName(day.key) }}
+            </span>
+            <span
+              v-else
+              class="text-[11px] text-ink-muted"
+            >
+              Descanso
+            </span>
           </div>
-
-          <AppCheckbox
-            :model-value="selectedDayKeys.includes(day.key)"
-            size="md"
-            class="pointer-events-none"
-            tabindex="-1"
-            aria-hidden="true"
-          />
         </div>
-      </div>
 
-      <!-- Footer -->
-      <div class="p-4 border-t border-border-grid bg-bg-alternate flex items-center justify-between">
+        <AppCheckbox
+          :model-value="selectedDayKeys.includes(day.key)"
+          size="md"
+          class="pointer-events-none"
+          tabindex="-1"
+          aria-hidden="true"
+        />
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <template #footer>
+      <div class="flex items-center justify-between">
         <span class="font-eyebrow text-xs text-ink-muted font-bold">
           {{ selectedDayKeys.length }} {{ selectedDayKeys.length === 1 ? 'dia selecionado' : 'dias selecionados' }}
         </span>
@@ -172,7 +147,6 @@ function handleSave() {
           </AppButton>
         </div>
       </div>
-    </div>
-  </div>
-</Transition>
+    </template>
+  </AppModal>
 </template>

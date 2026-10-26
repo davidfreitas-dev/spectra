@@ -5,6 +5,7 @@ import {
   AppCard,
   AppInput,
   AppChip,
+  AppPageHeader,
   AppStatusBadge,
   ExerciseDetailModal,
 } from '@/components'
@@ -121,18 +122,11 @@ function handleSelectVariation(variation: ExerciseCatalogItem) {
 <template>
   <div class="max-w-225 mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 select-none">
     <!-- View Header -->
-    <div class="pb-4 border-b border-border-grid">
-      <div class="inline-flex items-center gap-1.5 font-eyebrow text-[10px] text-primary-container font-bold uppercase tracking-wider mb-1">
-        <span class="w-2 h-2 rounded-xs bg-primary-container inline-block" />
-        <span>Catálogo Estático &amp; Imutável</span>
-      </div>
-      <h1 class="font-display text-2xl sm:text-3xl font-bold text-ink tracking-tight">
-        Biblioteca de Exercícios
-      </h1>
-      <p class="font-body text-xs text-ink-muted mt-1">
-        Guia de movimentos calistênicos com instruções posturais, variações e seus recordes pessoais.
-      </p>
-    </div>
+    <AppPageHeader
+      title="Biblioteca de Exercícios"
+      eyebrow="Catálogo Estático &amp; Imutável"
+      subtitle="Guia de movimentos calistênicos com instruções posturais, variações e seus recordes pessoais."
+    />
 
     <!-- Search & Filters Container -->
     <AppCard>

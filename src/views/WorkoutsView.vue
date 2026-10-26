@@ -11,6 +11,7 @@ import {
   AppButton,
   AppCard,
   AppIcon,
+  AppPageHeader,
   AppSegmentedControl,
   WorkoutEditorModal,
   WorkoutPreSummaryModal,
@@ -206,36 +207,31 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
 <template>
   <div class="max-w-225 mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 select-none">
     <!-- View Header -->
-    <div class="flex flex-wrap items-center justify-between gap-y-3 gap-x-4 pb-4 border-b border-border-grid">
-      <div class="order-1 sm:mr-auto min-w-0">
-        <div class="inline-flex items-center gap-1.5 font-eyebrow text-[10px] text-primary-container font-bold uppercase tracking-wider mb-1">
-          <span class="w-2 h-2 rounded-xs bg-primary-container inline-block" />
-          <span>Biblioteca de Rotinas</span>
-        </div>
-        <h1 class="font-display text-2xl sm:text-3xl font-bold text-ink tracking-tight">
-          Treinos
-        </h1>
-      </div>
+    <AppPageHeader
+      title="Treinos"
+      eyebrow="Biblioteca de Rotinas"
+    >
+      <template #actions>
+        <AppButton
+          v-if="activeTab === 'user'"
+          variant="fill"
+          size="sm"
+          class="order-2 sm:order-3 shrink-0"
+          @click="handleNewWorkout"
+        >
+          <AppIcon name="plus" :size="16" />
+          Novo Treino
+        </AppButton>
 
-      <AppButton
-        v-if="activeTab === 'user'"
-        variant="fill"
-        size="sm"
-        class="order-2 sm:order-3 shrink-0"
-        @click="handleNewWorkout"
-      >
-        <AppIcon name="plus" :size="16" />
-        Novo Treino
-      </AppButton>
-
-      <!-- Segmented Tab Toggle -->
-      <AppSegmentedControl
-        :model-value="activeTab"
-        :options="tabOptions"
-        class="order-3 sm:order-2 w-full sm:w-auto"
-        @update:model-value="(val) => (activeTab = val as 'user' | 'presets')"
-      />
-    </div>
+        <!-- Segmented Tab Toggle -->
+        <AppSegmentedControl
+          :model-value="activeTab"
+          :options="tabOptions"
+          class="order-3 sm:order-2 w-full sm:w-auto"
+          @update:model-value="(val) => (activeTab = val as 'user' | 'presets')"
+        />
+      </template>
+    </AppPageHeader>
 
     <!-- User Workouts Tab -->
     <div v-if="activeTab === 'user'" class="space-y-4">

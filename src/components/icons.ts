@@ -17,6 +17,7 @@ import {
   Copy,
   Save,
   Lock,
+  Search,
   ChevronDown,
   ArrowRight,
   ArrowUp,
@@ -55,6 +56,7 @@ export const iconMap = {
   // Actions
   plus: Plus,
   minus: Minus,
+  search: Search,
   check: Check,
   play: Play,
   pause: Pause,

@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   AppCard,
+  AppPageHeader,
   AppProgressBar,
   AppStatusBadge,
   AppButton,
@@ -147,18 +148,11 @@ function calculateSessionDuration(session: Session): string {
 <template>
   <div class="max-w-225 mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 select-none">
     <!-- View Header -->
-    <div class="pb-4 border-b border-border-grid">
-      <div class="inline-flex items-center gap-1.5 font-eyebrow text-[10px] text-primary-container font-bold uppercase tracking-wider mb-1">
-        <span class="w-2 h-2 rounded-xs bg-primary-container inline-block" />
-        <span>Evolução &amp; Consistência</span>
-      </div>
-      <h1 class="font-display text-2xl sm:text-3xl font-bold text-ink tracking-tight">
-        Progresso
-      </h1>
-      <p class="font-body text-xs text-ink-muted mt-1">
-        Acompanhe seus recordes pessoais, frequência semanal e evolução histórica sem estimativas fictícias.
-      </p>
-    </div>
+    <AppPageHeader
+      title="Progresso"
+      eyebrow="Evolução &amp; Consistência"
+      subtitle="Acompanhe seus recordes pessoais, frequência semanal e evolução histórica sem estimativas fictícias."
+    />
 
     <!-- Empty State if NO sessions exist yet -->
     <div

@@ -11,6 +11,8 @@ import {
   AppChip,
   AppStatusBadge,
   AppCard,
+  AppPageHeader,
+  AppModal,
   AppSpinner,
   AppCheckbox,
   AppAlert,
@@ -18,6 +20,9 @@ import {
   AppTabBar,
 } from '@/components'
 import type { SegmentedOption, SelectOption } from '@/types'
+
+// Modais showcase
+const showDemoModal = ref(false)
 
 // Form & workout state
 const workoutName = ref('')
@@ -776,18 +781,18 @@ const swatches = [
       </div>
     </section>
 
-    <!-- Section 05: Controls & Progress -->
+    <!-- Section 05: Controls, Progress & Navigation -->
     <section class="w-full bg-background px-4 sm:px-6 lg:px-8 py-12 border-b border-border-grid">
       <div class="max-w-300 mx-auto">
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-8">
           <div>
-            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">05 / CONTROLES &amp; PROGRESSO</span>
+            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">05 / CONTROLES &amp; NAVEGAÇÃO DE TREINO</span>
             <h2 class="font-headline text-2xl sm:text-3xl text-ink font-bold tracking-tight mt-1">
-              Controles Segmentados &amp; Barras de Progresso de Treino
+              Controles Segmentados, Progresso &amp; Tab Bar
             </h2>
           </div>
           <p class="max-w-md text-ink-muted font-body text-xs leading-relaxed lg:text-right">
-            Indicadores lineares mecânicos para monitoramento de séries concluídas e meta semanal da agenda.
+            Alternância rápida de métricas, monitoramento de séries da sessão e navegação inferior ágil com uma só mão.
           </p>
         </div>
 
@@ -829,99 +834,20 @@ const swatches = [
               />
             </div>
           </AppCard>
-
-          <!-- Spinner Loader -->
-          <div class="lg:col-span-2">
-            <AppCard title="Indicadores de Carregamento &amp; Spinner Mecânico (AppSpinner)" dot-color="primary" badge="Feedback Assíncrono">
-              <div class="space-y-8">
-                <!-- Tamanhos e Variantes -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Escala de Tamanhos (xs, sm, md, lg, xl)</div>
-                    <div class="flex flex-wrap items-center gap-6 p-4 rounded-xl bg-bg-alternate border border-border-grid">
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="xs" variant="primary" />
-                        <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">xs (14px)</span>
-                      </div>
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="sm" variant="primary" />
-                        <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">sm (16px)</span>
-                      </div>
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="md" variant="primary" />
-                        <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">md (24px)</span>
-                      </div>
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="lg" variant="primary" />
-                        <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">lg (40px)</span>
-                      </div>
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="xl" variant="primary" />
-                        <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">xl (56px)</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Variantes de Cor Semânticas</div>
-                    <div class="flex flex-wrap items-center gap-5 p-4 rounded-xl bg-bg-alternate border border-border-grid">
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="md" variant="primary" />
-                        <span class="font-eyebrow text-[9px] text-primary-container uppercase font-bold">primary</span>
-                      </div>
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="md" variant="ink" />
-                        <span class="font-eyebrow text-[9px] text-ink uppercase font-bold">ink</span>
-                      </div>
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="md" variant="muted" />
-                        <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">muted</span>
-                      </div>
-                      <div class="flex flex-col items-center gap-2">
-                        <AppSpinner size="md" variant="error" />
-                        <span class="font-eyebrow text-[9px] text-error uppercase font-bold">error</span>
-                      </div>
-                      <div class="flex flex-col items-center gap-2 px-3 py-1.5 rounded-lg bg-ink">
-                        <AppSpinner size="md" variant="surface" />
-                        <span class="font-eyebrow text-[9px] text-surface uppercase font-bold">surface</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Labels e Integração com Botões -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border-grid">
-                  <div>
-                    <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Spinners com Rótulo Técnico</div>
-                    <div class="space-y-4 p-4 rounded-xl bg-bg-alternate border border-border-grid">
-                      <div>
-                        <AppSpinner size="sm" variant="primary" label="Carregando Exercícios..." />
-                      </div>
-                      <div class="pt-3 border-t border-border-grid/60">
-                        <AppSpinner size="lg" variant="primary" label="Sincronizando Sessão..." label-position="bottom" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Integração com AppButton (:loading="true")</div>
-                    <div class="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-bg-alternate border border-border-grid">
-                      <AppButton variant="fill" size="sm" :loading="true">
-                        Carregando (Fill)
-                      </AppButton>
-                      <AppButton variant="outline" size="sm" :loading="true">
-                        Carregando (Outline)
-                      </AppButton>
-                      <AppButton variant="danger" size="sm" :loading="true">
-                        Carregando (Danger)
-                      </AppButton>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </AppCard>
-          </div>
         </div>
+
+        <!-- Mobile Navigation Tab Bar Showcase -->
+        <AppCard title="Navegação Inferior Mobile (AppTabBar)" dot-color="primary" badge="Acesso com Uma Só Mão" class="mt-8">
+          <p class="font-body text-xs text-ink-muted mb-4 leading-relaxed">
+            Barra fixa no rodapé ativa exclusivamente em celulares (&lt; md), substituindo o antigo menu hamburger com acesso direto com uma só mão às 4 abas centrais do app (Hoje, Treinos, Exercícios, Progresso).
+          </p>
+          <div class="p-4 bg-bg-alternate rounded-lg border border-border-grid">
+            <p class="text-xs text-ink-muted mb-3 font-mono">Exibição de referência inline:</p>
+            <div class="relative max-w-sm mx-auto overflow-hidden rounded-xl border border-border-grid bg-surface shadow-xs">
+              <AppTabBar class="static! shadow-none! border-t-0! block!" />
+            </div>
+          </div>
+        </AppCard>
       </div>
     </section>
 
@@ -1102,78 +1028,291 @@ const swatches = [
               </div>
             </div>
           </AppCard>
-
-          <AppCard title="Alertas &amp; Mensagens de Sistema (AppAlert)" dot-color="primary" badge="4 Estados Mapeados" class="mt-8">
-            <div class="space-y-4">
-              <div>
-                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
-                  1. Alerta Primário (Spectra Primary)
-                </span>
-                <AppAlert
-                  variant="primary"
-                  title="Dica de Rotina"
-                >
-                  Já preparamos uma rotina baseada no seu nível na aba <strong>Hoje</strong>. Você pode começar agora mesmo ou explorar a biblioteca!
-                </AppAlert>
-              </div>
-
-              <div>
-                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
-                  2. Alerta de Sucesso (Success)
-                </span>
-                <AppAlert
-                  variant="success"
-                  title="Série Concluída"
-                >
-                  Novo Recorde Pessoal (PR) registrado! Você superou sua marca anterior em 2 repetições.
-                </AppAlert>
-              </div>
-
-              <div>
-                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
-                  3. Alerta Informativo (Info)
-                </span>
-                <AppAlert
-                  variant="info"
-                  title="Aviso de Intervalo"
-                >
-                  O cronômetro de descanso continua rodando em segundo plano caso você alterne de aba.
-                </AppAlert>
-              </div>
-
-              <div>
-                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
-                  4. Alerta de Atenção / Erro (Danger)
-                </span>
-                <AppAlert
-                  variant="danger"
-                  title="Atenção à Postura"
-                  dismissible
-                >
-                  Mantenha as escápulas engajadas e evite hiperestender os cotovelos no final do movimento.
-                </AppAlert>
-              </div>
-            </div>
-          </AppCard>
         </div>
+      </div>
+    </section>
 
-        <!-- Mobile Navigation Tab Bar Showcase -->
-        <div class="mt-8">
-          <h3 class="font-headline text-sm font-bold text-ink uppercase tracking-wider mb-2">
-            Navegação Inferior Mobile (AppTabBar)
-          </h3>
-          <p class="font-body text-xs text-ink-muted mb-4">
-            Barra fixa no rodapé ativa exclusivamente em celulares (&lt; md), substituindo o antigo menu hamburger com acesso direto com uma só mão às 4 abas centrais do app.
+    <!-- Section 07: Feedback, Loadings & Alerts -->
+    <section class="w-full bg-background px-4 sm:px-6 lg:px-8 py-12 border-b border-border-grid">
+      <div class="max-w-300 mx-auto">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-8">
+          <div>
+            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">07 / FEEDBACK, CARREGAMENTO &amp; ALERTAS</span>
+            <h2 class="font-headline text-2xl sm:text-3xl text-ink font-bold tracking-tight mt-1">
+              Spinners Mecânicos &amp; Alertas do Sistema
+            </h2>
+          </div>
+          <p class="max-w-md text-ink-muted font-body text-xs leading-relaxed lg:text-right">
+            Indicadores de carregamento assíncrono durante sincronizações e alertas semânticos de alta visibilidade.
           </p>
-          <AppCard>
-            <div class="p-4 bg-bg-alternate rounded-lg border border-border-grid">
-              <p class="text-xs text-ink-muted mb-3 font-mono">Exibição de referência inline:</p>
-              <div class="relative max-w-sm mx-auto overflow-hidden rounded-xl border border-border-grid bg-surface shadow-xs">
-                <AppTabBar class="static! shadow-none! border-t-0! block!" />
+        </div>
+
+        <!-- Spinner Loader -->
+        <AppCard title="Indicadores de Carregamento &amp; Spinner Mecânico (AppSpinner)" dot-color="primary" badge="Feedback Assíncrono">
+          <div class="space-y-8">
+            <!-- Tamanhos e Variantes -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Escala de Tamanhos (xs, sm, md, lg, xl)</div>
+                <div class="flex flex-wrap items-center gap-6 p-4 rounded-xl bg-bg-alternate border border-border-grid">
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="xs" variant="primary" />
+                    <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">xs (14px)</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="sm" variant="primary" />
+                    <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">sm (16px)</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="md" variant="primary" />
+                    <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">md (24px)</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="lg" variant="primary" />
+                    <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">lg (40px)</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="xl" variant="primary" />
+                    <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">xl (56px)</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Variantes de Cor Semânticas</div>
+                <div class="flex flex-wrap items-center gap-5 p-4 rounded-xl bg-bg-alternate border border-border-grid">
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="md" variant="primary" />
+                    <span class="font-eyebrow text-[9px] text-primary-container uppercase font-bold">primary</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="md" variant="ink" />
+                    <span class="font-eyebrow text-[9px] text-ink uppercase font-bold">ink</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="md" variant="muted" />
+                    <span class="font-eyebrow text-[9px] text-ink-subtle uppercase font-bold">muted</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-2">
+                    <AppSpinner size="md" variant="error" />
+                    <span class="font-eyebrow text-[9px] text-error uppercase font-bold">error</span>
+                  </div>
+                  <div class="flex flex-col items-center gap-2 px-3 py-1.5 rounded-lg bg-ink">
+                    <AppSpinner size="md" variant="surface" />
+                    <span class="font-eyebrow text-[9px] text-surface uppercase font-bold">surface</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </AppCard>
+
+            <!-- Labels e Integração com Botões -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-border-grid">
+              <div>
+                <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Spinners com Rótulo Técnico</div>
+                <div class="space-y-4 p-4 rounded-xl bg-bg-alternate border border-border-grid">
+                  <div>
+                    <AppSpinner size="sm" variant="primary" label="Carregando Exercícios..." />
+                  </div>
+                  <div class="pt-3 border-t border-border-grid/60">
+                    <AppSpinner size="lg" variant="primary" label="Sincronizando Sessão..." label-position="bottom" />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div class="font-eyebrow text-[10px] text-ink-subtle uppercase mb-3 font-bold tracking-wider">Integração com AppButton (:loading="true")</div>
+                <div class="flex flex-wrap items-center gap-3 p-4 rounded-xl bg-bg-alternate border border-border-grid">
+                  <AppButton variant="fill" size="sm" :loading="true">
+                    Carregando (Fill)
+                  </AppButton>
+                  <AppButton variant="outline" size="sm" :loading="true">
+                    Carregando (Outline)
+                  </AppButton>
+                  <AppButton variant="danger" size="sm" :loading="true">
+                    Carregando (Danger)
+                  </AppButton>
+                </div>
+              </div>
+            </div>
+          </div>
+        </AppCard>
+
+        <!-- Alertas ocupando toda a largura (2 por linha) -->
+        <AppCard title="Alertas &amp; Mensagens de Sistema (AppAlert)" dot-color="primary" badge="4 Estados Mapeados" class="mt-8">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                1. Alerta Primário (Spectra Primary)
+              </span>
+              <AppAlert
+                variant="primary"
+                title="Dica de Rotina"
+              >
+                Já preparamos uma rotina baseada no seu nível na aba <strong>Hoje</strong>. Você pode começar agora mesmo ou explorar a biblioteca!
+              </AppAlert>
+            </div>
+
+            <div>
+              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                2. Alerta de Sucesso (Success)
+              </span>
+              <AppAlert
+                variant="success"
+                title="Série Concluída"
+              >
+                Novo Recorde Pessoal (PR) registrado! Você superou sua marca anterior em 2 repetições.
+              </AppAlert>
+            </div>
+
+            <div>
+              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                3. Alerta Informativo (Info)
+              </span>
+              <AppAlert
+                variant="info"
+                title="Aviso de Intervalo"
+              >
+                O cronômetro de descanso continua rodando em segundo plano caso você alterne de aba.
+              </AppAlert>
+            </div>
+
+            <div>
+              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                4. Alerta de Atenção / Erro (Danger)
+              </span>
+              <AppAlert
+                variant="danger"
+                title="Atenção à Postura"
+                dismissible
+              >
+                Mantenha as escápulas engajadas e evite hiperestender os cotovelos no final do movimento.
+              </AppAlert>
+            </div>
+          </div>
+        </AppCard>
+      </div>
+    </section>
+
+    <!-- Section 08: Screen Structures & Modals -->
+    <section class="w-full bg-surface-container-lowest px-4 sm:px-6 lg:px-8 py-12 border-b border-border-grid">
+      <div class="max-w-300 mx-auto">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-8">
+          <div>
+            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">08 / ESTRUTURAS DE TELA &amp; MODAIS</span>
+            <h2 class="font-headline text-2xl sm:text-3xl text-ink font-bold tracking-tight mt-1">
+              Cabeçalhos Padronizados &amp; Modais Adaptativos
+            </h2>
+          </div>
+          <p class="max-w-md text-ink-muted font-body text-xs leading-relaxed lg:text-right">
+            Hierarquia editorial para títulos de página e janelas modais com transição bottom-sheet e trava automática de scroll.
+          </p>
         </div>
+
+        <!-- Cabeçalhos ocupando toda a largura -->
+        <AppCard title="Cabeçalho Padronizado de Telas (AppPageHeader)" dot-color="primary" badge="Consistência Editorial">
+          <div class="space-y-6">
+            <div>
+              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                1. Padrão com Eyebrow e Status Badge (Exemplo: Tela Hoje / Configurações)
+              </span>
+              <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid">
+                <AppPageHeader
+                  title="Hoje"
+                  eyebrow="Visão Geral do Dia"
+                >
+                  <template #badge>
+                    <AppStatusBadge type="planned" label="Treino Agendado" />
+                  </template>
+                </AppPageHeader>
+              </div>
+            </div>
+
+            <div>
+              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                2. Padrão com Eyebrow e Subtítulo (Exemplo: Catálogo de Exercícios / Progresso)
+              </span>
+              <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid">
+                <AppPageHeader
+                  title="Biblioteca de Exercícios"
+                  eyebrow="Catálogo Estático &amp; Imutável"
+                  subtitle="Guia de movimentos calistênicos com instruções posturais, variações e recordes."
+                />
+              </div>
+            </div>
+
+            <div>
+              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                3. Padrão com Slot de Ações (Exemplo: Biblioteca de Treinos com Botão de Ação)
+              </span>
+              <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid">
+                <AppPageHeader
+                  title="Treinos"
+                  eyebrow="Biblioteca de Rotinas"
+                >
+                  <template #actions>
+                    <AppButton variant="fill" size="sm">
+                      <AppIcon name="plus" :size="16" />
+                      <span>Novo Treino</span>
+                    </AppButton>
+                  </template>
+                </AppPageHeader>
+              </div>
+            </div>
+          </div>
+        </AppCard>
+
+        <!-- Showcase AppModal -->
+        <AppCard title="Modal Base &amp; Bottom Sheet (AppModal)" dot-color="primary" badge="Controle de Foco &amp; Scroll Lock" class="mt-8">
+          <div class="space-y-4">
+            <p class="text-xs text-ink-muted leading-relaxed">
+              Componente base que padroniza o backdrop translúcido, transição nativa (bottom-sheet no mobile e pop no desktop), cabeçalho tátil com botão de fechar, trava de scroll da página em segundo plano e slot flexível de rodapé.
+            </p>
+
+            <div class="flex items-center gap-3">
+              <AppButton variant="fill" size="md" @click="showDemoModal = true">
+                <AppIcon name="menu" :size="18" />
+                <span>Abrir Modal de Demonstração</span>
+              </AppButton>
+            </div>
+          </div>
+        </AppCard>
+
+        <!-- Demo AppModal Instance -->
+        <AppModal
+          :is-open="showDemoModal"
+          eyebrow="Demonstração do Design System"
+          title="Modal Adaptativo (AppModal)"
+          subtitle="No mobile desliza como bottom-sheet; no desktop flutua ao centro."
+          max-width="md"
+          @close="showDemoModal = false"
+        >
+          <div class="p-5 space-y-4 text-xs text-ink">
+            <p class="leading-relaxed">
+              Este modal utiliza a casca unificada do Spectra. Todo o gerenciamento de trava de rolagem (<code class="bg-bg-alternate px-1 py-0.5 rounded font-mono">useBodyScrollLock</code>), animações de entrada/saída e fechamento ao clicar fora ou na tecla de escape são tratados centralmente.
+            </p>
+
+            <div class="p-3.5 rounded-xl border border-border-grid bg-bg-alternate space-y-2">
+              <span class="font-bold block text-ink">Recursos Integrados:</span>
+              <ul class="list-disc list-inside space-y-1 text-ink-muted">
+                <li>Trava automática de scroll do body</li>
+                <li>Transição suave com curva de desaceleração tátil</li>
+                <li>Suporte a cabeçalho padronizado com eyebrow e subtítulo</li>
+                <li>Slot para ações fixas no rodapé</li>
+              </ul>
+            </div>
+          </div>
+
+          <template #footer>
+            <div class="flex items-center justify-end gap-2">
+              <AppButton variant="outline" size="sm" @click="showDemoModal = false">
+                Cancelar
+              </AppButton>
+              <AppButton variant="fill" size="sm" @click="showDemoModal = false">
+                Entendido
+              </AppButton>
+            </div>
+          </template>
+        </AppModal>
       </div>
     </section>
   </div>
