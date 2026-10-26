@@ -12,6 +12,8 @@ import {
   AppChip,
   AppStatusBadge,
   AppCard,
+  AppEmptyState,
+  ExerciseCard,
   WorkoutCard,
   ProgressionSuggestionCard,
   AppPageHeader,
@@ -23,9 +25,11 @@ import {
   AppTabBar,
 } from '@/components'
 import type { SegmentedOption, SelectOption } from '@/types'
+import { EXERCISE_CATALOG } from '@/data/exercises'
 
 // Modais showcase
 const showDemoModal = ref(false)
+const sampleExercise = EXERCISE_CATALOG[0]
 
 const sampleWorkout = {
   id: 'sample-push',
@@ -1334,6 +1338,56 @@ const swatches = [
           <ProgressionSuggestionCard
             :suggestions="sampleSuggestions"
           />
+        </div>
+
+        <!-- Showcase ExerciseCard -->
+        <div class="mt-8">
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-2">
+            Card de Exercício no Catálogo (ExerciseCard)
+          </span>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <ExerciseCard
+              v-if="sampleExercise"
+              :exercise="sampleExercise"
+              :personal-record="20"
+            />
+          </div>
+        </div>
+
+        <!-- Showcase AppEmptyState -->
+        <div class="mt-8 space-y-4">
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block">
+            Estados Vazios Padronizados (AppEmptyState)
+          </span>
+
+          <!-- Card Variant -->
+          <AppEmptyState
+            variant="card"
+            title="Nenhum Treino Encontrado"
+            description="Exemplo de estado vazio em destaque para páginas principais ou seções completas sem dados."
+            icon="dumbbell"
+          >
+            <template #actions>
+              <AppButton variant="fill" size="md">
+                <AppIcon name="plus" :size="18" />
+                <span>Criar Novo Treino</span>
+              </AppButton>
+            </template>
+          </AppEmptyState>
+
+          <!-- Dashed Variant -->
+          <AppEmptyState
+            variant="dashed"
+            title="Lista de Exercícios Vazia"
+            description="Exemplo de estado vazio compacto com borda tracejada para uso interno em modais e caixas de seleção."
+            icon="search"
+          >
+            <template #actions>
+              <AppButton variant="outline" size="sm">
+                <span>Limpar Filtros</span>
+              </AppButton>
+            </template>
+          </AppEmptyState>
         </div>
 
         <!-- Showcase AppModal -->

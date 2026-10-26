@@ -2,11 +2,14 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import {
+  AppButton,
   AppCard,
+  AppEmptyState,
+  AppIcon,
   AppInput,
   AppChip,
   AppPageHeader,
-  AppStatusBadge,
+  ExerciseCard,
   ExerciseDetailModal,
 } from '@/components'
 import { EXERCISE_CATALOG } from '@/data/exercises'
@@ -117,6 +120,13 @@ function openDetail(exercise: ExerciseCatalogItem) {
 function handleSelectVariation(variation: ExerciseCatalogItem) {
   selectedExercise.value = variation
 }
+
+function clearFilters() {
+  searchQuery.value = ''
+  selectedMuscle.value = 'todos'
+  selectedLevel.value = 'todos'
+  selectedEquipment.value = 'todos'
+}
 </script>
 
 <template>
@@ -188,64 +198,35 @@ function handleSelectVariation(variation: ExerciseCatalogItem) {
     </AppCard>
 
     <!-- Results Counter -->
-    <div class="flex items-center justify-between text-xs font-eyebrow text-ink-muted">
+    <div v-if="filteredExercises.length > 0" class="flex items-center justify-between text-xs font-eyebrow text-ink-muted">
       <span>{{ filteredExercises.length }} exercícios encontrados</span>
       <span>Toque em um exercício para ver detalhes</span>
     </div>
 
+    <!-- Empty State when no results match filters -->
+    <AppEmptyState
+      v-if="filteredExercises.length === 0"
+      title="Nenhum exercício encontrado"
+      description="Não encontramos nenhum exercício correspondente aos filtros ou busca aplicados. Tente buscar por outros termos ou redefinir os filtros."
+      icon="search"
+    >
+      <template #actions>
+        <AppButton variant="outline" size="sm" @click="clearFilters">
+          <AppIcon name="replay" :size="16" />
+          <span>Limpar Filtros</span>
+        </AppButton>
+      </template>
+    </AppEmptyState>
+
     <!-- Exercises Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
-      <div
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch">
+      <ExerciseCard
         v-for="exercise in filteredExercises"
         :key="exercise.id"
-        class="cursor-pointer h-full flex flex-col"
-        @click="openDetail(exercise)"
-      >
-        <AppCard
-          :title="exercise.name"
-          :eyebrow="exercise.measurementType === 'reps' ? 'Repetições' : 'Isometria / Segundos'"
-          dot-color="primary"
-          class="h-full hover:border-ink hover:shadow-[0_6px_0_0_#111111] transition-all"
-        >
-          <div class="flex-1 flex flex-col justify-between space-y-3">
-            <div class="space-y-3">
-              <!-- Muscle Tags & Level Badge -->
-              <div class="flex flex-wrap items-center gap-1.5 min-h-6">
-                <span
-                  v-for="muscle in exercise.muscleGroups"
-                  :key="muscle"
-                  class="px-2 py-0.5 rounded bg-bg-alternate border border-border-grid font-eyebrow text-[10px] font-bold text-ink"
-                >
-                  {{ muscle }}
-                </span>
-              </div>
-
-              <!-- Level / PR indicator -->
-              <div class="flex items-center justify-between pt-4 border-t border-border-grid">
-                <div class="flex items-center gap-2">
-                  <AppStatusBadge :type="exercise.level" />
-                </div>
-
-                <!-- Personal Record Badge if exists -->
-                <span
-                  v-if="sessionsStore.getPersonalRecord(exercise.id) !== null"
-                  class="font-metric-number text-xs font-bold text-primary-container bg-primary-container/10 px-2 py-0.5 rounded border border-border-primary"
-                >
-                  PR: {{ sessionsStore.getPersonalRecord(exercise.id) }} {{ exercise.measurementType === 'reps' ? 'reps' : 's' }}
-                </span>
-                <span v-else class="text-[11px] text-ink-muted">
-                  Sem PR
-                </span>
-              </div>
-            </div>
-
-            <!-- Instructions preview -->
-            <p class="font-body text-xs text-ink-muted leading-relaxed line-clamp-2 mt-auto pt-1">
-              {{ exercise.instructions[0] }}
-            </p>
-          </div>
-        </AppCard>
-      </div>
+        :exercise="exercise"
+        :personal-record="sessionsStore.getPersonalRecord(exercise.id)"
+        @click="openDetail"
+      />
     </div>
 
     <!-- Exercise Detail Modal -->

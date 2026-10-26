@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { EXERCISE_CATALOG } from '@/data/exercises'
-import { AppButton, AppInput, AppChip, AppCheckbox, AppModal } from '@/components'
+import { AppButton, AppInput, AppChip, AppCheckbox, AppModal, AppEmptyState } from '@/components'
 import AppIcon from './AppIcon.vue'
 import type { ExerciseCatalogItem, Equipment } from '@/types/domain'
 
@@ -160,14 +160,13 @@ function handleSelect(exercise: ExerciseCatalogItem) {
 
     <!-- Exercise Items List -->
     <div class="p-4 sm:p-5 space-y-2">
-      <div
+      <AppEmptyState
         v-if="filteredExercises.length === 0"
-        class="py-12 text-center text-ink-muted space-y-2"
-      >
-        <AppIcon name="search" :size="32" class="mx-auto text-ink-muted/50" />
-        <p class="text-sm font-medium">Nenhum exercício encontrado para os filtros selecionados.</p>
-        <p class="text-xs">Tente buscar por outro termo ou desmarque o filtro de equipamento.</p>
-      </div>
+        variant="dashed"
+        title="Nenhum exercício encontrado"
+        description="Tente buscar por outro termo ou desmarque o filtro de equipamento."
+        icon="search"
+      />
 
       <button
         v-for="exercise in filteredExercises"

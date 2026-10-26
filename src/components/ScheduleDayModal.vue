@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { AppButton, AppModal } from '@/components'
+import { AppButton, AppEmptyState, AppModal } from '@/components'
 import AppIcon from './AppIcon.vue'
 import { DAYS_OF_WEEK } from '@/constants/domain'
 import type { Workout } from '@/types/domain'
@@ -76,26 +76,20 @@ function handleExplore() {
       </div>
 
       <!-- Empty state when user has no workouts yet -->
-      <div
+      <AppEmptyState
         v-if="workouts.length === 0"
-        class="p-4 text-center space-y-3 bg-bg-alternate rounded-xl border border-dashed border-border-grid"
+        variant="dashed"
+        title="Nenhum treino criado"
+        description="Copie um modelo pronto de calistenia ou crie uma rotina personalizada para agendar na semana."
+        icon="dumbbell"
       >
-        <div class="w-9 h-9 mx-auto rounded-full bg-surface border border-border-grid flex items-center justify-center text-ink-muted">
-          <AppIcon name="dumbbell" :size="18" />
-        </div>
-        <div>
-          <div class="font-bold text-xs text-ink">Nenhum treino criado</div>
-          <p class="text-[11px] text-ink-muted mt-0.5 leading-relaxed">
-            Copie um modelo pronto de calistenia ou crie uma rotina personalizada para agendar na semana.
-          </p>
-        </div>
-        <div class="pt-1">
+        <template #actions>
           <AppButton variant="fill" size="sm" @click="handleExplore">
             <AppIcon name="copy" :size="16" />
-            Explorar Treinos Prontos
+            <span>Explorar Treinos Prontos</span>
           </AppButton>
-        </div>
-      </div>
+        </template>
+      </AppEmptyState>
 
       <!-- Available workouts list -->
       <template v-else>

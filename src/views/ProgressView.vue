@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   AppCard,
+  AppEmptyState,
   AppPageHeader,
   WeeklyGoalCard,
   AppStatusBadge,
@@ -144,29 +145,19 @@ function calculateSessionDuration(session: Session): string {
     />
 
     <!-- Empty State if NO sessions exist yet -->
-    <div
+    <AppEmptyState
       v-if="sessions.length === 0"
-      class="p-8 sm:p-12 rounded-2xl border-2 border-border-primary bg-surface text-center space-y-4 shadow-[0_4px_0_0_#111111]"
+      title="Seu Progresso Começa no Primeiro Treino"
+      description="O Spectra não exibe estatísticas fictícias nem gráficos sem dados. Complete sua primeira sessão guiada para ativar o histórico, recordes pessoais e métricas de consistência."
+      icon="trending_up"
     >
-      <div class="w-14 h-14 rounded-2xl bg-bg-alternate border border-border-grid flex items-center justify-center mx-auto text-primary-container">
-        <AppIcon name="trending_up" :size="30" />
-      </div>
-      <div class="space-y-1">
-        <h2 class="font-display text-xl font-bold text-ink">
-          Seu Progresso Começa no Primeiro Treino
-        </h2>
-        <p class="text-xs text-ink-muted max-w-md mx-auto leading-relaxed">
-          O Spectra não exibe estatísticas fictícias nem gráficos sem dados. Complete sua primeira sessão guiada para ativar o histórico, recordes pessoais e métricas de consistência.
-        </p>
-      </div>
-
-      <div class="pt-2">
+      <template #actions>
         <AppButton variant="fill" size="md" @click="router.push('/')">
           <AppIcon name="play" :size="20" />
-          Iniciar Meu Primeiro Treino
+          <span>Iniciar Meu Primeiro Treino</span>
         </AppButton>
-      </div>
-    </div>
+      </template>
+    </AppEmptyState>
 
     <!-- Main Content when sessions exist -->
     <template v-else>

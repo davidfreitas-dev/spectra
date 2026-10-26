@@ -5,6 +5,7 @@ import { EXERCISE_CATALOG } from '@/data/exercises'
 import {
   AppButton,
   AppCard,
+  AppEmptyState,
   AppInput,
   AppStepper,
   AppIcon,
@@ -179,20 +180,13 @@ function handleSave() {
       </div>
 
       <!-- Empty items state -->
-      <div
+      <AppEmptyState
         v-if="items.length === 0"
-        class="p-8 text-center border-2 border-dashed border-border-grid rounded-2xl bg-bg-alternate/50 space-y-3"
-      >
-        <div class="w-10 h-10 rounded-full bg-surface border border-border-grid flex items-center justify-center mx-auto text-ink-muted">
-          <AppIcon name="dumbbell" :size="20" />
-        </div>
-        <div>
-          <span class="font-bold text-sm text-ink block">Nenhum exercício adicionado</span>
-          <p class="text-xs text-ink-muted mt-0.5">
-            Toque no botão "Adicionar" acima para escolher movimentos do catálogo.
-          </p>
-        </div>
-      </div>
+        variant="dashed"
+        title="Nenhum exercício adicionado"
+        description="Toque no botão 'Adicionar' acima para escolher movimentos do catálogo."
+        icon="dumbbell"
+      />
 
       <!-- Items List -->
       <div v-else class="space-y-3">

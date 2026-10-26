@@ -8,6 +8,7 @@ import { DAYS_OF_WEEK } from '@/constants/domain'
 import { useBodyScrollLock } from '@/composables/useBodyScrollLock'
 import {
   AppButton,
+  AppEmptyState,
   AppIcon,
   AppPageHeader,
   AppSegmentedControl,
@@ -216,12 +217,19 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
 
     <!-- User Workouts Tab -->
     <div v-if="activeTab === 'user'" class="space-y-4">
-      <div v-if="workoutsStore.workouts.length === 0" class="py-12 text-center text-ink-muted text-sm space-y-3">
-        <p>Você ainda não tem treinos criados.</p>
-        <AppButton variant="fill" size="md" @click="handleNewWorkout">
-          Criar Primeiro Treino
-        </AppButton>
-      </div>
+      <AppEmptyState
+        v-if="workoutsStore.workouts.length === 0"
+        title="Você ainda não tem treinos criados"
+        description="Crie uma rotina personalizada com seus exercícios favoritos ou copie um dos modelos prontos na aba ao lado."
+        icon="dumbbell"
+      >
+        <template #actions>
+          <AppButton variant="fill" size="md" @click="handleNewWorkout">
+            <AppIcon name="plus" :size="18" />
+            <span>Criar Primeiro Treino</span>
+          </AppButton>
+        </template>
+      </AppEmptyState>
 
       <div
         v-for="workout in workoutsStore.workouts"
