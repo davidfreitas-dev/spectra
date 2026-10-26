@@ -189,7 +189,12 @@ function handleSave() {
       />
 
       <!-- Items List -->
-      <div v-else class="space-y-3">
+      <TransitionGroup
+        v-else
+        name="reorder-list"
+        tag="div"
+        class="space-y-3 relative overflow-x-hidden"
+      >
         <AppCard
           v-for="(item, index) in items"
           :key="item.id"
@@ -295,7 +300,7 @@ function handleSave() {
             </div>
           </div>
         </AppCard>
-      </div>
+      </TransitionGroup>
     </div>
 
     <!-- Footer Buttons -->

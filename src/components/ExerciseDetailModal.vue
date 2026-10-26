@@ -117,8 +117,8 @@ const harderExercise = computed(() => {
             class="p-3 rounded-lg border border-border-grid bg-surface hover:bg-bg-alternate hover:border-border-primary transition-all text-left group cursor-pointer"
             @click="emit('select-variation', easierExercise)"
           >
-            <div class="flex items-center gap-1.5 text-[11px] font-bold text-success-container font-eyebrow uppercase mb-1">
-              <AppIcon name="arrow_down" :size="14" />
+            <div class="flex items-center gap-1.5 text-[11px] font-bold text-success font-eyebrow uppercase mb-1">
+              <AppIcon name="arrow_down" :size="14" class="text-success" />
               <span>Variação Mais Fácil</span>
             </div>
             <div class="font-bold text-xs text-ink group-hover:text-primary-container transition-colors">
