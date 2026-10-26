@@ -12,6 +12,7 @@ import {
   AppChip,
   AppStatusBadge,
   AppCard,
+  AppMetricCard,
   AppEmptyState,
   ExerciseCard,
   WorkoutCard,
@@ -29,7 +30,8 @@ import { EXERCISE_CATALOG } from '@/data/exercises'
 
 // Modais showcase
 const showDemoModal = ref(false)
-const sampleExercise = EXERCISE_CATALOG[0]
+const sampleExerciseReps = EXERCISE_CATALOG.find((e) => e.id === 'pushup-standard') || EXERCISE_CATALOG[0]
+const sampleExerciseIsometric = EXERCISE_CATALOG.find((e) => e.id === 'plank-standard')
 
 const sampleWorkout = {
   id: 'sample-push',
@@ -812,18 +814,18 @@ const swatches = [
       </div>
     </section>
 
-    <!-- Section 05: Controls, Progress & Navigation -->
+    <!-- Section 05: Controls & Progress -->
     <section class="w-full bg-background px-4 sm:px-6 lg:px-8 py-12 border-b border-border-grid">
       <div class="max-w-300 mx-auto">
         <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-8">
           <div>
-            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">05 / CONTROLES &amp; NAVEGAÇÃO DE TREINO</span>
+            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">05 / CONTROLES &amp; PROGRESSO</span>
             <h2 class="font-headline text-2xl sm:text-3xl text-ink font-bold tracking-tight mt-1">
-              Controles Segmentados, Progresso &amp; Tab Bar
+              Controles Segmentados &amp; Barras de Progresso
             </h2>
           </div>
           <p class="max-w-md text-ink-muted font-body text-xs leading-relaxed lg:text-right">
-            Alternância rápida de métricas, monitoramento de séries da sessão e navegação inferior ágil com uma só mão.
+            Alternância rápida de métricas e monitoramento mecânico de séries e metas em andamento.
           </p>
         </div>
 
@@ -866,32 +868,6 @@ const swatches = [
             </div>
           </AppCard>
         </div>
-
-        <!-- WeeklyGoalCard Showcase -->
-        <div class="mt-8">
-          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-2">
-            Card Integrado de Meta Semanal &amp; Celebração (WeeklyGoalCard)
-          </span>
-          <WeeklyGoalCard
-            :completed-count="4"
-            :weekly-goal="4"
-            :sound-enabled="true"
-            title="Meta Semanal de Treinos (Exemplo: 100% Concluída)"
-          />
-        </div>
-
-        <!-- Mobile Navigation Tab Bar Showcase -->
-        <AppCard title="Navegação Inferior Mobile (AppTabBar)" dot-color="primary" badge="Acesso com Uma Só Mão" class="mt-8">
-          <p class="font-body text-xs text-ink-muted mb-4 leading-relaxed">
-            Barra fixa no rodapé ativa exclusivamente em celulares (&lt; md), substituindo o antigo menu hamburger com acesso direto com uma só mão às 4 abas centrais do app (Hoje, Treinos, Exercícios, Progresso).
-          </p>
-          <div class="p-4 bg-bg-alternate rounded-lg border border-border-grid">
-            <p class="text-xs text-ink-muted mb-3 font-mono">Exibição de referência inline:</p>
-            <div class="relative max-w-sm mx-auto overflow-hidden rounded-xl border border-border-grid bg-surface shadow-xs">
-              <AppTabBar class="static! shadow-none! border-t-0! block!" />
-            </div>
-          </div>
-        </AppCard>
       </div>
     </section>
 
@@ -1237,29 +1213,181 @@ const swatches = [
       </div>
     </section>
 
-    <!-- Section 08: Screen Structures & Modals -->
+    <!-- Section 08: Cards & Domain Containers -->
     <section class="w-full bg-surface-container-lowest px-4 sm:px-6 lg:px-8 py-12 border-b border-border-grid">
-      <div class="max-w-300 mx-auto">
-        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3 mb-8">
+      <div class="max-w-300 mx-auto space-y-10">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3">
           <div>
-            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">08 / ESTRUTURAS DE TELA &amp; MODAIS</span>
+            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">08 / CARDS &amp; CONTAINERS DE CONTEÚDO</span>
             <h2 class="font-headline text-2xl sm:text-3xl text-ink font-bold tracking-tight mt-1">
-              Cabeçalhos Padronizados &amp; Modais Adaptativos
+              Galeria Completa de Cards
             </h2>
           </div>
           <p class="max-w-md text-ink-muted font-body text-xs leading-relaxed lg:text-right">
-            Hierarquia editorial para títulos de página e janelas modais com transição bottom-sheet e trava automática de scroll.
+            Containers visuais neo-brutalistas, cards de métricas dinâmicas, modelos estruturados de treino, metas semanais e catálogo de exercícios.
           </p>
         </div>
 
-        <!-- Cabeçalhos ocupando toda a largura -->
-        <AppCard title="Cabeçalho Padronizado de Telas (AppPageHeader)" dot-color="primary" badge="Consistência Editorial">
-          <div class="space-y-6">
-            <div>
-              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
-                1. Padrão com Eyebrow e Status Badge (Exemplo: Tela Hoje / Configurações)
-              </span>
-              <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid">
+        <!-- 1. Cards Base & Métricas Numéricas -->
+        <div>
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-3">
+            1. Cards Base &amp; Métricas Numéricas (AppCard &amp; AppMetricCard)
+          </span>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 items-stretch">
+            <AppMetricCard
+              label="Total de Treinos"
+              value="18"
+              subtext="Últimas 8 semanas"
+              delta="+3"
+              delta-type="positive"
+            />
+            <AppMetricCard
+              label="Taxa de Conclusão"
+              value="94%"
+              subtext="Consistência na agenda"
+              highlight
+              delta="Alta"
+              delta-type="positive"
+            />
+            <AppMetricCard
+              label="Recorde Recente"
+              value="25 reps"
+              subtext="Flexão Tradicional"
+              delta="PR"
+              delta-type="positive"
+            />
+            <AppMetricCard
+              label="Tempo Médio"
+              value="32 min"
+              subtext="Por sessão de treino"
+              delta="Estável"
+              delta-type="neutral"
+            />
+          </div>
+        </div>
+
+        <!-- 2. Cards de Treino & Meta Semanal -->
+        <div>
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-3">
+            2. Cards Especializados de Treino &amp; Meta Semanal (WorkoutCard &amp; WeeklyGoalCard)
+          </span>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <WorkoutCard
+              :workout="sampleWorkout"
+              eyebrow="Agendado: Seg, Qua, Sex"
+              dot-color="primary"
+            >
+              <template #actions>
+                <div class="flex items-center justify-end gap-2">
+                  <AppButton variant="outline" size="sm">
+                    <AppIcon name="edit" :size="16" />
+                    <span>Editar</span>
+                  </AppButton>
+                  <AppButton variant="fill" size="sm">
+                    <AppIcon name="play" :size="16" />
+                    <span>Iniciar</span>
+                  </AppButton>
+                </div>
+              </template>
+            </WorkoutCard>
+
+            <WeeklyGoalCard
+              :completed-count="4"
+              :weekly-goal="4"
+              :sound-enabled="true"
+              title="Meta Semanal (100% Concluída)"
+            />
+          </div>
+        </div>
+
+        <!-- 3. Cards de Progressão & Catálogo de Exercícios -->
+        <div>
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-3">
+            3. Sugestões de Progressão &amp; Catálogo (ProgressionSuggestionCard &amp; ExerciseCard)
+          </span>
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <ProgressionSuggestionCard
+              :suggestions="sampleSuggestions"
+            />
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ExerciseCard
+                v-if="sampleExerciseReps"
+                :exercise="sampleExerciseReps"
+                :personal-record="20"
+              />
+              <ExerciseCard
+                v-if="sampleExerciseIsometric"
+                :exercise="sampleExerciseIsometric"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Estados Vazios (AppEmptyState) -->
+        <div>
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-3">
+            4. Estados Vazios Padronizados (AppEmptyState: Card &amp; Dashed)
+          </span>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <AppEmptyState
+              variant="card"
+              title="Nenhum Treino Encontrado"
+              description="Exemplo de estado vazio em destaque para páginas principais ou seções sem dados."
+              icon="dumbbell"
+            >
+              <template #actions>
+                <AppButton variant="fill" size="md">
+                  <AppIcon name="plus" :size="18" />
+                  <span>Criar Primeiro Treino</span>
+                </AppButton>
+              </template>
+            </AppEmptyState>
+
+            <AppEmptyState
+              variant="dashed"
+              title="Lista de Exercícios Vazia"
+              description="Exemplo de estado vazio compacto com borda tracejada para modais e seletores."
+              icon="search"
+            >
+              <template #actions>
+                <AppButton variant="outline" size="sm">
+                  <span>Limpar Filtros</span>
+                </AppButton>
+              </template>
+            </AppEmptyState>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 09: Screen Structures & Modals -->
+    <section class="w-full bg-background px-4 sm:px-6 lg:px-8 py-12 border-b border-border-grid">
+      <div class="max-w-300 mx-auto space-y-10">
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-3">
+          <div>
+            <span class="font-eyebrow text-xs uppercase text-primary-container tracking-wider font-bold">09 / ESTRUTURAS DE TELA &amp; MODAIS</span>
+            <h2 class="font-headline text-2xl sm:text-3xl text-ink font-bold tracking-tight mt-1">
+              Cabeçalhos Padronizados, Navegação &amp; Modais
+            </h2>
+          </div>
+          <p class="max-w-md text-ink-muted font-body text-xs leading-relaxed lg:text-right">
+            Hierarquia editorial para títulos de página, barra fixa mobile e janelas modais adaptativas com bottom-sheet.
+          </p>
+        </div>
+
+        <!-- Cabeçalhos de Tela em Grid de 3 colunas -->
+        <div>
+          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-3">
+            Cabeçalhos Padronizados de Tela (AppPageHeader)
+          </span>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Header 1 -->
+            <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid flex flex-col justify-between">
+              <div>
+                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                  Com Eyebrow &amp; Badge
+                </span>
                 <AppPageHeader
                   title="Hoje"
                   eyebrow="Visão Geral do Dia"
@@ -1271,140 +1399,74 @@ const swatches = [
               </div>
             </div>
 
-            <div>
-              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
-                2. Padrão com Eyebrow e Subtítulo (Exemplo: Catálogo de Exercícios / Progresso)
-              </span>
-              <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid">
+            <!-- Header 2 -->
+            <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid flex flex-col justify-between">
+              <div>
+                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                  Com Eyebrow &amp; Subtítulo
+                </span>
                 <AppPageHeader
-                  title="Biblioteca de Exercícios"
-                  eyebrow="Catálogo Estático &amp; Imutável"
-                  subtitle="Guia de movimentos calistênicos com instruções posturais, variações e recordes."
+                  title="Exercícios"
+                  eyebrow="Catálogo Estático"
+                  subtitle="Guia de movimentos com variações e recordes."
                 />
               </div>
             </div>
 
-            <div>
-              <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
-                3. Padrão com Slot de Ações (Exemplo: Biblioteca de Treinos com Botão de Ação)
-              </span>
-              <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid">
+            <!-- Header 3 -->
+            <div class="p-4 bg-bg-alternate rounded-xl border border-border-grid flex flex-col justify-between">
+              <div>
+                <span class="font-eyebrow text-[10px] text-ink-muted uppercase font-bold tracking-wider block mb-2">
+                  Com Ações Integradas
+                </span>
                 <AppPageHeader
                   title="Treinos"
-                  eyebrow="Biblioteca de Rotinas"
+                  eyebrow="Biblioteca"
                 >
                   <template #actions>
                     <AppButton variant="fill" size="sm">
                       <AppIcon name="plus" :size="16" />
-                      <span>Novo Treino</span>
+                      <span>Novo</span>
                     </AppButton>
                   </template>
                 </AppPageHeader>
               </div>
             </div>
           </div>
-        </AppCard>
+        </div>
 
-        <!-- Showcase WorkoutCard -->
-        <div class="mt-8">
-          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-2">
-            Card Padronizado de Treino (WorkoutCard)
-          </span>
-          <WorkoutCard
-            :workout="sampleWorkout"
-            eyebrow="Agendado: Seg, Qua, Sex"
-            dot-color="primary"
-          >
-            <template #actions>
-              <div class="flex items-center justify-end gap-2">
-                <AppButton variant="outline" size="sm">
-                  <AppIcon name="edit" :size="16" />
-                  <span>Editar</span>
-                </AppButton>
-                <AppButton variant="fill" size="sm">
-                  <AppIcon name="play" :size="16" />
-                  <span>Iniciar</span>
+        <!-- Modais Adaptativos & Navegação Mobile -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+          <!-- AppModal Demo Card -->
+          <AppCard title="Modal Adaptativo (AppModal)" dot-color="primary" badge="Bottom Sheet &amp; Scroll Lock" class="h-full flex flex-col justify-between">
+            <div class="space-y-4">
+              <p class="text-xs text-ink-muted leading-relaxed">
+                Componente base que padroniza o backdrop translúcido, transição nativa (bottom-sheet no mobile e pop no desktop), cabeçalho tátil com botão de fechar e trava automática de scroll.
+              </p>
+
+              <div>
+                <AppButton variant="fill" size="md" @click="showDemoModal = true">
+                  <AppIcon name="menu" :size="18" />
+                  <span>Abrir Modal de Demonstração</span>
                 </AppButton>
               </div>
-            </template>
-          </WorkoutCard>
-        </div>
-
-        <!-- Showcase ProgressionSuggestionCard -->
-        <div class="mt-8">
-          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-2">
-            Card de Sugestões de Progressão (ProgressionSuggestionCard)
-          </span>
-          <ProgressionSuggestionCard
-            :suggestions="sampleSuggestions"
-          />
-        </div>
-
-        <!-- Showcase ExerciseCard -->
-        <div class="mt-8">
-          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block mb-2">
-            Card de Exercício no Catálogo (ExerciseCard)
-          </span>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ExerciseCard
-              v-if="sampleExercise"
-              :exercise="sampleExercise"
-              :personal-record="20"
-            />
-          </div>
-        </div>
-
-        <!-- Showcase AppEmptyState -->
-        <div class="mt-8 space-y-4">
-          <span class="font-eyebrow text-xs uppercase text-ink-muted font-bold tracking-wider block">
-            Estados Vazios Padronizados (AppEmptyState)
-          </span>
-
-          <!-- Card Variant -->
-          <AppEmptyState
-            variant="card"
-            title="Nenhum Treino Encontrado"
-            description="Exemplo de estado vazio em destaque para páginas principais ou seções completas sem dados."
-            icon="dumbbell"
-          >
-            <template #actions>
-              <AppButton variant="fill" size="md">
-                <AppIcon name="plus" :size="18" />
-                <span>Criar Novo Treino</span>
-              </AppButton>
-            </template>
-          </AppEmptyState>
-
-          <!-- Dashed Variant -->
-          <AppEmptyState
-            variant="dashed"
-            title="Lista de Exercícios Vazia"
-            description="Exemplo de estado vazio compacto com borda tracejada para uso interno em modais e caixas de seleção."
-            icon="search"
-          >
-            <template #actions>
-              <AppButton variant="outline" size="sm">
-                <span>Limpar Filtros</span>
-              </AppButton>
-            </template>
-          </AppEmptyState>
-        </div>
-
-        <!-- Showcase AppModal -->
-        <AppCard title="Modal Base &amp; Bottom Sheet (AppModal)" dot-color="primary" badge="Controle de Foco &amp; Scroll Lock" class="mt-8">
-          <div class="space-y-4">
-            <p class="text-xs text-ink-muted leading-relaxed">
-              Componente base que padroniza o backdrop translúcido, transição nativa (bottom-sheet no mobile e pop no desktop), cabeçalho tátil com botão de fechar, trava de scroll da página em segundo plano e slot flexível de rodapé.
-            </p>
-
-            <div class="flex items-center gap-3">
-              <AppButton variant="fill" size="md" @click="showDemoModal = true">
-                <AppIcon name="menu" :size="18" />
-                <span>Abrir Modal de Demonstração</span>
-              </AppButton>
             </div>
-          </div>
-        </AppCard>
+          </AppCard>
+
+          <!-- AppTabBar Demo Card -->
+          <AppCard title="Navegação Inferior Mobile (AppTabBar)" dot-color="ink" badge="Acesso com Uma Só Mão" class="h-full flex flex-col justify-between">
+            <div class="space-y-4">
+              <p class="text-xs text-ink-muted leading-relaxed">
+                Barra fixa no rodapé ativa exclusivamente em celulares (&lt; md), com acesso direto com uma só mão às 4 abas centrais do app (Hoje, Treinos, Exercícios, Progresso).
+              </p>
+              <div class="p-3 bg-bg-alternate rounded-xl border border-border-grid">
+                <div class="relative max-w-sm mx-auto overflow-hidden rounded-xl border border-border-grid bg-surface shadow-xs">
+                  <AppTabBar class="static! shadow-none! border-t-0! block!" />
+                </div>
+              </div>
+            </div>
+          </AppCard>
+        </div>
 
         <!-- Demo AppModal Instance -->
         <AppModal
