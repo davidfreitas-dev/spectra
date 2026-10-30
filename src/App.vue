@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
-import { AppNavbar, AppTabBar } from '@/components'
+import { AppNavbar, AppTabBar, AuthModal } from '@/components'
+import { useAuthStore } from '@/stores/authStore'
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 const transitionName = ref('page-slide-left')
 
 const routeOrder: Record<string, number> = {
@@ -42,5 +44,11 @@ router.beforeEach((to, from) => {
 
     <!-- Mobile Bottom Tabs Bar (Hidden during active workout session) -->
     <AppTabBar v-if="route.path !== '/session'" />
+
+    <!-- Modal Global de Autenticação / Sincronização em Nuvem -->
+    <AuthModal
+      :is-open="authStore.isAuthModalOpen"
+      @close="authStore.closeAuthModal"
+    />
   </div>
 </template>

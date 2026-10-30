@@ -1,30 +1,55 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
+  AppPageHeader,
   AppCard,
   AppButton,
   AppToggle,
   AppSegmentedControl,
-  AppPageHeader,
-  AppStatusBadge,
   AppChip,
   AppConfirmDialog,
   AppIcon,
+  SettingsAccountCard,
 } from '@/components'
+import { useSettingsBackup } from '@/composables/useSettingsBackup'
 import { StorageService } from '@/services/storageService'
+import { SyncService, syncStatus, lastSyncedAt } from '@/services/syncService'
 import { usePreferencesStore } from '@/stores/preferencesStore'
 import { useTourStore } from '@/stores/tourStore'
-import { CURRENT_SCHEMA_VERSION } from '@/constants/domain'
-import { PreferencesSchema, WorkoutSchema, SessionSchema } from '@/types/domain'
-import { z } from 'zod'
+import { useAuthStore } from '@/stores/authStore'
 import type { UserLevel, Equipment } from '@/types/domain'
 import type { SegmentedOption } from '@/types/components'
 
+// 1. Stores & Navigation
 const router = useRouter()
 const preferencesStore = usePreferencesStore()
 const tourStore = useTourStore()
+const authStore = useAuthStore()
 
+// 2. Reactive State
+const isManualSyncing = ref(false)
+const isConfirmSignOutOpen = ref(false)
+const isConfirmResetOpen = ref(false)
+const isResetting = ref(false)
+
+const feedbackMessage = ref<string | null>(null)
+const feedbackType = ref<'success' | 'error'>('success')
+let feedbackTimer: ReturnType<typeof setTimeout> | null = null
+
+// 3. Composable for Backup & Restore
+const {
+  isExporting,
+  isImporting,
+  setFileInput,
+  exportBackup,
+  triggerImport,
+  handleFileSelected,
+} = useSettingsBackup({
+  onFeedback: showFeedback,
+})
+
+// 4. Static / Domain Options
 const levelOptions: SegmentedOption[] = [
   { value: 'beginner', label: 'Iniciante' },
   { value: 'intermediate', label: 'Intermediário' },
@@ -38,26 +63,38 @@ const equipmentOptions: { value: Equipment; label: string }[] = [
   { value: 'rope', label: 'Corda de Pular' },
 ]
 
-const feedbackMessage = ref<string | null>(null)
-const feedbackType = ref<'success' | 'error'>('success')
-const fileInputRef = ref<HTMLInputElement | null>(null)
-const isExporting = ref(false)
-const isImporting = ref(false)
-const isResetting = ref(false)
-const isConfirmResetOpen = ref(false)
-
-onMounted(() => {
-  preferencesStore.load()
-})
-
+// 5. Actions & Handlers
 function showFeedback(msg: string, type: 'success' | 'error' = 'success') {
+  if (feedbackTimer) clearTimeout(feedbackTimer)
   feedbackMessage.value = msg
   feedbackType.value = type
-  setTimeout(() => {
+  feedbackTimer = setTimeout(() => {
     feedbackMessage.value = null
   }, 4000)
 }
 
+// Account & Cloud Sync Handlers
+async function handleManualSync() {
+  if (!authStore.userId) return
+  isManualSyncing.value = true
+  const success = await SyncService.syncOnLogin(authStore.userId, () => {
+    preferencesStore.load()
+  })
+  isManualSyncing.value = false
+  if (success) {
+    showFeedback('Dados sincronizados com o Firestore!')
+  } else {
+    showFeedback('Falha ao sincronizar com a nuvem.', 'error')
+  }
+}
+
+async function executeSignOut() {
+  await authStore.signOutUser()
+  isConfirmSignOutOpen.value = false
+  showFeedback('Conta desconectada com sucesso. Modo visitante ativo.')
+}
+
+// Preferences Handlers
 function handleLevelChange(val: string | number) {
   preferencesStore.setLevel(val as UserLevel)
   showFeedback('Nível atualizado!')
@@ -90,6 +127,16 @@ function handleVibrationToggle(val: boolean) {
   preferencesStore.setToggles(preferencesStore.preferences.soundEnabled, val)
 }
 
+// Tour & Tutorials Handlers
+function handleStartInteractiveTour() {
+  preferencesStore.resetSessionTour()
+  tourStore.startTour()
+  showFeedback('Tour interativo ativado! Redirecionando para a tela Hoje...')
+  setTimeout(() => {
+    router.push('/')
+  }, 700)
+}
+
 function handleReplayOnboarding() {
   preferencesStore.resetOnboarding()
   showFeedback('Tutorial de boas-vindas reiniciado! Redirecionando...')
@@ -103,114 +150,22 @@ function handleReenableSessionTips() {
   showFeedback('Dicas e guia da tela de treino reativados!')
 }
 
-function handleStartInteractiveTour() {
-  preferencesStore.resetSessionTour()
-  tourStore.startTour()
-  showFeedback('Tour interativo ativado! Redirecionando para a tela Hoje...')
-  setTimeout(() => {
-    router.push('/')
-  }, 700)
-}
-
-// Backup Schema para validação rigorosa na importação
-const BackupSchema = z.object({
-  app: z.string().optional(),
-  schemaVersion: z.number().int().max(CURRENT_SCHEMA_VERSION),
-  exportedAt: z.string(),
-  preferences: PreferencesSchema,
-  workouts: z.array(WorkoutSchema),
-  sessions: z.array(SessionSchema),
-})
-
-async function exportBackup() {
-  isExporting.value = true
-  try {
-    const data = {
-      app: 'calistenia',
-      schemaVersion: CURRENT_SCHEMA_VERSION,
-      exportedAt: new Date().toISOString(),
-      preferences: preferencesStore.preferences,
-      workouts: StorageService.getWorkouts(),
-      sessions: StorageService.getSessions(),
-    }
-
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `spectra-backup-${new Date().toISOString().slice(0, 10)}.json`
-    a.click()
-    URL.revokeObjectURL(url)
-
-    showFeedback('Backup JSON exportado com sucesso!')
-  } finally {
-    setTimeout(() => {
-      isExporting.value = false
-    }, 400)
-  }
-}
-
-function triggerImport() {
-  fileInputRef.value?.click()
-}
-
-async function handleFileSelected(event: Event) {
-  const target = event.target as HTMLInputElement
-  const file = target.files?.[0]
-  if (!file) return
-
-  isImporting.value = true
-  try {
-    const text = await file.text()
-    const json = JSON.parse(text)
-
-    // Validação de schema
-    const validation = BackupSchema.safeParse(json)
-    if (!validation.success) {
-      showFeedback('Arquivo de backup inválido ou incompatível com esta versão.', 'error')
-      target.value = ''
-      isImporting.value = false
-      return
-    }
-
-    // Confirmação explícita de substituição
-    const confirm = window.confirm(
-      'Atenção: A restauração substituirá todos os seus treinos, histórico e preferências atuais pelos dados deste backup. Deseja prosseguir?'
-    )
-
-    if (!confirm) {
-      target.value = ''
-      isImporting.value = false
-      return
-    }
-
-    const { preferences, workouts, sessions } = validation.data
-    StorageService.savePreferences(preferences)
-    StorageService.saveWorkouts(workouts)
-    StorageService.saveSessions(sessions)
-
-    showFeedback('Backup restaurado com sucesso! Recarregando...')
-    setTimeout(() => {
-      window.location.reload()
-    }, 1200)
-  } catch {
-    showFeedback('Falha ao processar o arquivo. Verifique o formato JSON.', 'error')
-    isImporting.value = false
-  } finally {
-    target.value = ''
-  }
-}
-
-function openResetConfirm() {
-  isConfirmResetOpen.value = true
-}
-
+// Danger Zone Reset
 function handleConfirmReset() {
   isResetting.value = true
   StorageService.clearAll()
   isConfirmResetOpen.value = false
   window.location.reload()
 }
+
+// 6. Lifecycle
+onMounted(() => {
+  preferencesStore.load()
+})
+
+onUnmounted(() => {
+  if (feedbackTimer) clearTimeout(feedbackTimer)
+})
 </script>
 
 <template>
@@ -219,11 +174,7 @@ function handleConfirmReset() {
     <AppPageHeader
       title="Configurações"
       eyebrow="Preferências &amp; Dados"
-    >
-      <template #badge>
-        <AppStatusBadge type="bodyweight" label="100% Local-first" />
-      </template>
-    </AppPageHeader>
+    />
 
     <!-- Alert / Feedback Notification -->
     <div
@@ -239,6 +190,20 @@ function handleConfirmReset() {
       />
       <span>{{ feedbackMessage }}</span>
     </div>
+
+    <!-- Account & Cloud Sync Card -->
+    <SettingsAccountCard
+      :is-authenticated="authStore.isAuthenticated"
+      :user-display-name="authStore.userDisplayName"
+      :user-email="authStore.userEmail"
+      :user-photo-u-r-l="authStore.userPhotoURL"
+      :sync-status="syncStatus"
+      :last-synced-at="lastSyncedAt"
+      :is-syncing="isManualSyncing"
+      @sync="handleManualSync"
+      @sign-out="isConfirmSignOutOpen = true"
+      @connect-google="authStore.openAuthModal"
+    />
 
     <!-- Experience Level Card -->
     <AppCard title="Nível de Treino" eyebrow="Preferência Padrão" dot-color="primary">
@@ -331,19 +296,29 @@ function handleConfirmReset() {
         </p>
 
         <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-border-grid">
-          <AppButton variant="fill" size="sm" :loading="isExporting" @click="exportBackup">
+          <AppButton
+            variant="fill"
+            size="sm"
+            :loading="isExporting"
+            @click="exportBackup(preferencesStore.preferences)"
+          >
             <AppIcon name="download" :size="16" />
             Exportar Backup JSON
           </AppButton>
 
-          <AppButton variant="outline" size="sm" :loading="isImporting" @click="triggerImport">
+          <AppButton
+            variant="outline"
+            size="sm"
+            :loading="isImporting"
+            @click="triggerImport"
+          >
             <AppIcon name="upload" :size="16" />
             Restaurar Backup JSON
           </AppButton>
 
           <!-- Hidden File Input for import -->
           <input
-            ref="fileInputRef"
+            :ref="(el) => setFileInput(el as HTMLInputElement | null)"
             type="file"
             accept=".json,application/json"
             class="hidden"
@@ -361,7 +336,12 @@ function handleConfirmReset() {
         </p>
 
         <div class="pt-4 border-t border-border-grid">
-          <AppButton variant="danger" size="sm" :loading="isResetting" @click="openResetConfirm">
+          <AppButton
+            variant="danger"
+            size="sm"
+            :loading="isResetting"
+            @click="isConfirmResetOpen = true"
+          >
             <AppIcon name="trash" :size="16" />
             Apagar Todos os Dados
           </AppButton>
@@ -369,7 +349,7 @@ function handleConfirmReset() {
       </div>
     </AppCard>
 
-    <!-- Dialogo Modal de Confirmação Crítica -->
+    <!-- Dialogo Modal de Confirmação Crítica (Reset) -->
     <AppConfirmDialog
       :is-open="isConfirmResetOpen"
       title="Apagar Todos os Dados?"
@@ -381,6 +361,20 @@ function handleConfirmReset() {
       :loading="isResetting"
       @close="isConfirmResetOpen = false"
       @confirm="handleConfirmReset"
+    />
+
+    <!-- Diálogo de Confirmação para Desconectar Conta -->
+    <AppConfirmDialog
+      :is-open="isConfirmSignOutOpen"
+      title="Desconectar Conta?"
+      eyebrow="Conta Google"
+      description="Ao desconectar, seus dados continuarão salvos normalmente neste navegador, mas as novas alterações deixarão de ser sincronizadas com a nuvem até que você faça login novamente."
+      confirm-text="Desconectar"
+      cancel-text="Continuar Conectado"
+      variant="warning"
+      :loading="authStore.isAuthActionLoading"
+      @close="isConfirmSignOutOpen = false"
+      @confirm="executeSignOut"
     />
   </div>
 </template>

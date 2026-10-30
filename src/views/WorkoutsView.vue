@@ -17,7 +17,9 @@ import {
   WorkoutEditorModal,
   WorkoutPreSummaryModal,
   WorkoutScheduleModal,
+  CloudSyncBanner,
 } from '@/components'
+import { useAuthStore } from '@/stores/authStore'
 import { canUserPerformWorkout, getWorkoutRequiredEquipment } from '@/utils/workoutMetrics'
 import type { Workout, WorkoutItem } from '@/types/domain'
 import type { SegmentedOption } from '@/types'
@@ -27,6 +29,7 @@ const route = useRoute()
 const workoutsStore = useWorkoutsStore()
 const preferencesStore = usePreferencesStore()
 const sessionsStore = useSessionsStore()
+const authStore = useAuthStore()
 
 const activeTab = ref<'user' | 'presets'>('user')
 
@@ -218,29 +221,48 @@ function handleSaveSchedule(selectedDayKeys: string[]) {
       eyebrow="Biblioteca de Rotinas"
     >
       <template #actions>
+        <!-- Segmented Tab Toggle (Desktop) -->
+        <AppSegmentedControl
+          :model-value="activeTab"
+          :options="tabOptions"
+          class="hidden sm:block sm:w-auto"
+          @update:model-value="(val) => (activeTab = val as 'user' | 'presets')"
+        />
+
         <AppButton
           v-if="activeTab === 'user'"
           variant="fill"
           size="sm"
-          class="order-2 sm:order-3 shrink-0"
+          class="shrink-0"
           @click="handleNewWorkout"
         >
           <AppIcon name="plus" :size="16" />
           Novo Treino
         </AppButton>
-
-        <!-- Segmented Tab Toggle -->
-        <AppSegmentedControl
-          :model-value="activeTab"
-          :options="tabOptions"
-          class="order-3 sm:order-2 w-full sm:w-auto"
-          @update:model-value="(val) => (activeTab = val as 'user' | 'presets')"
-        />
       </template>
     </AppPageHeader>
 
+    <!-- Segmented Tab Toggle (Mobile) -->
+    <div class="sm:hidden -mt-2">
+      <AppSegmentedControl
+        :model-value="activeTab"
+        :options="tabOptions"
+        @update:model-value="(val) => (activeTab = val as 'user' | 'presets')"
+      />
+    </div>
+
     <!-- User Workouts Tab -->
     <div v-if="activeTab === 'user'" class="space-y-4">
+      <!-- Cloud Sync Suggestion Banner (Momento 2: Rotinas Salvas) -->
+      <CloudSyncBanner
+        v-if="!authStore.isAuthenticated && workoutsStore.workouts.length > 0 && !preferencesStore.isCloudPromptDismissed('workout_created')"
+        variant="card"
+        title="Rotinas salvas neste dispositivo"
+        description="Conecte sua conta Google para salvar seus treinos na nuvem e acessá-los em qualquer celular ou computador."
+        button-text="Salvar com Google"
+        context-key="workout_created"
+      />
+
       <AppEmptyState
         v-if="workoutsStore.workouts.length === 0"
         title="Você ainda não tem treinos criados"

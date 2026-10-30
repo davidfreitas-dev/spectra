@@ -45,6 +45,10 @@ import {
   PersonStanding,
   Spline,
   Leaf,
+  LogOut,
+  Cloud,
+  CloudOff,
+  RefreshCw,
 } from '@lucide/vue'
 
 export const iconMap = {
@@ -97,9 +101,13 @@ export const iconMap = {
   rope: Spline,
   leaf: Leaf,
 
-  // Backup
+  // Backup & Cloud
   download: Download,
   upload: Upload,
+  cloud: Cloud,
+  cloud_off: CloudOff,
+  sync: RefreshCw,
+  logout: LogOut,
 
   // Equipment
   body: PersonStanding,

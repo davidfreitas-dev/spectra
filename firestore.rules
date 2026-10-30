@@ -1,0 +1,83 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Validação de Treinos conforme DOMAIN_LIMITS
+    function isValidWorkout(data) {
+      return data.keys().hasOnly(['id', 'name', 'items', 'createdAt', 'updatedAt'])
+        && data.id is string
+        && data.name is string 
+        && data.name.size() >= 1 && data.name.size() <= 60
+        && data.items is list
+        && data.items.size() >= 1 && data.items.size() <= 30
+        && data.createdAt is string
+        && data.updatedAt is string;
+    }
+
+    // Validação de Preferências
+    function isValidPreferences(data) {
+      return data.keys().hasOnly([
+        'schemaVersion', 'level', 'equipment', 'schedule', 
+        'soundEnabled', 'vibrationEnabled', 'onboardingDone', 'firstSessionTourDone',
+        'cloudPromptsDismissedAt'
+      ])
+      && data.schemaVersion is int
+      && data.level in ['beginner', 'intermediate', 'advanced']
+      && data.equipment is list
+      && data.soundEnabled is bool
+      && data.vibrationEnabled is bool
+      && data.onboardingDone is bool;
+    }
+
+    // Validação de Sessões Concluídas/Parciais
+    function isValidSession(data) {
+      return data.keys().hasOnly([
+        'id', 'workoutId', 'workoutName', 'status', 'startedAt', 'endedAt', 'exercises', 'note'
+      ])
+      && data.id is string
+      && data.status in ['completed', 'partial']
+      && data.exercises is list
+      && data.exercises.size() >= 1 && data.exercises.size() <= 30
+      && (!('note' in data) || (data.note is string && data.note.size() <= 500));
+    }
+
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+
+      // Preferências
+      match /preferences/main {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidPreferences(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      // Treinos personalizados
+      match /workouts/{workoutId} {
+        allow read: if isOwner(userId);
+        allow create, update: if isOwner(userId) && isValidWorkout(request.resource.data);
+        allow delete: if isOwner(userId);
+      }
+
+      // Sessões finalizadas: Imutáveis (sem update)
+      match /sessions/{sessionId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSession(request.resource.data);
+        allow update: if false; // Imutabilidade do histórico garantida
+        allow delete: if isOwner(userId);
+      }
+
+      // Bloqueio explícito de subcoleções desconhecidas
+      match /{allOther=**} {
+        allow read, write: if false;
+      }
+    }
+  }
+}

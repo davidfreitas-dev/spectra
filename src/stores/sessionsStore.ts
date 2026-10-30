@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { StorageService } from '@/services/storageService'
+import { auth } from '@/services/firebase'
+import { SyncService } from '@/services/syncService'
 import { EXERCISE_CATALOG } from '@/data/exercises'
 import { PROGRESSION_RULES } from '@/constants/domain'
 import type {
@@ -220,6 +222,9 @@ export const useSessionsStore = defineStore('sessions', () => {
 
     sessions.value.unshift(finished)
     persistSessions()
+    if (auth?.currentUser?.uid) {
+      SyncService.syncSession(auth.currentUser.uid, finished)
+    }
 
     activeSession.value = null
     persistActiveSession()
@@ -248,6 +253,9 @@ export const useSessionsStore = defineStore('sessions', () => {
 
     sessions.value.unshift(partial)
     persistSessions()
+    if (auth?.currentUser?.uid) {
+      SyncService.syncSession(auth.currentUser.uid, partial)
+    }
 
     activeSession.value = null
     persistActiveSession()
@@ -270,6 +278,9 @@ export const useSessionsStore = defineStore('sessions', () => {
     sessions.value = sessions.value.filter((s) => s.id !== sessionId)
     if (sessions.value.length !== prev) {
       persistSessions()
+      if (auth?.currentUser?.uid) {
+        SyncService.deleteCloudSession(auth.currentUser.uid, sessionId)
+      }
       return true
     }
     return false

@@ -2,6 +2,7 @@
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import AppButton from './AppButton.vue'
 import AppIcon from './AppIcon.vue'
+import { useAuthStore } from '@/stores/authStore'
 
 interface NavItem {
   label: string
@@ -42,6 +43,7 @@ const emit = defineEmits<{
 
 const route = useRoute()
 const router = useRouter()
+const authStore = useAuthStore()
 
 function isItemActive(item: NavItem): boolean {
   if (item.active !== undefined) return item.active
@@ -143,9 +145,34 @@ function handleStartTodayWorkout() {
           </AppButton>
         </div>
 
-        <!-- Settings Button (Secondary Outline Variant, Icon-Only) -->
+        <!-- Settings / Account Button -->
+        <!-- Se autenticado: avatar do usuário com indicador de nuvem (substitui o ícone de engrenagem) -->
+        <button
+          v-if="showUser && authStore.isAuthenticated"
+          type="button"
+          class="relative flex items-center justify-center w-9 h-9 rounded-full border-2 border-border-primary overflow-hidden hover:ring-2 hover:ring-primary/40 transition-all cursor-pointer bg-surface shadow-[0_1.5px_0_0_#111111] shrink-0"
+          title="Minha Conta & Configurações"
+          aria-label="Minha Conta & Configurações"
+          @click="goToSettings"
+        >
+          <img
+            v-if="authStore.userPhotoURL"
+            :src="authStore.userPhotoURL"
+            :alt="authStore.userDisplayName"
+            class="w-full h-full object-cover"
+            referrerpolicy="no-referrer"
+          />
+          <div
+            v-else
+            class="w-full h-full bg-primary-soft text-primary font-bold text-xs flex items-center justify-center"
+          >
+            {{ authStore.userDisplayName.slice(0, 1).toUpperCase() }}
+          </div>
+        </button>
+
+        <!-- Se visitante: botão padrão de engrenagem -->
         <AppButton
-          v-if="showUser"
+          v-else-if="showUser"
           variant="outline"
           size="sm"
           icon-only

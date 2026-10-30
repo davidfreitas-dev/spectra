@@ -10,7 +10,9 @@ import {
   AppButton,
   AppIcon,
   SessionDetailModal,
+  CloudSyncBanner,
 } from '@/components'
+import { useAuthStore } from '@/stores/authStore'
 import { useSessionsStore } from '@/stores/sessionsStore'
 import { usePreferencesStore } from '@/stores/preferencesStore'
 import { EXERCISE_CATALOG } from '@/data/exercises'
@@ -19,6 +21,7 @@ import type { Session, ExerciseCatalogItem } from '@/types/domain'
 const router = useRouter()
 const sessionsStore = useSessionsStore()
 const preferencesStore = usePreferencesStore()
+const authStore = useAuthStore()
 
 // Modal de detalhe da sessão
 const selectedSession = ref<Session | null>(null)
@@ -142,6 +145,16 @@ function calculateSessionDuration(session: Session): string {
       title="Progresso"
       eyebrow="Evolução &amp; Consistência"
       subtitle="Acompanhe seus recordes pessoais, frequência semanal e evolução histórica sem estimativas fictícias."
+    />
+
+    <!-- Cloud Sync Suggestion Banner (Momento 3: Progresso & Longo Prazo) -->
+    <CloudSyncBanner
+      v-if="!authStore.isAuthenticated && sessions.length > 0 && !preferencesStore.isCloudPromptDismissed('progress_view', 14)"
+      variant="banner"
+      title="Mantenha seu histórico e recordes protegidos"
+      description="Seus dados de evolução estão salvos apenas neste navegador. Conecte sua conta Google para salvar tudo na nuvem e nunca perder seu progresso."
+      button-text="Conectar Google"
+      context-key="progress_view"
     />
 
     <!-- Empty State if NO sessions exist yet -->

@@ -34,7 +34,8 @@ useBodyScrollLock(toRef(props, 'isOpen'))
 </script>
 
 <template>
-  <Transition name="modal-pop">
+  <Teleport to="body">
+    <Transition name="modal-pop">
     <div
       v-if="isOpen"
       class="modal-backdrop fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/50 backdrop-blur-xs select-none"
@@ -105,5 +106,6 @@ useBodyScrollLock(toRef(props, 'isOpen'))
       </div>
     </div>
   </div>
-</Transition>
+  </Transition>
+</Teleport>
 </template>

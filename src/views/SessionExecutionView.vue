@@ -17,13 +17,16 @@ import {
   ExerciseDetailModal,
   FirstSessionGuideModal,
   AppSpotlightOverlay,
+  CloudSyncBanner,
 } from '@/components'
+import { useAuthStore } from '@/stores/authStore'
 import type { SessionExercise, ExerciseCatalogItem } from '@/types/domain'
 
 const router = useRouter()
 const sessionsStore = useSessionsStore()
 const preferencesStore = usePreferencesStore()
 const tourStore = useTourStore()
+const authStore = useAuthStore()
 const { requestWakeLock, releaseWakeLock } = useWakeLock()
 const { playTimerComplete, playSetComplete, playCelebration } = useSound()
 const { fireCelebrationBurst } = useConfetti()
@@ -926,6 +929,16 @@ function openExerciseDetail() {
               </div>
             </div>
           </div>
+
+          <!-- Cloud Sync Suggestion Card (Momento 1) -->
+          <CloudSyncBanner
+            v-if="!authStore.isAuthenticated && !preferencesStore.isCloudPromptDismissed('workout_summary')"
+            variant="card"
+            title="Proteja o registro do seu treino"
+            description="Conecte sua conta Google em 1 toque para salvar seu histórico e nunca perder sua evolução caso troque de aparelho."
+            button-text="Salvar com Google"
+            context-key="workout_summary"
+          />
 
           <!-- Notes Textarea -->
           <div class="space-y-1.5 pt-1">

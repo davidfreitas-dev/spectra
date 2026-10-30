@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { StorageService } from '@/services/storageService'
+import { auth } from '@/services/firebase'
+import { SyncService } from '@/services/syncService'
 import { PRESET_WORKOUTS } from '@/data/presetWorkouts'
 import type { Workout, WorkoutItem } from '@/types/domain'
 
@@ -28,6 +30,8 @@ export const useWorkoutsStore = defineStore('workouts', () => {
 
   function saveWorkout(workout: { id?: string; name: string; items: WorkoutItem[] }): Workout {
     const now = new Date().toISOString()
+    let saved: Workout
+
     if (workout.id) {
       const index = workouts.value.findIndex((w) => w.id === workout.id)
       if (index > -1) {
@@ -37,8 +41,12 @@ export const useWorkoutsStore = defineStore('workouts', () => {
           items: workout.items,
           updatedAt: now,
         }
+        saved = workouts.value[index]
         persist()
-        return workouts.value[index]
+        if (auth?.currentUser?.uid) {
+          SyncService.syncWorkout(auth.currentUser.uid, saved)
+        }
+        return saved
       }
     }
 
@@ -51,6 +59,9 @@ export const useWorkoutsStore = defineStore('workouts', () => {
     }
     workouts.value.push(created)
     persist()
+    if (auth?.currentUser?.uid) {
+      SyncService.syncWorkout(auth.currentUser.uid, created)
+    }
     return created
   }
 
@@ -59,6 +70,9 @@ export const useWorkoutsStore = defineStore('workouts', () => {
     workouts.value = workouts.value.filter((w) => w.id !== id)
     if (workouts.value.length !== prevLen) {
       persist()
+      if (auth?.currentUser?.uid) {
+        SyncService.deleteCloudWorkout(auth.currentUser.uid, id)
+      }
       return true
     }
     return false
@@ -82,6 +96,9 @@ export const useWorkoutsStore = defineStore('workouts', () => {
 
     workouts.value.push(duplicate)
     persist()
+    if (auth?.currentUser?.uid) {
+      SyncService.syncWorkout(auth.currentUser.uid, duplicate)
+    }
     return duplicate
   }
 
@@ -103,6 +120,9 @@ export const useWorkoutsStore = defineStore('workouts', () => {
 
     workouts.value.push(copy)
     persist()
+    if (auth?.currentUser?.uid) {
+      SyncService.syncWorkout(auth.currentUser.uid, copy)
+    }
     return copy
   }
 
@@ -114,6 +134,9 @@ export const useWorkoutsStore = defineStore('workouts', () => {
       item.target = newTarget
       workout.updatedAt = new Date().toISOString()
       persist()
+      if (auth?.currentUser?.uid) {
+        SyncService.syncWorkout(auth.currentUser.uid, workout)
+      }
     }
   }
 
@@ -125,6 +148,9 @@ export const useWorkoutsStore = defineStore('workouts', () => {
       item.suggestionDismissedAt = new Date().toISOString()
       workout.updatedAt = new Date().toISOString()
       persist()
+      if (auth?.currentUser?.uid) {
+        SyncService.syncWorkout(auth.currentUser.uid, workout)
+      }
     }
   }
 
